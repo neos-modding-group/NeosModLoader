@@ -99,20 +99,7 @@ namespace NeosModLoader
         private static bool SetVersionString(Engine engine)
         {
             // calculate correct version string
-            string target;
-            if (Engine.ExtraAssemblies.Count == 0)
-            {
-                target = Engine.VersionNumber;
-            }
-            else
-            {
-                //TODO: this is dead code
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append(Engine.VersionNumber);
-                foreach (string extraAssembly in Engine.ExtraAssemblies)
-                    stringBuilder.Append("+" + extraAssembly);
-                target = stringBuilder.ToString();
-            }
+            string target = Engine.VersionNumber;
 
             if (!engine.VersionString.Equals(target))
             {
