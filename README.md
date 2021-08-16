@@ -45,7 +45,7 @@ No. NeosModLoader is required to load mods built against it.
 Yes, **however** other mod loaders are likely to come with LibHarmony, and you need to ensure you only have one. Therefore you may need to remove 0Harmony.dll from your Neos install directory. If the foreign mod loader's LibHarmony version is significantly different from the standard Harmony 2 library, then it will not be compatible with NeosModLoader at all.
 
 ### Can Mods call into other mods?
-Yes. As of NeosModLoader 1.1.0, all mod assemblies are loaded before any mod hooks are called. Mod hooks are called alphabetically by the mod filename, so you can purposefully alter your filename (`aaaa_mod.dll`) to make sure your hooks run first.
+Yes. All mod assemblies are loaded before any mod hooks are called. Mod hooks are called alphabetically by the mod filename, so you can purposefully alter your filename (`aaaa_mod.dll`) to make sure your hooks run first.
 
 ## Making a Mod
 
