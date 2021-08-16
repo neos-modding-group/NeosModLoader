@@ -10,7 +10,7 @@ namespace NeosModLoader
 {
     internal class ModLoader
     {
-        public static readonly string VERSION = "1.1.0";
+        public static readonly string VERSION = "1.2.0";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         internal static Dictionary<Assembly, NeosMod> LoadedMods { get; } = new Dictionary<Assembly, NeosMod>();
 
@@ -25,6 +25,8 @@ namespace NeosModLoader
                 modsToLoad = Directory.GetFiles(modDirectory, "*.dll")
                     .Select(file => new ModAssembly(file))
                     .ToArray();
+
+                Array.Sort(modsToLoad, (a, b) => string.CompareOrdinal(a.File, b.File));
             }
             catch (Exception e)
             {
@@ -103,7 +105,8 @@ namespace NeosModLoader
             if (modClasses.Length == 0)
             {
                 Logger.ErrorInternal($"no mods found in {mod.File}");
-            } else if (modClasses.Length != 1)
+            }
+            else if (modClasses.Length != 1)
             {
                 Logger.ErrorInternal($"more than one mod found in {mod.File}. no mods will be loaded.");
             }

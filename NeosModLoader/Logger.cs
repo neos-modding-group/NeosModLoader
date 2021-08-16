@@ -10,12 +10,18 @@ namespace NeosModLoader
     {
         internal static void DebugExternal(string message)
         {
-            LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
+            if (Configuration.get().Debug)
+            {
+                LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
+            }
         }
 
         internal static void DebugInternal(string message)
         {
-            LogInternal(LogType.DEBUG, message);
+            if (Configuration.get().Debug)
+            {
+                LogInternal(LogType.DEBUG, message);
+            }
         }
 
         internal static void MsgExternal(string message)
@@ -52,11 +58,11 @@ namespace NeosModLoader
         {
             if (source == null)
             {
-                UniLog.Log($"[NeosModLoader][{LogTypeName(logType)}] {message}");
+                UniLog.Log($"{GetTagFromLogType(logType)}[NeosModLoader] {message}");
             }
             else
             {
-                UniLog.Log($"[NeosModLoader/{source}][{LogTypeName(logType)}] {message}");
+                UniLog.Log($"{GetTagFromLogType(logType)}[NeosModLoader/{source}] {message}");
             }
         }
 
@@ -85,15 +91,15 @@ namespace NeosModLoader
             ERROR,
         }
 
-        private static string LogTypeName(LogType logType)
+        private static string GetTagFromLogType(LogType logType)
         {
-            switch(logType)
+            switch (logType)
             {
-                case LogType.DEBUG: return "DEBUG";
-                case LogType.INFO: return "INFO";
-                case LogType.WARN: return "WARN";
-                case LogType.ERROR: return "ERROR";
-                default: return Enum.GetName(typeof(LogType), logType);
+                case LogType.DEBUG: return "[DEBUG]";
+                case LogType.INFO: return "[INFO] ";
+                case LogType.WARN: return "[WARN] ";
+                case LogType.ERROR: return "[ERROR]";
+                default: return $"[{Enum.GetName(typeof(LogType), logType)}]"; // should never happen, but just in case...
             }
         }
     }

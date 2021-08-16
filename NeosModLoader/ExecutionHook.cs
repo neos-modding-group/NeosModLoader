@@ -15,7 +15,7 @@ namespace NeosModLoader
         {
             try
             {
-                Logger.DebugInternal($"NeosModLoader v{ModLoader.VERSION} starting up!");
+                Logger.MsgInternal($"NeosModLoader v{ModLoader.VERSION} starting up!{(Configuration.get().Debug ? " Debug logs will be shown." : "")}");
                 NeosVersionReset.Initialize();
                 ModLoader.LoadMods();
             }

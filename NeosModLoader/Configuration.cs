@@ -33,7 +33,11 @@ namespace NeosModLoader
 
                             if ("unsafe".Equals(key) && "true".Equals(value))
                             {
-                                _configuration.UnsafeMode = true;
+                                _configuration.Unsafe = true;
+                            }
+                            else if ("debug".Equals(key) && "true".Equals(value))
+                            {
+                                _configuration.Debug = true;
                             }
                         }
                     }
@@ -65,6 +69,7 @@ namespace NeosModLoader
             return Path.GetDirectoryName(path);
         }
 
-        public bool UnsafeMode { get; private set; } = true;
+        public bool Unsafe { get; private set; } = false;
+        public bool Debug { get; private set; } = false;
     }
 }

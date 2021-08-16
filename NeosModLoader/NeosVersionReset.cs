@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace NeosModLoader
 {
@@ -25,9 +24,9 @@ namespace NeosModLoader
                 return;
             }
 
-            if (Configuration.get().UnsafeMode)
+            if (Configuration.get().Unsafe)
             {
-                Logger.WarnInternal("Unsafe mode is on! Beware of using plugin components in multiplayer!");
+                Logger.WarnInternal("Unsafe mode is on! Version will be reset even if other plugins are detected! Beware of using plugin components in multiplayer!");
                 extraAssemblies.Clear();
             }
             else if (extraAssemblies.Count != 0)
