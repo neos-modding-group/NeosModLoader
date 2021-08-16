@@ -10,12 +10,18 @@ namespace NeosModLoader
 {
     internal class ModLoader
     {
-        public static readonly string VERSION = "1.2.0";
+        public static readonly string VERSION = "1.2.1";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         internal static Dictionary<Assembly, NeosMod> LoadedMods { get; } = new Dictionary<Assembly, NeosMod>();
 
         internal static void LoadMods()
         {
+            if (Configuration.get().NoMods)
+            {
+                Logger.DebugInternal("mods will not be loaded due to configuration file");
+                return;
+            }
+
             string modDirectory = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName + "\\nml_mods";
             Logger.DebugInternal($"loading mods from {modDirectory}");
 

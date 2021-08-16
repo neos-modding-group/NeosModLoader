@@ -109,3 +109,16 @@ It showcases the following:
 - A valid Visual Studio project setup
 - Using LibHarmony to patch a Neos method
 - Using Unity to alter all existing GameObjects of a certain type
+
+### Configuration
+NeosModLoader aims to have a reasonable default configuration, but certain things can be changed via a config file.
+The `NeosModLoader.config` file should be placed in the same directory as `NeosModLoader.dll`, and contains keys and values in the following format:
+```
+debug=true
+nomods=false
+```
+
+| Configuration | Default | Description |
+| --- | --- | --- |
+| `debug` | `false` | if `true`, NeosMod.Debug() logs will appear in your log file. Otherwise, they are hidden. |
+| `nomods` | `false` | if `true`, mods will not be loaded. |
