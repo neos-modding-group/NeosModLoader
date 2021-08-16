@@ -15,7 +15,7 @@ namespace NeosModLoader
             if (_configuration == null)
             {
                 // the config file can just sit next to the dll. Simple.
-                string path = string.Format("{0}\\{1}", GetAssemblyDirectory(), CONFIG_FILENAME);
+                string path = $"{GetAssemblyDirectory()}\\{CONFIG_FILENAME}";
                 _configuration = new Configuration();
 
                 // .NET's ConfigurationManager is some hot trash to the point where I'm just done with it.
@@ -42,7 +42,7 @@ namespace NeosModLoader
                 {
                     if (e is FileNotFoundException)
                     {
-                        Logger.MsgInternal(string.Format("{0} is missing! This is probably fine.", CONFIG_FILENAME));
+                        Logger.MsgInternal($"{CONFIG_FILENAME} is missing! This is probably fine.");
                     }
                     else if (e is DirectoryNotFoundException || e is IOException || e is UnauthorizedAccessException)
                     {

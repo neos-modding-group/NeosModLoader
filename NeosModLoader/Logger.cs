@@ -52,11 +52,11 @@ namespace NeosModLoader
         {
             if (source == null)
             {
-                UniLog.Log(string.Format("[NeosModLoader][{0}] {1}", LogTypeName(logType), message));
+                UniLog.Log($"[NeosModLoader][{LogTypeName(logType)}] {message}");
             }
             else
             {
-                UniLog.Log(string.Format("[NeosModLoader/{0}][{1}] {2}", source, LogTypeName(logType), message));
+                UniLog.Log($"[NeosModLoader/{source}][{LogTypeName(logType)}] {message}");
             }
         }
 

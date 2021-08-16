@@ -10,13 +10,14 @@ namespace NeosModLoader
 {
     internal class ModLoader
     {
+        public static readonly string VERSION = "1.1.0";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         internal static Dictionary<Assembly, NeosMod> LoadedMods { get; } = new Dictionary<Assembly, NeosMod>();
 
         internal static void LoadMods()
         {
             string modDirectory = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName + "\\nml_mods";
-            Logger.DebugInternal(string.Format("loading mods from {0}", modDirectory));
+            Logger.DebugInternal($"loading mods from {modDirectory}");
 
             ModAssembly[] modsToLoad = null;
             try
@@ -36,12 +37,12 @@ namespace NeosModLoader
                     }
                     catch (Exception e2)
                     {
-                        Logger.ErrorInternal(string.Format("Error creating mod directory:\n{0}\n{1}", e2.ToString(), e2.StackTrace.ToString()));
+                        Logger.ErrorInternal($"Error creating mod directory:\n{e2}");
                     }
                 }
                 else
                 {
-                    Logger.ErrorInternal(string.Format("Error enumerating mod directory:\n{0}\n{1}", e.ToString(), e.StackTrace.ToString()));
+                    Logger.ErrorInternal($"Error enumerating mod directory:\n{e}");
                 }
                 return;
             }
@@ -54,7 +55,7 @@ namespace NeosModLoader
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorInternal(string.Format("Unexpected exception loading mod assembly from {0}:\n{1}\n{2}", mod.File, e.ToString(), e.StackTrace.ToString()));
+                    Logger.ErrorInternal($"Unexpected exception loading mod assembly from {mod.File}:\n{e}");
                 }
             }
 
@@ -66,7 +67,7 @@ namespace NeosModLoader
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorInternal(string.Format("Unexpected exception loading mod from {0}:\n{1}\n{2}", mod.File, e.ToString(), e.StackTrace.ToString()));
+                    Logger.ErrorInternal($"Unexpected exception loading mod from {mod.File}:\n{e}");
                 }
             }
         }
@@ -80,12 +81,12 @@ namespace NeosModLoader
             }
             catch (Exception e)
             {
-                Logger.ErrorInternal(string.Format("error loading assembly from {0}: {1}", mod.File, e.ToString()));
+                Logger.ErrorInternal($"error loading assembly from {mod.File}: {e}");
                 return;
             }
             if (assembly == null)
             {
-                Logger.ErrorInternal(string.Format("unexpected null loading assembly from {0}", mod.File));
+                Logger.ErrorInternal($"unexpected null loading assembly from {mod.File}");
                 return;
             }
             mod.Assembly = assembly;
@@ -101,10 +102,10 @@ namespace NeosModLoader
             Type[] modClasses = mod.Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && NEOS_MOD_TYPE.IsAssignableFrom(t)).ToArray();
             if (modClasses.Length == 0)
             {
-                Logger.ErrorInternal(string.Format("no mods found in {0}", mod.File));
+                Logger.ErrorInternal($"no mods found in {mod.File}");
             } else if (modClasses.Length != 1)
             {
-                Logger.ErrorInternal(string.Format("more than one mod found in {0}. no mods will be loaded.", mod.File));
+                Logger.ErrorInternal($"more than one mod found in {mod.File}. no mods will be loaded.");
             }
             else
             {
@@ -116,23 +117,23 @@ namespace NeosModLoader
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorInternal(string.Format("error instantiating mod {0} from {1}:\n{2}\n{3}", modClass.FullName, mod.File, e.ToString(), e.StackTrace.ToString()));
+                    Logger.ErrorInternal($"error instantiating mod {modClass.FullName} from {mod.File}:\n{e}");
                     return;
                 }
                 if (neosMod == null)
                 {
-                    Logger.ErrorInternal(string.Format("unexpected null instantiating mod {0} from {1}", modClass.FullName, mod.File));
+                    Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.File}");
                     return;
                 }
                 LoadedMods.Add(mod.Assembly, neosMod);
-                Logger.MsgInternal(string.Format("loaded mod {0} {1} from {2}", neosMod.Name, neosMod.Version, mod.File));
+                Logger.MsgInternal($"loaded mod {neosMod.Name} {neosMod.Version} from {mod.File}");
                 try
                 {
                     neosMod.OnEngineInit();
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorInternal(string.Format("mod {0} from {1} threw error from OnEngineInit():\n{2}\n{3}", modClass.FullName, mod.File, e.ToString(), e.StackTrace.ToString()));
+                    Logger.ErrorInternal($"mod {modClass.FullName} from {mod.File} threw error from OnEngineInit():\n{e}");
                 }
             }
         }

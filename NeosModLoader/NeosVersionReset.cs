@@ -40,7 +40,7 @@ namespace NeosModLoader
             int? vanillaProtocolVersionMaybe = GetVanillaProtocolVersion();
             if (vanillaProtocolVersionMaybe is int vanillaProtocolVersion)
             {
-                Logger.DebugInternal(string.Format("vanilla protocol version is {0}", vanillaProtocolVersion));
+                Logger.DebugInternal($"vanilla protocol version is {vanillaProtocolVersion}");
                 vanillaCompatibilityHash = CalculateCompatibilityHash(vanillaProtocolVersion);
             }
             else
@@ -82,7 +82,7 @@ namespace NeosModLoader
             // This is super sketchy and liable to break with new compiler versions.
             // I have a good reason for doing it though... if I just called the setter it would recursively
             // end up calling itself, because I'm HOOKINGthe CompatibilityHash setter.
-            FieldInfo field = AccessTools.DeclaredField(typeof(Engine), string.Format("<{0}>k__BackingField", nameof(Engine.CompatibilityHash)));
+            FieldInfo field = AccessTools.DeclaredField(typeof(Engine), $"<{nameof(Engine.CompatibilityHash)}>k__BackingField");
 
             if (field == null)
             {
@@ -91,7 +91,7 @@ namespace NeosModLoader
             }
             else
             {
-                Logger.DebugInternal(string.Format("changing compatibility hash from {0} to {1}", engine.CompatibilityHash, Target));
+                Logger.DebugInternal($"changing compatibility hash from {engine.CompatibilityHash} to {Target}");
                 field.SetValue(engine, Target);
                 return true;
             }
@@ -109,7 +109,7 @@ namespace NeosModLoader
                     Logger.WarnInternal("unable to write Engine._versionString");
                     return false;
                 }
-                Logger.DebugInternal(string.Format("changing version string from {0} to {1}", engine.VersionString, target));
+                Logger.DebugInternal($"changing version string from {engine.VersionString} to {target}");
                 field.SetValue(engine, target);
             }
             return true;

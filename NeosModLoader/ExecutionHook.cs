@@ -15,13 +15,13 @@ namespace NeosModLoader
         {
             try
             {
-                Logger.DebugInternal("execution hook running");
+                Logger.DebugInternal($"NeosModLoader v{ModLoader.VERSION} starting up!");
                 NeosVersionReset.Initialize();
                 ModLoader.LoadMods();
             }
             catch (Exception e) // it's important that this doesn't send exceptions back to Neos
             {
-                Logger.ErrorInternal(string.Format("Exception in execution hook!\n{0}\n{1}", e.ToString(), e.StackTrace.ToString()));
+                Logger.ErrorInternal($"Exception in execution hook!\n{e}");
             }
         }
 
