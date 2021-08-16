@@ -24,16 +24,20 @@ If you are trying to modify Neos's existing behavior without adding any new comp
 
 ### What does NeosModLoader do?
 NeosModLoader is simply a Neos [plugin](https://wiki.neos.com/Plugins) that does a lot of the boilerplate necessary to get mods working in a reasonable way. In summary, it:
-1. Forces Neos to initialize it earlier than a normal plugin with a sneaky hook
-1. Ensures that Neos's compatibility check doesn't prevent you from joining other players
-1. Loads mod .dll files and calls their `OnEngineInit()` function so the mods can begin executing
+1. Initializes earlier than a normal plugin
+2. Ensures that Neos's compatibility check doesn't prevent you from joining other players. For safety reasons this will only work if NeosModLoader is the only plugin.
+3. Loads mod .dll files and calls their `OnEngineInit()` function so the mods can begin executing
+
+### I can't join sessions because my version doesn't match!
+Make sure NeosModLoader is the only plugin being loaded. For safety reasons NeosModLoader will only bypass the plugin compatibility check for itself, not other plugins.
 
 ### Does NeosModLoader violate the Neos Guidelines?
-No. As per the [guidelines](https://docs.google.com/document/d/1mqdbIvbj1b2LeFhNzfAASeTpRZk6vmbXISYLdTXTVR4/edit#) plugins are specifically allowed.
+Sort answer: maybe?  
+Long answer: [see here](doc/neos_guidelines.md).
 
 ### Why build a custom mod loader?
-1. Neos Plugins do not break the Neos Guidelines. While using a generic Unity mod loader probably won't get you into trouble, it's technically against the guidelines.
-1. As Neos Plugins are officially supported we can expect them to continue working even through major engine changes, for example if Neos ever switches to a non-Unity engine.
+1. Neos Plugins are given extra protections in the [Neos Guidelines](https://docs.google.com/document/d/1mqdbIvbj1b2LeFhNzfAASeTpRZk6vmbXISYLdTXTVR4/edit), and those same protections are not extended to a generic Unity mod loader.
+2. As Neos Plugins are officially supported we can expect them to continue working even through major engine changes, for example if Neos ever switches to a non-Unity engine.
 
 ### Can NeosModLoader load Neos plugins?
 No. You need to use `-LoadAssembly <path>` to load plugins. There is important plugin handling code that does not run for NeosModLoader mods.
@@ -51,9 +55,9 @@ Yes. All mod assemblies are loaded before any mod hooks are called. Mod hooks ar
 
 ### Basic Visual Studio setup
 1. Make a new .NET library against .NET version 4.6.2. You can use 4.7.2 if you absolutely need it in order to compile, but some features may not work.
-1. Add NeosModLoader.dll as a reference.
-1. Add references to Neos libraries as needed (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Neos_Data\Managed`)
-1. Remove the reference to `System.Net.Http` as it will make the compiler angry
+2. Add NeosModLoader.dll as a reference.
+3. Add references to Neos libraries as needed (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Neos_Data\Managed`)
+4. Remove the reference to `System.Net.Http` as it will make the compiler angry
 
 ### Hooks
 #### `OnEngineInit()`
