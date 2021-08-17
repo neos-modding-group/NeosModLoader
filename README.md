@@ -50,8 +50,10 @@ If you are trying to modify Neos's existing behavior without adding any new comp
 - Neos Plugins can normally execute when Local Home loads at the earliest. NeosModLoader begins executing significantly earlier, giving you more room to alter Neos's behavior before it finishes initializing.
 - Steam has a relatively small character limit on launch options, and every Neos plugin you install pushes you closer to that limit. Having more than a handful plugins will therefore prevent you from using Steam to launch the game, and NeosModLoader is unaffected by this issue.
 
-### Can Mods call into other mods?
-Yes. All mod assemblies are loaded before any mod hooks are called. Mod hooks are called alphabetically by the mod filename, so you can purposefully alter your filename (`aaaa_mod.dll`) to make sure your hooks run first.
+### Can mods depend on other mods?
+Yes. All mod assemblies are loaded before any mod hooks are called, so no special setup is needed if your mod provides public methods.
+
+Mod hooks are called alphabetically by the mod filename, so you can purposefully alter your filename (`0_mod.dll`) to make sure your hooks run first.
 
 ### Can NeosModLoader load Neos plugins?
 No. You need to use `-LoadAssembly <path>` to load plugins. There is important plugin handling code that does not run for NeosModLoader mods.
