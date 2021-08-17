@@ -54,15 +54,15 @@ namespace NeosModLoader
             LogInternal(LogType.ERROR, message);
         }
 
-        private static void LogInternal(LogType logType, string message, string source = null)
+        private static void LogInternal(string logTypePrefix, string message, string source = null)
         {
             if (source == null)
             {
-                UniLog.Log($"{GetTagFromLogType(logType)}[NeosModLoader] {message}");
+                UniLog.Log($"{logTypePrefix}[NeosModLoader] {message}");
             }
             else
             {
-                UniLog.Log($"{GetTagFromLogType(logType)}[NeosModLoader/{source}] {message}");
+                UniLog.Log($"{logTypePrefix}[NeosModLoader/{source}] {message}");
             }
         }
 
@@ -83,24 +83,12 @@ namespace NeosModLoader
             return null;
         }
 
-        private enum LogType
+        private sealed class LogType
         {
-            DEBUG,
-            INFO,
-            WARN,
-            ERROR,
-        }
-
-        private static string GetTagFromLogType(LogType logType)
-        {
-            switch (logType)
-            {
-                case LogType.DEBUG: return "[DEBUG]";
-                case LogType.INFO: return "[INFO] ";
-                case LogType.WARN: return "[WARN] ";
-                case LogType.ERROR: return "[ERROR]";
-                default: return $"[{Enum.GetName(typeof(LogType), logType)}]"; // should never happen, but just in case...
-            }
+            public readonly static string DEBUG = "[DEBUG]";
+            public readonly static string INFO = "[INFO] ";
+            public readonly static string WARN = "[WARN] ";
+            public readonly static string ERROR = "[ERROR]";
         }
     }
 }
