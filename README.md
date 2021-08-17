@@ -51,6 +51,14 @@ Yes, **however** other mod loaders are likely to come with LibHarmony, and you n
 ### Can Mods call into other mods?
 Yes. All mod assemblies are loaded before any mod hooks are called. Mod hooks are called alphabetically by the mod filename, so you can purposefully alter your filename (`aaaa_mod.dll`) to make sure your hooks run first.
 
+### Are Mods safe? 
+Mods are not sandboxed in any way. In other words, they run with the same level of privilege as Neos itself. A poorly written mod could cause performance or stability issues. A maliciously designed mod could give a malicious actor a dangerous level of control over your computer. **Make sure you only use mods from sources you trust.**
+
+If you aren't sure if you can trust a mod and you have some level of ability to read code, you can look at its source code. If the source code is unavailable or you suspect it may differ from the contents of the .dll file, you can inspect the mod with a [C# decompiler](https://www.google.com/search?q=c%23+decompiler). Things to be particularly wary of include:
+- Obfuscated code
+- Sending or receiving data over the internet
+- Interacting with the file system (reading, writing, or executing files from disk)
+
 ## Making a Mod
 
 ### Basic Visual Studio setup
