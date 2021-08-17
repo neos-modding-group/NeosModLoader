@@ -13,15 +13,6 @@ A mod loader for [Neos VR](https://neos.com/).
 A list of known mods is available [here](https://github.com/zkxs/neos-mod-list/blob/master/README.md)!
 
 ## FAQ
-### As a mod developer, why should I use NeosModLoader over a Neos Plugin?
-If you are just trying to make a new component or logix node, you should use a plugin. The plugin system is specifically designed for that.
-
-If you are trying to modify Neos's existing behavior without adding any new components, NeosModLoader offers the following:
-- [LibHarmony](https://github.com/pardeike/Harmony) is a dependency of NeosModLoader, so as a mod developer you don't need to worry about making sure it's installed
-- Neos Plugins normally break multiplayer compatibility. The NeosModLoader plugin has been specifically designed to remain compatible. This feature will only work if NeosModLoader.dll is the *only* plugin you are using.
-- Neos Plugins can normally execute when Local Home loads at the earliest. NeosModLoader uses a special hooking technique to begin executing significantly earlier, giving you more room to alter Neos's behavior before it finishes initializing.
-- Steam has a relatively small character limit on launch options, and every Neos plugin you install pushes you closer to that limit. Having more than a few plugins is impossible for this reason, but there's no limit on how many mods NeosModLoader can load.
-
 ### What does NeosModLoader do?
 NeosModLoader is simply a Neos [plugin](https://wiki.neos.com/Plugins) that does a lot of the boilerplate necessary to get mods working in a reasonable way. In summary, it:
 1. Initializes earlier than a normal plugin
@@ -35,22 +26,6 @@ Make sure NeosModLoader is the only plugin being loaded. For safety reasons Neos
 Sort answer: maybe?  
 Long answer: [see here](doc/neos_guidelines.md).
 
-### Why build a custom mod loader?
-1. Neos Plugins are given extra protections in the [Neos Guidelines](https://docs.google.com/document/d/1mqdbIvbj1b2LeFhNzfAASeTpRZk6vmbXISYLdTXTVR4/edit), and those same protections are not extended to a generic Unity mod loader.
-2. As Neos Plugins are officially supported we can expect them to continue working even through major engine changes, for example if Neos ever switches to a non-Unity engine.
-
-### Can NeosModLoader load Neos plugins?
-No. You need to use `-LoadAssembly <path>` to load plugins. There is important plugin handling code that does not run for NeosModLoader mods.
-
-### Can Neos load NeosModLoader mods as plugins?
-No. NeosModLoader is required to load mods built against it.
-
-### Is NeosModLoader compatible with other mod loaders?
-Yes, **however** other mod loaders are likely to come with LibHarmony, and you need to ensure you only have one. Therefore you may need to remove 0Harmony.dll from your Neos install directory. If the foreign mod loader's LibHarmony version is significantly different from the standard Harmony 2 library, then it will not be compatible with NeosModLoader at all.
-
-### Can Mods call into other mods?
-Yes. All mod assemblies are loaded before any mod hooks are called. Mod hooks are called alphabetically by the mod filename, so you can purposefully alter your filename (`aaaa_mod.dll`) to make sure your hooks run first.
-
 ### Are Mods safe? 
 Mods are not sandboxed in any way. In other words, they run with the same level of privilege as Neos itself. A poorly written mod could cause performance or stability issues. A maliciously designed mod could give a malicious actor a dangerous level of control over your computer. **Make sure you only use mods from sources you trust.**
 
@@ -58,6 +33,31 @@ If you aren't sure if you can trust a mod and you have some level of ability to 
 - Obfuscated code
 - Sending or receiving data over the internet
 - Interacting with the file system (reading, writing, or executing files from disk)
+
+### Is NeosModLoader compatible with other mod loaders?
+Yes, **however** other mod loaders are likely to come with LibHarmony, and you need to ensure you only have one. Therefore you may need to remove 0Harmony.dll from your Neos install directory. If the foreign mod loader's LibHarmony version is significantly different from the standard Harmony 2 library, then it will not be compatible with NeosModLoader at all.
+
+### Why build a custom mod loader?
+1. Neos Plugins are given extra protections in the [Neos Guidelines](https://docs.google.com/document/d/1mqdbIvbj1b2LeFhNzfAASeTpRZk6vmbXISYLdTXTVR4/edit), and those same protections are not extended to a generic Unity mod loader.
+2. As Neos Plugins are officially supported we can expect them to continue working even through major engine changes, for example if Neos ever switches to a non-Unity engine.
+
+### As a mod developer, why should I use NeosModLoader over a Neos Plugin?
+If you are just trying to make a new component or logix node, you should use a plugin. The plugin system is specifically designed for that.
+
+If you are trying to modify Neos's existing behavior without adding any new components, NeosModLoader offers the following:
+- [LibHarmony](https://github.com/pardeike/Harmony) is a dependency of NeosModLoader, so as a mod developer you don't need to worry about making sure it's installed
+- Neos Plugins normally break multiplayer compatibility. The NeosModLoader plugin has been specifically designed to remain compatible. This feature will only work if NeosModLoader.dll is the *only* plugin you are using.
+- Neos Plugins can normally execute when Local Home loads at the earliest. NeosModLoader begins executing significantly earlier, giving you more room to alter Neos's behavior before it finishes initializing.
+- Steam has a relatively small character limit on launch options, and every Neos plugin you install pushes you closer to that limit. Having more than a handful plugins will therefore prevent you from using Steam to launch the game, and NeosModLoader is unaffected by this issue.
+
+### Can Mods call into other mods?
+Yes. All mod assemblies are loaded before any mod hooks are called. Mod hooks are called alphabetically by the mod filename, so you can purposefully alter your filename (`aaaa_mod.dll`) to make sure your hooks run first.
+
+### Can NeosModLoader load Neos plugins?
+No. You need to use `-LoadAssembly <path>` to load plugins. There is important plugin handling code that does not run for NeosModLoader mods.
+
+### Are NeosModLoader mods plugins?
+No. NeosModLoader mods will not work if used as a Neos plugin.
 
 ## Making a Mod
 
