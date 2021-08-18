@@ -83,7 +83,7 @@ My opinion is yes, mods are healthy for the game. You might have deduced this fr
 ## The Pros
 - Tomorrow's quality of life improvements, today. Sometimes the Neos team needs to direct their efforts elsewhere. Allowing the community to make temporary fixes pending a permanent solution is an easy win. Example: [MotionBlurDisable](https://github.com/zkxs/MotionBlurDisable), which won't be implemented in Neos until a full Settings redesign.
 - Mods let power users opt in to warranty-voiding tools. Sometimes a desired feature has a very niche audience and risks breaking in the future. But at the same time it can be very useful in the present. Example: [ExportNeosToJson](https://github.com/zkxs/ExportNeosToJson).
-- The classic "if you outlaw guns only outlaws will have guns" argument. Example: <ins>redacted</ins>.
+- The classic "if you outlaw guns only outlaws will have guns" argument. Example: \[redacted\].
 <!-- - Potential to improve the game. If the planets align, what was once a mod could be integrated into the game proper. But let's be honest, it's going to be easier for Froox to build the feature himself than porting some random garbage code in from a mod... -->
 <!-- - Possible source of new developers. If you're hiring someone to program for Neos... why not hire someone who's *already* programming for Neos? -->
 
