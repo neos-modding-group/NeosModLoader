@@ -22,11 +22,23 @@ NeosModLoader is simply a Neos [plugin](https://wiki.neos.com/Plugins) that does
 ### I can't join sessions because my version doesn't match!
 Make sure NeosModLoader is the only plugin being loaded. For safety reasons NeosModLoader will only bypass the plugin compatibility check for itself, not other plugins.
 
+### Something is broken! Where can I get help?
+1. Check the logs (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Logs`) for clues as to what is going wrong.
+2. Disable NeosModLoader by removing the `-LoadAssembly <path>` launch option. If Neos is still having problems while unmodified, you can get support on the [Neos Discord](https://discordapp.com/invite/GQ92NUu5). You should not ask the Neos Discord for help with mods.
+3. If you only experience the problem while modded, try uninstalling all of your mods and re-installing them one by one. Once you find the problematic mod reach out it its developers.
+4. If you are having an issue with NeosModLoader itself, please open [an issue](https://github.com/zkxs/NeosModLoader/issues).
+
 ### Does NeosModLoader violate the Neos Guidelines?
 Sort answer: maybe?  
 Long answer: [see here](doc/neos_guidelines.md).
 
-### Are Mods safe? 
+### Will people know I'm using mods?
+- NeosModLoader itself does not do anything identifiable over the network. You will appear to be running the vanilla Neos version to any component that shows your version strings or compatibility hash.
+- If you are running other plugins, they will alter your version strings and compatibility hash.
+- NeosModLoader logs to the same log file Neos uses. If you send your logs to anyone it will be obvious that you are using a plugin. This is intended.
+- NeosModLoader mods may have effects visible to other users, depending on the mod.
+
+### Are mods safe? 
 Mods are not sandboxed in any way. In other words, they run with the same level of privilege as Neos itself. A poorly written mod could cause performance or stability issues. A maliciously designed mod could give a malicious actor a dangerous level of control over your computer. **Make sure you only use mods from sources you trust.**
 
 If you aren't sure if you can trust a mod and you have some level of ability to read code, you can look at its source code. If the source code is unavailable or you suspect it may differ from the contents of the .dll file, you can inspect the mod with a [C# decompiler](https://www.google.com/search?q=c%23+decompiler). Things to be particularly wary of include:
@@ -34,10 +46,13 @@ If you aren't sure if you can trust a mod and you have some level of ability to 
 - Sending or receiving data over the internet
 - Interacting with the file system (reading, writing, or executing files from disk)
 
+### Where does NeosModLoader log to?
+The regular Neos logs: `C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Logs`
+
 ### Is NeosModLoader compatible with other mod loaders?
 Yes, **however** other mod loaders are likely to come with LibHarmony, and you need to ensure you only have one. Therefore you may need to remove 0Harmony.dll from your Neos install directory. If the foreign mod loader's LibHarmony version is significantly different from the standard Harmony 2 library, then it will not be compatible with NeosModLoader at all.
 
-### Why build a custom mod loader?
+### Why did you build a custom mod loader for Neos?
 1. Neos Plugins are given extra protections in the [Neos Guidelines](https://docs.google.com/document/d/1mqdbIvbj1b2LeFhNzfAASeTpRZk6vmbXISYLdTXTVR4/edit), and those same protections are not extended to a generic Unity mod loader.
 2. As Neos Plugins are officially supported we can expect them to continue working even through major engine changes, for example if Neos ever switches to a non-Unity engine.
 
@@ -62,7 +77,7 @@ No. You need to use `-LoadAssembly <path>` to load plugins. There is important p
 No. NeosModLoader mods will not work if used as a Neos plugin.
 
 ## Making a Mod
-
+If you have some level of familiarity with C#, getting started making mods should not be too difficult.
 ### Basic Visual Studio setup
 1. Make a new .NET library against .NET version 4.6.2. You can use 4.7.2 if you absolutely need it in order to compile, but some features may not work.
 2. Add NeosModLoader.dll as a reference.
@@ -124,7 +139,13 @@ It showcases the following:
 - Using LibHarmony to patch a Neos method
 - Using Unity to alter all existing GameObjects of a certain type
 
-### Configuration
+### Additional Resources
+- [Quick C# Refresher](https://learnxinyminutes.com/docs/csharp/)
+- [LibHarmony Documentation](https://harmony.pardeike.net/)
+- [Unity API Documentation](https://docs.unity3d.com/ScriptReference/index.html)
+- [Neos Plugin Wiki Page](https://wiki.neos.com/Plugins)
+
+## Configuration
 NeosModLoader aims to have a reasonable default configuration, but certain things can be changed via a config file.
 The `NeosModLoader.config` file should be placed in the same directory as `NeosModLoader.dll`, and contains keys and values in the following format:
 ```
@@ -133,6 +154,6 @@ nomods=false
 ```
 
 | Configuration | Default | Description |
-| --- | --- | --- |
-| `debug` | `false` | if `true`, NeosMod.Debug() logs will appear in your log file. Otherwise, they are hidden. |
-| `nomods` | `false` | if `true`, mods will not be loaded. |
+| ------------- | ------- | ----------- |
+| `debug`       | `false` | if `true`, NeosMod.Debug() logs will appear in your log file. Otherwise, they are hidden. |
+| `nomods`      | `false` | if `true`, mods will not be loaded. |
