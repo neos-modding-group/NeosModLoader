@@ -15,45 +15,32 @@ namespace NeosModLoader
     {
         internal static void Initialize()
         {
+            Configuration config = Configuration.get();
             Engine engine = Engine.Current;
+
             List<string> extraAssemblies = Engine.ExtraAssemblies;
+            bool nmlPresent = extraAssemblies.Contains("NeosModLoader.dll");
 
-            if (!extraAssemblies.Remove("NeosModLoader.dll"))
+            if (!nmlPresent)
             {
-                Logger.ErrorInternal("assertion failed: Engine.ExtraAssemblies did not contain NeosModLoader.dll");
-                return;
+                throw new Exception("assertion failed: Engine.ExtraAssemblies did not contain NeosModLoader.dll");
             }
 
-            if (Configuration.get().Unsafe)
+            bool otherPluginsPresent = extraAssemblies.Count > 1;
+            bool shouldSpoofCompatibility = !otherPluginsPresent || config.Unsafe;
+            bool shouldSpoofVersion = !config.AdvertiseVersion && shouldSpoofCompatibility;
+
+            bool success = true;
+            if (shouldSpoofVersion)
             {
-                Logger.WarnInternal("Unsafe mode is on! Version will be reset even if other plugins are detected! Beware of using plugin components in multiplayer!");
+                // we intentionally attempt to set the version string first, so if it fails the compatibilty hash is left on the original value
+                // this is to prevent the case where a player simply doesn't know their version string is wrong
                 extraAssemblies.Clear();
+                success = SpoofVersionString(engine);
             }
-            else if (extraAssemblies.Count != 0)
+            if (success && shouldSpoofCompatibility)
             {
-                Logger.ErrorInternal("NeosModLoader.dll must be your only plugin to keep multiplayer compatibility!");
-                return;
-            }
-
-            string vanillaCompatibilityHash;
-            int? vanillaProtocolVersionMaybe = GetVanillaProtocolVersion();
-            if (vanillaProtocolVersionMaybe is int vanillaProtocolVersion)
-            {
-                Logger.DebugInternal($"vanilla protocol version is {vanillaProtocolVersion}");
-                vanillaCompatibilityHash = CalculateCompatibilityHash(vanillaProtocolVersion);
-            }
-            else
-            {
-                Logger.ErrorInternal("unable to determine vanilla protocol version");
-                return;
-            }
-
-            // we intentionally attempt to set the version string first, so if it fails the compatibilty hash is left on the original value
-            // this is to prevent the case where a player simply doesn't know their version string is wrong
-            bool success = SetVersionString(engine);
-            if (success)
-            {
-                success = SetCompatibilityHash(engine, vanillaCompatibilityHash);
+                success = SpoofCompatibilityHash(engine);
             }
             if (success)
             {
@@ -62,6 +49,23 @@ namespace NeosModLoader
             else
             {
                 Logger.WarnInternal("version spoofing failed");
+            }
+        }
+
+        private static bool SpoofCompatibilityHash(Engine engine)
+        {
+            string vanillaCompatibilityHash;
+            int? vanillaProtocolVersionMaybe = GetVanillaProtocolVersion();
+            if (vanillaProtocolVersionMaybe is int vanillaProtocolVersion)
+            {
+                Logger.DebugInternal($"vanilla protocol version is {vanillaProtocolVersion}");
+                vanillaCompatibilityHash = CalculateCompatibilityHash(vanillaProtocolVersion);
+                return SetCompatibilityHash(engine, vanillaCompatibilityHash);
+            }
+            else
+            {
+                Logger.ErrorInternal("unable to determine vanilla protocol version");
+                return false;
             }
         }
 
@@ -95,7 +99,8 @@ namespace NeosModLoader
                 return true;
             }
         }
-        private static bool SetVersionString(Engine engine)
+
+        private static bool SpoofVersionString(Engine engine)
         {
             // calculate correct version string
             string target = Engine.VersionNumber;

@@ -33,10 +33,11 @@ Sort answer: maybe?
 Long answer: [see here](doc/neos_guidelines.md).
 
 ### Will people know I'm using mods?
-- NeosModLoader itself does not do anything identifiable over the network. You will appear to be running the vanilla Neos version to any component that shows your version strings or compatibility hash.
+- By default, NeosModLoader does not do anything identifiable over the network. You will appear to be running the vanilla Neos version to any component that shows your version strings or compatibility hash.
 - If you are running other plugins, they will alter your version strings and compatibility hash.
 - NeosModLoader logs to the same log file Neos uses. If you send your logs to anyone it will be obvious that you are using a plugin. This is intended.
 - NeosModLoader mods may have effects visible to other users, depending on the mod.
+- If you wish to opt in to using your real version string you can set `advertiseversion=true` in the NeosModLoader.config file.
 
 ### Are mods safe? 
 Mods are not sandboxed in any way. In other words, they run with the same level of privilege as Neos itself. A poorly written mod could cause performance or stability issues. A maliciously designed mod could give a malicious actor a dangerous level of control over your computer. **Make sure you only use mods from sources you trust.**
@@ -153,7 +154,8 @@ debug=true
 nomods=false
 ```
 
-| Configuration | Default | Description |
-| ------------- | ------- | ----------- |
-| `debug`       | `false` | if `true`, NeosMod.Debug() logs will appear in your log file. Otherwise, they are hidden. |
-| `nomods`      | `false` | if `true`, mods will not be loaded. |
+| Configuration      | Default | Description |
+| ------------------ | ------- | ----------- |
+| `debug`            | `false` | If `true`, NeosMod.Debug() logs will appear in your log file. Otherwise, they are hidden. |
+| `nomods`           | `false` | If `true`, mods will not be loaded. |
+| `advertiseversion` | `false` | If `false`, your version will be spoofed and will resemble `2021.8.29.1240`. If `true`, your version will be left unaltered and will resemble `2021.8.29.1240+NeosModLoader.dll`. This version string is visible to other players under certain circumstances. |

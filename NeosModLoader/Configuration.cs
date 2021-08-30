@@ -43,6 +43,10 @@ namespace NeosModLoader
                             {
                                 _configuration.NoMods = true;
                             }
+                            else if ("advertiseversion".Equals(key) && "true".Equals(value))
+                            {
+                                _configuration.AdvertiseVersion = true;
+                            }
                         }
                     }
                 }
@@ -76,5 +80,6 @@ namespace NeosModLoader
         public bool Unsafe { get; private set; } = false;
         public bool Debug { get; private set; } = false;
         public bool NoMods { get; private set; } = false;
+        public bool AdvertiseVersion { get; private set; } = false;
     }
 }
