@@ -131,7 +131,7 @@ namespace MyMod
     }
 }
 ```
-
+A [Template repo](https://github.com/EIA485/NeosTemplate/) is available.
 ### Full Example
 A working example mod is available here: https://github.com/zkxs/MotionBlurDisable
 
