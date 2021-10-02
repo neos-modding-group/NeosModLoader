@@ -15,12 +15,7 @@ namespace NeosModLoader
             if (_configuration == null)
             {
                 // the config file can just sit next to the dll. Simple.
-                string path;
-                if (Environment.OSVersion.Platform==PlatformID.Unix)
-                    path = $"{GetAssemblyDirectory()}/{CONFIG_FILENAME}";
-                else
-                    path = $"{GetAssemblyDirectory()}\\{CONFIG_FILENAME}";
-
+                string path = Path.Combine(GetAssemblyDirectory(), CONFIG_FILENAME);
                 _configuration = new Configuration();
 
                 // .NET's ConfigurationManager is some hot trash to the point where I'm just done with it.
