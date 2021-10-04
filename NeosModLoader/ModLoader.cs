@@ -22,7 +22,8 @@ namespace NeosModLoader
                 return;
             }
 
-            string modDirectory = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName + "\\nml_mods";
+            string modDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_mods");
+
             Logger.DebugInternal($"loading mods from {modDirectory}");
 
             ModAssembly[] modsToLoad = null;
