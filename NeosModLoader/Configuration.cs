@@ -54,7 +54,7 @@ namespace NeosModLoader
                 {
                     if (e is FileNotFoundException)
                     {
-                        Logger.MsgInternal($"{CONFIG_FILENAME} is missing! This is probably fine.");
+                        Logger.MsgInternal($"{path} is missing! This is probably fine.");
                     }
                     else if (e is DirectoryNotFoundException || e is IOException || e is UnauthorizedAccessException)
                     {
