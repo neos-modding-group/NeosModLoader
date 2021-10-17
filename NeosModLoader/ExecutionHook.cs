@@ -9,6 +9,7 @@ namespace NeosModLoader
 #pragma warning disable CS0169
         // field must exist due to reflective access
         private static Type __connectorType;
+        private static Type __connectorTypes;
 #pragma warning restore CS0169
 
         static ExecutionHook()
