@@ -1,4 +1,4 @@
-﻿namespace NeosModLoader
+namespace NeosModLoader
 {
     public abstract class NeosMod
     {
