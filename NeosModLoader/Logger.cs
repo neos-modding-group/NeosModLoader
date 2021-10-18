@@ -23,6 +23,7 @@ namespace NeosModLoader
                 LogInternal(LogType.DEBUG, message);
             }
         }
+
         internal static void DebugList(object[] messages)
         {
             string Source = SourceFromStackTrace();
@@ -41,6 +42,7 @@ namespace NeosModLoader
         {
             LogInternal(LogType.INFO, message);
         }
+
         internal static void MsgList(object[] messages)
         {
             string Source = SourceFromStackTrace();
@@ -59,6 +61,7 @@ namespace NeosModLoader
         {
             LogInternal(LogType.WARN, message);
         }
+
         internal static void WarnList(object[] messages)
         {
             string Source = SourceFromStackTrace();
