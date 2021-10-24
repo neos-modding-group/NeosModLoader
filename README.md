@@ -13,6 +13,9 @@ A mod loader for [Neos VR](https://neos.com/).
 A list of known mods is available [here](https://github.com/zkxs/neos-mod-list/blob/master/README.md)!
 
 ## Frequently Asked Questions
+### Do you have a Discord server?
+Yes. [Here it is.](https://discord.gg/vCDJK9xyvm)
+
 ### What does NeosModLoader do?
 NeosModLoader is simply a Neos [plugin](https://wiki.neos.com/Plugins) that does a lot of the boilerplate necessary to get mods working in a reasonable way. In summary, it:
 1. Initializes earlier than a normal plugin
