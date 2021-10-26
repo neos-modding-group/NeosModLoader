@@ -27,9 +27,10 @@ Make sure NeosModLoader is the only plugin being loaded. For safety reasons Neos
 
 ### Something is broken! Where can I get help?
 1. Check the logs (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Logs`) for clues as to what is going wrong.
-2. Disable NeosModLoader by removing the `-LoadAssembly <path>` launch option. If Neos is still having problems while unmodified, you can get support on the [Neos Discord](https://discordapp.com/invite/GQ92NUu5). You should not ask the Neos Discord for help with mods.
+2. Disable NeosModLoader by removing the `-LoadAssembly <path>` launch option. If Neos is still having problems while completely unmodified, you can get support on the [Neos Discord](https://discordapp.com/invite/GQ92NUu5). **You should not ask the Neos Discord for help with mods.**
 3. If you only experience the problem while modded, try uninstalling all of your mods and re-installing them one by one. Once you find the problematic mod reach out it its developers.
 4. If you are having an issue with NeosModLoader itself, please open [an issue](https://github.com/zkxs/NeosModLoader/issues).
+5. If you are having trouble diagnosing the issue yourself, we have a #help-and-support channel in the [Neos Modding Discord](https://discord.gg/vCDJK9xyvm).
 
 ### Does NeosModLoader violate the Neos Guidelines?
 Sort answer: maybe?  
