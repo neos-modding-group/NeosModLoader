@@ -10,13 +10,14 @@ namespace NeosModLoader
 {
     internal class ModLoader
     {
-        public static readonly string VERSION = "1.4.1";
+        public static readonly string VERSION = "1.5.0";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         internal static Dictionary<Assembly, NeosMod> LoadedMods { get; } = new Dictionary<Assembly, NeosMod>();
 
         internal static void LoadMods()
         {
-            if (Configuration.get().NoMods)
+            Configuration config = Configuration.get();
+            if (config.NoMods)
             {
                 Logger.DebugInternal("mods will not be loaded due to configuration file");
                 return;
@@ -26,6 +27,7 @@ namespace NeosModLoader
 
             Logger.DebugInternal($"loading mods from {modDirectory}");
 
+            // generate list of assemblies to load
             ModAssembly[] modsToLoad = null;
             try
             {
@@ -56,6 +58,7 @@ namespace NeosModLoader
                 return;
             }
 
+            // mods assemblies are all loaded before hooking begins so mods can interconnect if needed
             foreach (ModAssembly mod in modsToLoad)
             {
                 try
@@ -68,6 +71,7 @@ namespace NeosModLoader
                 }
             }
 
+            // call OnEngineInit() for each mod
             foreach (ModAssembly mod in modsToLoad)
             {
                 try
@@ -77,6 +81,30 @@ namespace NeosModLoader
                 catch (Exception e)
                 {
                     Logger.ErrorInternal($"Unexpected exception loading mod from {mod.File}:\n{e}");
+                }
+            }
+
+            // log potential conflicts
+            if (config.LogConflicts)
+            {
+                IEnumerable<MethodBase> patchedMethods = Harmony.GetAllPatchedMethods();
+                foreach (MethodBase patchedMethod in patchedMethods)
+                {
+                    Patches patches = Harmony.GetPatchInfo(patchedMethod);
+                    HashSet<string> owners = new HashSet<string>(patches.Owners);
+                    if (owners.Count > 1)
+                    {
+                        Logger.WarnInternal($"method \"{patchedMethod.FullDescription()}\" has been patched by the following:");
+                        foreach (string owner in owners)
+                        {
+                            Logger.WarnInternal($"    \"{owner}\"");
+                        }
+                    }
+                    else if (config.Debug)
+                    {
+                        string owner = owners.FirstOrDefault();
+                        Logger.DebugInternal($"method \"{patchedMethod.FullDescription()}\" has been patched by \"{owner}\"");
+                    }
                 }
             }
         }
