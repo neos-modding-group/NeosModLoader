@@ -3,6 +3,8 @@
 A mod loader for [Neos VR](https://neos.com/).
 
 ## Installation
+If you are using the Steam version of Neos you are in the right place. If you are using the standalone version, [read these extra instructions](doc/neos_standalone_setup.md).
+
 1. Download [NeosModLoader.dll](https://github.com/zkxs/NeosModLoader/releases/latest/download/NeosModLoader.dll) to a location of your choosing.
 2. Place [0Harmony.dll](https://github.com/zkxs/NeosModLoader/releases/download/1.0.0.0/0Harmony.dll) in your Neos install directory (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR`).
 3. Add mod DLL files to a `nml_mods` folder under your Neos install directory (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\nml_mods`). You can create the folder if it's missing, or simply launch Neos once with NeosModLoader installed and it will be created automatically.
@@ -15,6 +17,9 @@ A list of known mods is available [here](https://github.com/zkxs/neos-mod-list/b
 ## Frequently Asked Questions
 ### Do you have a Discord server?
 Yes. [Here it is.](https://discord.gg/vCDJK9xyvm)
+
+### What is a mod?
+Mods are .dll files loaded by NeosModLoader that change the behavior of your Neos client in some way. Unlike plugins, mods are specifically designed to work in multiplayer.
 
 ### What does NeosModLoader do?
 NeosModLoader is simply a Neos [plugin](https://wiki.neos.com/Plugins) that does a lot of the boilerplate necessary to get mods working in a reasonable way. In summary, it:
@@ -60,6 +65,9 @@ Yes, **however** other mod loaders are likely to come with LibHarmony, and you n
 ### Why did you build a custom mod loader for Neos?
 1. Neos Plugins are given extra protections in the [Neos Guidelines](https://docs.google.com/document/d/1mqdbIvbj1b2LeFhNzfAASeTpRZk6vmbXISYLdTXTVR4/edit), and those same protections are not extended to a generic Unity mod loader.
 2. As Neos Plugins are officially supported we can expect them to continue working even through major engine changes, for example if Neos ever switches to a non-Unity engine.
+
+### As a content creator, when is a mod the right solution?
+Check out this document for more detail: [Problem Solving Techniques](doc/problem_solving_techniques.md).
 
 ### As a mod developer, why should I use NeosModLoader over a Neos Plugin?
 If you are just trying to make a new component or logix node, you should use a plugin. The plugin system is specifically designed for that.
@@ -151,12 +159,13 @@ It showcases the following:
 - [Neos Plugin Wiki Page](https://wiki.neos.com/Plugins)
 
 ## Configuration
-NeosModLoader aims to have a reasonable default configuration, but certain things can be changed via a config file.
-The `NeosModLoader.config` file should be placed in the same directory as `NeosModLoader.dll`, and contains keys and values in the following format:
+NeosModLoader aims to have a reasonable default configuration, but certain things can be adjusted via an optional config file. The config file does not create itself automatically, but you can create it yourself by making a `NeosModLoader.config` file in the same directory as `NeosModLoader.dll`. `NeosModLoader.config` is a simple text file that supports keys and values in the following format:
 ```
 debug=true
 nomods=false
 ```
+
+Not all keys are required to be present. Missing keys will use the defaults outlined below:
 
 | Configuration      | Default | Description |
 | ------------------ | ------- | ----------- |
