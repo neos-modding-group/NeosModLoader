@@ -1,4 +1,4 @@
-﻿using BaseX;
+using BaseX;
 using FrooxEngine;
 using HarmonyLib;
 using System;

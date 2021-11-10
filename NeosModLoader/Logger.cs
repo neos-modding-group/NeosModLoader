@@ -1,4 +1,4 @@
-﻿using BaseX;
+using BaseX;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,6 +24,15 @@ namespace NeosModLoader
             }
         }
 
+        internal static void DebugList(object[] messages)
+        {
+            string Source = SourceFromStackTrace();
+            foreach (object element in messages)
+            {
+                LogInternal(LogType.DEBUG, element.ToString(), Source);
+            }
+        }
+
         internal static void MsgExternal(string message)
         {
             LogInternal(LogType.INFO, message, SourceFromStackTrace());
@@ -32,6 +41,15 @@ namespace NeosModLoader
         internal static void MsgInternal(string message)
         {
             LogInternal(LogType.INFO, message);
+        }
+
+        internal static void MsgList(object[] messages)
+        {
+            string Source = SourceFromStackTrace();
+            foreach (object element in messages)
+            {
+                LogInternal(LogType.INFO, element.ToString(), Source);
+            }
         }
 
         internal static void WarnExternal(string message)
@@ -44,6 +62,15 @@ namespace NeosModLoader
             LogInternal(LogType.WARN, message);
         }
 
+        internal static void WarnList(object[] messages)
+        {
+            string Source = SourceFromStackTrace();
+            foreach (object element in messages)
+            {
+                LogInternal(LogType.WARN, element.ToString(), Source);
+            }
+        }
+
         internal static void ErrorExternal(string message)
         {
             LogInternal(LogType.ERROR, message, SourceFromStackTrace());
@@ -52,6 +79,15 @@ namespace NeosModLoader
         internal static void ErrorInternal(string message)
         {
             LogInternal(LogType.ERROR, message);
+        }
+
+        internal static void ErrorList(object[] messages)
+        {
+            string Source = SourceFromStackTrace();
+            foreach (object element in messages)
+            {
+                LogInternal(LogType.ERROR, element.ToString(), Source);
+            }
         }
 
         private static void LogInternal(string logTypePrefix, string message, string source = null)

@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +10,7 @@ namespace NeosModLoader
 {
     internal class ModLoader
     {
-        public static readonly string VERSION = "1.3.1";
+        public static readonly string VERSION = "1.4.1";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         internal static Dictionary<Assembly, NeosMod> LoadedMods { get; } = new Dictionary<Assembly, NeosMod>();
 
