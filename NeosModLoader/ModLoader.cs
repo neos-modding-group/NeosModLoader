@@ -97,7 +97,7 @@ namespace NeosModLoader
                         Logger.WarnInternal($"method \"{patchedMethod.FullDescription()}\" has been patched by the following:");
                         foreach (string owner in owners)
                         {
-                            Logger.WarnInternal($"    \"{owner}\"");
+                            Logger.WarnInternal($"    \"{owner}\" ({TypesForOwner(patches, owner)})");
                         }
                     }
                     else if (config.Debug)
@@ -107,6 +107,16 @@ namespace NeosModLoader
                     }
                 }
             }
+        }
+
+        private static string TypesForOwner(Patches patches, string owner)
+        {
+            Func<Patch, bool> ownerEquals = patch => Equals(patch.owner, owner);
+            int prefixCount = patches.Prefixes.Where(ownerEquals).Count();
+            int postfixCount = patches.Postfixes.Where(ownerEquals).Count();
+            int transpilerCount = patches.Transpilers.Where(ownerEquals).Count();
+            int finalizerCount = patches.Finalizers.Where(ownerEquals).Count();
+            return $"prefix={prefixCount}; postfix={postfixCount}; transpiler={transpilerCount}; finalizer={finalizerCount}";
         }
 
         private static void LoadAssembly(ModAssembly mod)
