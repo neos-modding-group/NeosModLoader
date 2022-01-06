@@ -53,7 +53,7 @@ public class NeosModConfigurationExample : NeosMod
 ```
 
 ### Defining a Configuration
-Mods that wish to use a configuration must define the optional `GetConfigurationDefinition()` method. This method requires you return a `ModConfigurationDefinition` instance, which can only be obtained by calling `DefineConfiguration()`. `DefineConfiguration()` requires two parameters: a version and a list of configuration keys. The version should be a [semantic version](semver)—in summary the major version should be bumped for breaking changes, and the minor version should be bumped for new configuration keys. NeosModLoader uses this version number to check the saved configuration against your definition and ensure they are compatible. Configuration keys will be discussed in the next section.
+Mods that wish to use a configuration must define the optional `GetConfigurationDefinition()` method. This method requires you return a `ModConfigurationDefinition` instance, which can only be obtained by calling `DefineConfiguration()`. `DefineConfiguration()` requires two parameters: a version and a list of configuration keys. The version should be a [semantic version][semver]—in summary the major version should be bumped for breaking changes, and the minor version should be bumped for new configuration keys. NeosModLoader uses this version number to check the saved configuration against your definition and ensure they are compatible. Configuration keys will be discussed in the next section.
 
 ### Configuration Keys
 Configuration keys define the values your mod's config can store. The relevant class is `ModConfigurationKey<T>`, which has the following constructor:
