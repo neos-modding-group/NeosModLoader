@@ -94,6 +94,7 @@ namespace NeosModLoader
                     LoadedNeosMod loaded = InitializeMod(mod);
                     if (loaded != null)
                     {
+                        // if loading succeeded, then we need to register the mod
                         RegisterMod(loaded);
                     }
                 }
@@ -111,7 +112,7 @@ namespace NeosModLoader
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorInternal($"Unexpected exception initializing mod {mod.NeosMod.Name} from {mod.ModAssembly.File}:\n{e}");
+                    Logger.ErrorInternal($"Unexpected exception in OnEngineInit() for mod {mod.NeosMod.Name} from {mod.ModAssembly.File}:\n{e}");
                 }
             }
 
@@ -140,6 +141,10 @@ namespace NeosModLoader
             }
         }
 
+        /// <summary>
+        /// We have a bunch of maps and things the mod needs to be registered in. This method does all that jazz.
+        /// </summary>
+        /// <param name="mod">The successfully loaded mod to register</param>
         private static void RegisterMod(LoadedNeosMod mod)
         {
             try

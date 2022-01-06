@@ -11,5 +11,6 @@
         internal NeosMod NeosMod { get; private set; }
         internal ModAssembly ModAssembly { get; private set; }
         internal ModConfiguration ModConfiguration { get; set; }
+        internal bool AllowSavingConfiguration = true;
     }
 }

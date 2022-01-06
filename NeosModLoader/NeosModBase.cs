@@ -10,6 +10,11 @@ namespace NeosModLoader
         public abstract string Version { get; }
         public virtual string Link { get; }
 
+        public ModConfiguration GetConfiguration()
+        {
+            return ModLoader.ModBaseLookupMap[this].ModConfiguration;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is NeosModBase @base &&
