@@ -70,20 +70,40 @@ namespace NeosModLoader
             IsValueValid = valueValidator;
         }
 
+        private Predicate<T> IsValueValid;
+        public override Type ValueType() => typeof(T);
+
         /// <summary>
         /// Checks if a value is valid for this configuration item
         /// </summary>
-        public Predicate<T> IsValueValid { get; private set; }
-        public override Type ValueType() => typeof(T);
+        /// <param name="value">value to check</param>
+        /// <returns>true if the value is valid</returns>
         public override bool Validate(object value)
         {
             if (value is T castValue)
             {
-                return IsValueValid(castValue);
+                return ValidateTyped(castValue);
             }
             else
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if a value is valid for this configuration item
+        /// </summary>
+        /// <param name="value">value to check</param>
+        /// <returns>true if the value is valid</returns>
+        public bool ValidateTyped(T value)
+        {
+            if (IsValueValid == null)
+            {
+                return true;
+            }
+            else
+            {
+                return IsValueValid(value);
             }
         }
     }

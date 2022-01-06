@@ -79,9 +79,8 @@ namespace NeosModLoader
         /// <summary>
         /// The delegate that is called for configuration change events.
         /// </summary>
-        /// <param name="config">The configuration the change occured in</param>
-        /// <param name="key">The specific key who's value changed</param>
-        public delegate void ConfigurationChangedEventHandler(ModConfiguration config, ModConfigurationKey key);
+        /// <param name="configurationChangedEvent">The event containing details about the configuration change</param>
+        public delegate void ConfigurationChangedEventHandler(ConfigurationChangedEvent configurationChangedEvent);
 
         /// <summary>
         /// Called if any config value for any mod changed.
@@ -168,7 +167,8 @@ namespace NeosModLoader
         /// </summary>
         /// <param name="key">The key</param>
         /// <param name="value">The new value</param>
-        public void Set(ModConfigurationKey key, object value)
+        /// <param name="eventLabel">A custom label you may assign to this event</param>
+        public void Set(ModConfigurationKey key, object value, string eventLabel = null)
         {
             if (!key.Validate(value))
             {
@@ -177,7 +177,7 @@ namespace NeosModLoader
             if (key.ValueType().IsAssignableFrom(value.GetType()))
             {
                 Values[key] = value;
-                RaiseConfigurationChangedEvent(key);
+                RaiseConfigurationChangedEvent(key, eventLabel);
             }
             else
             {
@@ -185,20 +185,22 @@ namespace NeosModLoader
             }
         }
 
+
         /// <summary>
         /// Set a typed configuration value
         /// </summary>
         /// <typeparam name="T">The value type</typeparam>
         /// <param name="key">The key</param>
         /// <param name="value">The new value</param>
-        public void Set<T>(ModConfigurationKey<T> key, T value)
+        /// <param name="eventLabel">A custom label you may assign to this event</param>
+        public void Set<T>(ModConfigurationKey<T> key, T value, string eventLabel = null)
         {
-            if (!key.IsValueValid(value))
+            if (!key.ValidateTyped(value))
             {
                 throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{key.Name}\"");
             }
             Values[key] = value;
-            RaiseConfigurationChangedEvent(key);
+            RaiseConfigurationChangedEvent(key, eventLabel);
         }
 
         internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
@@ -293,11 +295,11 @@ namespace NeosModLoader
             }
         }
 
-        private void RaiseConfigurationChangedEvent(ModConfigurationKey key)
+        private void RaiseConfigurationChangedEvent(ModConfigurationKey key, string label)
         {
             try
             {
-                OnAnyConfigurationChanged?.SafeInvoke(this, key);
+                OnAnyConfigurationChanged?.SafeInvoke(this, new ConfigurationChangedEvent(this, key, label));
             }
             catch (Exception e)
             {
@@ -306,7 +308,7 @@ namespace NeosModLoader
 
             try
             {
-                OnThisConfigurationChanged?.SafeInvoke(this, key);
+                OnThisConfigurationChanged?.SafeInvoke(this, new ConfigurationChangedEvent(this, key, label));
             }
             catch (Exception e)
             {
