@@ -84,7 +84,7 @@ You can override a `HandleIncompatibleConfigurationVersions()` function in your 
 - `IncompatibleConfigurationHandlingOption.ERROR`: Fail to read the config, and block saving over the config on disk.
 - `IncompatibleConfigurationHandlingOption.CLOBBER`: Destroy the saved config and start over from scratch.
 
-If you do not override `HandleIncompatibleConfigurationVersions()`, the default is to return `ERROR` on all incompatibilities. `HandleIncompatibleConfigurationVersions` is only called for configs that are detected to be incompatible under [semantic versioning][semver].
+If you do not override `HandleIncompatibleConfigurationVersions()`, the default is to return `ERROR` on all incompatibilities. `HandleIncompatibleConfigurationVersions()` is only called for configs that are detected to be incompatible under [semantic versioning][semver].
 
 Here's an example implementation that can detect mod downgrades and conditionally avoid clobbering your new config:
 ```csharp
