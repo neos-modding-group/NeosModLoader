@@ -40,6 +40,13 @@ namespace NeosModLoader
         /// <returns>true if the value is valid</returns>
         public abstract bool Validate(object value);
 
+        /// <summary>
+        /// Computes a default value for this key, if a default provider is set
+        /// </summary>
+        /// <param name="defaultValue">the computed default value, or null if no default provider was set</param>
+        /// <returns>true if a default was computed</returns>
+        public abstract bool TryComputeDefault(out object defaultValue);
+
         public override bool Equals(object obj)
         {
             return obj is ModConfigurationKey key &&
@@ -63,21 +70,19 @@ namespace NeosModLoader
         /// </summary>
         /// <param name="name">Unique name of this config item</param>
         /// <param name="description">Human-readable description of this config item</param>
+        /// <param name="computeDefault">Function that, if present, computes a default value for this key</param>
         /// <param name="internalAccessOnly">If true, only the owning mod should have access to this config item</param>
         /// <param name="valueValidator">Checks if a value is valid for this configuration item</param>
-        public ModConfigurationKey(string name, string description, bool internalAccessOnly = false, Predicate<T> valueValidator = null) : base(name, description, internalAccessOnly)
+        public ModConfigurationKey(string name, string description, Func<T> computeDefault = null, bool internalAccessOnly = false, Predicate<T> valueValidator = null) : base(name, description, internalAccessOnly)
         {
+            ComputeDefault = computeDefault;
             IsValueValid = valueValidator;
         }
 
+        private Func<T> ComputeDefault;
         private Predicate<T> IsValueValid;
         public override Type ValueType() => typeof(T);
 
-        /// <summary>
-        /// Checks if a value is valid for this configuration item
-        /// </summary>
-        /// <param name="value">value to check</param>
-        /// <returns>true if the value is valid</returns>
         public override bool Validate(object value)
         {
             if (value is T castValue)
@@ -104,6 +109,39 @@ namespace NeosModLoader
             else
             {
                 return IsValueValid(value);
+            }
+        }
+
+        public override bool TryComputeDefault(out object defaultValue)
+        {
+            if (TryComputeDefaultTyped(out T defaultTypedValue))
+            {
+                defaultValue = defaultTypedValue;
+                return true;
+            }
+            else
+            {
+                defaultValue = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Computes a default value for this key, if a default provider is set
+        /// </summary>
+        /// <param name="defaultValue">the computed default value, or default(T) if no default provider was set</param>
+        /// <returns>true if a default was computed</returns>
+        public bool TryComputeDefaultTyped(out T defaultValue)
+        {
+            if (ComputeDefault == null)
+            {
+                defaultValue = default(T);
+                return false;
+            }
+            else
+            {
+                defaultValue = ComputeDefault();
+                return true;
             }
         }
     }

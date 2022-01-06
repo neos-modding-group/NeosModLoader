@@ -58,12 +58,13 @@ Mods that wish to use a configuration must define the optional `GetConfiguration
 ### Configuration Keys
 Configuration keys define the values your mod's config can store. The relevant class is `ModConfigurationKey<T>`, which has the following constructor:
 ```csharp
-public ModConfigurationKey(string name, string description, bool internalAccessOnly = false, Predicate<T> valueValidator = null)
+public ModConfigurationKey(string name, string description, Func<T> computeDefault = null, bool internalAccessOnly = false, Predicate<T> valueValidator = null)
 ```
 |Parameter | Description | Default |
 | -------- | ----------- | ------- |
 | name | Unique name of this config item | *required* |
 | description | Human-readable description of this config item | *required* |
+| computeDefault | Function that, if present, computes a default value for this key | `null` |
 | internalAccessOnly | If true, only the owning mod should have access to this config item. Note that this is *not* enforced by NeosModLoader itself. | `false` |
 | valueValidator | A custom function that (if present) checks if a value is valid for this configuration item | `null` |
 

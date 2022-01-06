@@ -138,7 +138,20 @@ namespace NeosModLoader
         /// <returns>true if the value was read successfully</returns>
         public bool TryGetValue(ModConfigurationKey key, out object value)
         {
-            return Values.TryGetValue(key, out value);
+            if (Values.TryGetValue(key, out object valueObject))
+            {
+                value = valueObject;
+                return true;
+            }
+            else if (key.TryComputeDefault(out value))
+            {
+                return true;
+            }
+            else
+            {
+                value = null;
+                return false;
+            }
         }
 
         /// <summary>
@@ -153,6 +166,10 @@ namespace NeosModLoader
             if (Values.TryGetValue(key, out object valueObject))
             {
                 value = (T)valueObject;
+                return true;
+            }
+            else if (key.TryComputeDefaultTyped(out value))
+            {
                 return true;
             }
             else
