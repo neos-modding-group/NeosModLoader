@@ -203,10 +203,11 @@ namespace NeosModLoader
                     using (JsonTextWriter jsonTextWriter = new JsonTextWriter(streamWriter))
                     {
                         json.WriteTo(jsonTextWriter);
+
+                        // I actually cannot believe I have to truncate the file myself
+                        file.SetLength(file.Position);
                     }
                 }
-                // I actually cannot believe I have to truncate the file myself
-                file.SetLength(file.Position);
             }
         }
     }
