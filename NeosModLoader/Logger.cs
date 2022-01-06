@@ -1,5 +1,4 @@
 using BaseX;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -10,7 +9,7 @@ namespace NeosModLoader
     {
         internal static void DebugExternal(string message)
         {
-            if (Configuration.get().Debug)
+            if (ModLoaderConfiguration.get().Debug)
             {
                 LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
             }
@@ -18,7 +17,7 @@ namespace NeosModLoader
 
         internal static void DebugInternal(string message)
         {
-            if (Configuration.get().Debug)
+            if (ModLoaderConfiguration.get().Debug)
             {
                 LogInternal(LogType.DEBUG, message);
             }

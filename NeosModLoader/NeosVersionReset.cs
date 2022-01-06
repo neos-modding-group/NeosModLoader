@@ -15,7 +15,7 @@ namespace NeosModLoader
     {
         internal static void Initialize()
         {
-            Configuration config = Configuration.get();
+            ModLoaderConfiguration config = ModLoaderConfiguration.get();
             Engine engine = Engine.Current;
 
             List<string> extraAssemblies = Engine.ExtraAssemblies;

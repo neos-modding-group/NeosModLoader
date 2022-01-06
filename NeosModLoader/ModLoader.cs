@@ -1,7 +1,6 @@
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,7 +15,7 @@ namespace NeosModLoader
 
         internal static void LoadMods()
         {
-            Configuration config = Configuration.get();
+            ModLoaderConfiguration config = ModLoaderConfiguration.get();
             if (config.NoMods)
             {
                 Logger.DebugInternal("mods will not be loaded due to configuration file");
