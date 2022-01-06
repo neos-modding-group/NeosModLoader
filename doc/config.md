@@ -79,6 +79,17 @@ The `ModConfiguration` class provides two events you can subscribe to:
 - The static event `OnAnyConfigurationChanged` is called if any config value for any mod changed.
 - The instance event `OnThisConfigurationChanged` is called if one of the values in this mod's config changed.
 
+Both of these events use the following delegate:
+```csharp
+public delegate void ConfigurationChangedEventHandler(ConfigurationChangedEvent configurationChangedEvent);
+```
+A `ConfigurationChangedEvent` has the following properties:
+- `ModConfiguration Config` is the configuration the change occurred in
+- `ModConfigurationKey Key` is the specific key who's value changed
+- `string Label` is a custom label that may be set by whoever changed the configuration. This may be `null`.
+
+These events can be used to trigger actions if your configuration is externally changed.
+
 ### Handling Incompatible Configuration Versions
 You can override a `HandleIncompatibleConfigurationVersions()` function in your NeosMod to define how incompatible versions are handled. You have two options:
 - `IncompatibleConfigurationHandlingOption.ERROR`: Fail to read the config, and block saving over the config on disk.
@@ -104,17 +115,6 @@ public override IncompatibleConfigurationHandlingOption HandleIncompatibleConfig
     }
 }
 ```
-
-Both of these events use the following delegate:
-```csharp
-public delegate void ConfigurationChangedEventHandler(ConfigurationChangedEvent configurationChangedEvent);
-```
-A `ConfigurationChangedEvent` has the following properties:
-- `ModConfiguration Config` is the configuration the change occurred in
-- `ModConfigurationKey Key` is the specific key who's value changed
-- `string Label` is a custom label that may be set by whoever changed the configuration. This may be `null`.
-
-These events can be used to trigger actions if your configuration is externally changed.
 
 ## Working With Other Mods' Configurations
 An example of enumerating all configs:
