@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace NeosModLoader
 {
+    /// <summary>
+    /// Untyped mod configuration key.
+    /// </summary>
     public abstract class ModConfigurationKey
     {
         internal ModConfigurationKey(string name, string description, bool internalAccessOnly)
@@ -49,13 +52,27 @@ namespace NeosModLoader
         }
     }
 
+    /// <summary>
+    /// Typed mod configuration key.
+    /// </summary>
+    /// <typeparam name="T">The value's type</typeparam>
     public class ModConfigurationKey<T> : ModConfigurationKey
     {
+        /// <summary>
+        /// Creates a new ModConfigurationKey
+        /// </summary>
+        /// <param name="name">Unique name of this config item</param>
+        /// <param name="description">Human-readable description of this config item</param>
+        /// <param name="internalAccessOnly">If true, only the owning mod should have access to this config item</param>
+        /// <param name="valueValidator">Checks if a value is valid for this configuration item</param>
         public ModConfigurationKey(string name, string description, bool internalAccessOnly = false, Predicate<T> valueValidator = null) : base(name, description, internalAccessOnly)
         {
             IsValueValid = valueValidator;
         }
 
+        /// <summary>
+        /// Checks if a value is valid for this configuration item
+        /// </summary>
         public Predicate<T> IsValueValid { get; private set; }
         public override Type ValueType() => typeof(T);
         public override bool Validate(object value)

@@ -13,12 +13,26 @@ namespace NeosModLoader
         List<ModConfigurationKey> ConfigurationItemDefinitions { get; }
     }
 
+    /// <summary>
+    /// Defines a mod configuration. This should be defined by a NeosMod using the NeosMod.DefineConfiguration() method.
+    /// </summary>
     public class ModConfigurationDefinition : IModConfiguration
     {
+        /// <summary>
+        /// Mod that owns this configuration definition
+        /// </summary>
         public NeosModBase Owner { get; private set; }
+
+        /// <summary>
+        /// Semantic version for this configuration definition. This is used to check if the defined and saved configs are compatible
+        /// </summary>
         public Version Version { get; private set; }
 
         private List<ModConfigurationKey> configurationItemDefinitions;
+
+        /// <summary>
+        /// The list of coniguration keys defined in this configuration definition
+        /// </summary>
         public List<ModConfigurationKey> ConfigurationItemDefinitions
         {
             // clone the list because I don't trust giving public API users shallow copies one bit
@@ -34,19 +48,50 @@ namespace NeosModLoader
         }
     }
 
+    /// <summary>
+    /// The configuration for a mod. Each mod has zero or one configuration. The configuration object will never be reassigned once initialized.
+    /// </summary>
     public class ModConfiguration : IModConfiguration
     {
         private ModConfigurationDefinition Definition;
-        public Dictionary<ModConfigurationKey, object> Values { get; private set; }
+        internal Dictionary<ModConfigurationKey, object> Values { get; private set; }
         internal LoadedNeosMod LoadedNeosMod { get; private set; }
 
         private static string ConfigDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_config");
         private static readonly string VERSION_JSON_KEY = "version";
         private static readonly string VALUES_JSON_KEY = "values";
 
+        /// <summary>
+        /// Mod that owns this configuration definition
+        /// </summary>
         public NeosModBase Owner => Definition.Owner;
+
+        /// <summary>
+        /// Semantic version for this configuration definition. This is used to check if the defined and saved configs are compatible
+        /// </summary>
         public Version Version => Definition.Version;
+
+        /// <summary>
+        /// The list of coniguration keys defined in this configuration definition
+        /// </summary>
         public List<ModConfigurationKey> ConfigurationItemDefinitions => Definition.ConfigurationItemDefinitions;
+
+        /// <summary>
+        /// The delegate that is called for configuration change events.
+        /// </summary>
+        /// <param name="config">The configuration the change occured in</param>
+        /// <param name="key">The specific key who's value changed</param>
+        public delegate void ConfigurationChangedEventHandler(ModConfiguration config, ModConfigurationKey key);
+
+        /// <summary>
+        /// Called if any config value for any mod changed.
+        /// </summary>
+        public static event ConfigurationChangedEventHandler OnAnyConfigurationChanged;
+
+        /// <summary>
+        /// Called if one of the values in this mod's config changed.
+        /// </summary>
+        public event ConfigurationChangedEventHandler OnThisConfigurationChanged;
 
         private ModConfiguration(LoadedNeosMod loadedNeosMod, ModConfigurationDefinition definition, Dictionary<ModConfigurationKey, object> values)
         {
@@ -86,11 +131,24 @@ namespace NeosModLoader
             return true;
         }
 
+        /// <summary>
+        /// Try to read a configuration value
+        /// </summary>
+        /// <param name="key">The key</param>
+        /// <param name="value">The value if we succeeded, or null if we failed.</param>
+        /// <returns>true if the value was read successfully</returns>
         public bool TryGetValue(ModConfigurationKey key, out object value)
         {
             return Values.TryGetValue(key, out value);
         }
 
+        /// <summary>
+        /// Try to read a typed configuration value
+        /// </summary>
+        /// <typeparam name="T">The value type</typeparam>
+        /// <param name="key">The key</param>
+        /// <param name="value">The value if we succeeded, or default(T) if we failed.</param>
+        /// <returns>true if the value was read successfully</returns>
         public bool TryGetValue<T>(ModConfigurationKey<T> key, out T value)
         {
             if (Values.TryGetValue(key, out object valueObject))
@@ -105,11 +163,21 @@ namespace NeosModLoader
             }
         }
 
+        /// <summary>
+        /// Set a configuration value
+        /// </summary>
+        /// <param name="key">The key</param>
+        /// <param name="value">The new value</param>
         public void Set(ModConfigurationKey key, object value)
         {
+            if (!key.Validate(value))
+            {
+                throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{key.Name}\"");
+            }
             if (key.ValueType().IsAssignableFrom(value.GetType()))
             {
                 Values[key] = value;
+                RaiseConfigurationChangedEvent(key);
             }
             else
             {
@@ -117,9 +185,20 @@ namespace NeosModLoader
             }
         }
 
+        /// <summary>
+        /// Set a typed configuration value
+        /// </summary>
+        /// <typeparam name="T">The value type</typeparam>
+        /// <param name="key">The key</param>
+        /// <param name="value">The new value</param>
         public void Set<T>(ModConfigurationKey<T> key, T value)
         {
+            if (!key.IsValueValid(value))
+            {
+                throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{key.Name}\"");
+            }
             Values[key] = value;
+            RaiseConfigurationChangedEvent(key);
         }
 
         internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
@@ -169,6 +248,9 @@ namespace NeosModLoader
             return new ModConfiguration(mod, definition, values);
         }
 
+        /// <summary>
+        /// Persist this configuration to disk. This method is not called automatically.
+        /// </summary>
         public void Save()
         {
             // prevent saving if we've determined something is amiss with the configuration
@@ -210,15 +292,36 @@ namespace NeosModLoader
                 }
             }
         }
+
+        private void RaiseConfigurationChangedEvent(ModConfigurationKey key)
+        {
+            try
+            {
+                OnAnyConfigurationChanged?.SafeInvoke(this, key);
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorInternal($"An OnAnyConfigurationChanged event subscriber threw an exception:\n{e}");
+            }
+
+            try
+            {
+                OnThisConfigurationChanged?.SafeInvoke(this, key);
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorInternal($"An OnThisConfigurationChanged event subscriber threw an exception:\n{e}");
+            }
+        }
     }
 
     internal class ModConfigurationException : Exception
     {
-        public ModConfigurationException(string message) : base(message)
+        internal ModConfigurationException(string message) : base(message)
         {
         }
 
-        public ModConfigurationException(string message, Exception innerException) : base(message, innerException)
+        internal ModConfigurationException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

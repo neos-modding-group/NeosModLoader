@@ -9,6 +9,9 @@ namespace NeosModLoader
 {
     internal class ModLoader
     {
+        /// <summary>
+        /// NeosModLoader's version
+        /// </summary>
         public static readonly string VERSION = "1.5.0";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         internal static List<LoadedNeosMod> LoadedMods { get; } = new List<LoadedNeosMod>();

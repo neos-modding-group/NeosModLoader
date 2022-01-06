@@ -118,10 +118,10 @@ namespace NeosModLoader
 
         private sealed class LogType
         {
-            public readonly static string DEBUG = "[DEBUG]";
-            public readonly static string INFO = "[INFO] ";
-            public readonly static string WARN = "[WARN] ";
-            public readonly static string ERROR = "[ERROR]";
+            internal readonly static string DEBUG = "[DEBUG]";
+            internal readonly static string INFO = "[INFO] ";
+            internal readonly static string WARN = "[WARN] ";
+            internal readonly static string ERROR = "[ERROR]";
         }
     }
 }

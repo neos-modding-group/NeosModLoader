@@ -18,11 +18,27 @@ namespace NeosModLoader
         public static void Error(string message) => Logger.ErrorExternal(message);
         public static void Error(object message) => Logger.ErrorExternal(message.ToString());
         public static void Error(params object[] messages) => Logger.ErrorList(messages);
+
+        /// <summary>
+        /// Called once immediately after NeosModLoader begins execution
+        /// </summary>
         public virtual void OnEngineInit() { }
+
+        /// <summary>
+        /// Get the defined configuration for this mod. This should be overridden by your mod if necessary.
+        /// </summary>
+        /// <returns>This mod's configuration definition. null by default.</returns>
         public virtual ModConfigurationDefinition GetConfigurationDefinition()
         {
             return null;
         }
+
+        /// <summary>
+        /// Create a configuration definition for this mod.
+        /// </summary>
+        /// <param name="version">The semantic version of the configuration definition</param>
+        /// <param name="configurationItemDefinitions">A list of configuration items</param>
+        /// <returns></returns>
         public ModConfigurationDefinition DefineConfiguration(Version version, List<ModConfigurationKey> configurationItemDefinitions)
         {
             return new ModConfigurationDefinition(this, version, configurationItemDefinitions);
