@@ -94,6 +94,7 @@ These events can be used to trigger actions if your configuration is externally 
 You can override a `HandleIncompatibleConfigurationVersions()` function in your NeosMod to define how incompatible versions are handled. You have two options:
 - `IncompatibleConfigurationHandlingOption.ERROR`: Fail to read the config, and block saving over the config on disk.
 - `IncompatibleConfigurationHandlingOption.CLOBBER`: Destroy the saved config and start over from scratch.
+- `IncompatibleConfigurationHandlingOption.FORCE_LOAD`: Ignore the version number and load the config anyways. This may throw exceptions and break your mod.
 
 If you do not override `HandleIncompatibleConfigurationVersions()`, the default is to return `ERROR` on all incompatibilities. `HandleIncompatibleConfigurationVersions()` is only called for configs that are detected to be incompatible under [semantic versioning][semver].
 

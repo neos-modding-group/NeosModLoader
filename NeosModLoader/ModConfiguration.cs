@@ -258,6 +258,9 @@ namespace NeosModLoader
                                 case IncompatibleConfigurationHandlingOption.CLOBBER:
                                     Logger.WarnInternal($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}. Clobbering old config and starting fresh.");
                                     return new ModConfiguration(mod, definition, values);
+                                case IncompatibleConfigurationHandlingOption.FORCE_LOAD:
+                                    // continue processing
+                                    break;
                                 case IncompatibleConfigurationHandlingOption.ERROR:
                                     // fall through to default
                                 default:
@@ -380,5 +383,10 @@ namespace NeosModLoader
         /// Destroy the saved config and start over from scratch.
         /// </summary>
         CLOBBER,
+
+        /// <summary>
+        /// Ignore the version number and attempt to load the config from disk
+        /// </summary>
+        FORCE_LOAD,
     }
 }
