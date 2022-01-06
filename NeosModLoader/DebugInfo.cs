@@ -1,9 +1,4 @@
-﻿using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace NeosModLoader
 {
@@ -12,12 +7,14 @@ namespace NeosModLoader
         internal static void Log()
         {
             Logger.MsgInternal($"NeosModLoader v{ModLoader.VERSION} starting up!{(Configuration.get().Debug ? " Debug logs will be shown." : "")}");
-            Logger.MsgInternal($"Using Harmony v{GetHarmonyVersion()}");
+            Logger.MsgInternal($"Using Harmony v{GetAssemblyVersion(typeof(HarmonyLib.Harmony))}");
+            Logger.MsgInternal($"Using BaseX v{GetAssemblyVersion(typeof(BaseX.floatQ))}");
+            Logger.MsgInternal($"Using FrooxEngine v{GetAssemblyVersion(typeof(FrooxEngine.IComponent))}");
         }
 
-        private static string GetHarmonyVersion()
+        private static string GetAssemblyVersion(Type typeFromAssembly)
         {
-            return typeof(Harmony).Assembly.GetName()?.Version?.ToString();
+            return typeFromAssembly.Assembly.GetName()?.Version?.ToString();
         }
     }
 }
