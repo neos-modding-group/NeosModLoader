@@ -43,5 +43,16 @@ namespace NeosModLoader
         {
             return new ModConfigurationDefinition(this, version, configurationItemDefinitions);
         }
+
+        /// <summary>
+        /// Defines handling of incompatible configuration versions
+        /// </summary>
+        /// <param name="serializedVersion">Configuration version read from the config file</param>
+        /// <param name="definedVersion">Configuration version defined in the mod code</param>
+        /// <returns></returns>
+        public virtual IncompatibleConfigurationHandlingOption HandleIncompatibleConfigurationVersions(Version serializedVersion, Version definedVersion)
+        {
+            return IncompatibleConfigurationHandlingOption.ERROR;
+        }
     }
 }

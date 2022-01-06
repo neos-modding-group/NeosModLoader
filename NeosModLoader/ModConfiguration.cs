@@ -220,6 +220,16 @@ namespace NeosModLoader
             RaiseConfigurationChangedEvent(key, eventLabel);
         }
 
+        /// <summary>
+        /// Removes a configuration value, if set
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>true if a value was successfully found and removed, false if there was no value to remove</returns>
+        public bool Unset(ModConfigurationKey key)
+        {
+            return Values.Remove(key);
+        }
+
         internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
         {
             ModConfigurationDefinition definition = mod.NeosMod.GetConfigurationDefinition();
@@ -242,8 +252,18 @@ namespace NeosModLoader
                         Version version = new Version(json[VERSION_JSON_KEY].ToObject<string>());
                         if (!AreVersionsCompatible(version, definition.Version))
                         {
-                            mod.AllowSavingConfiguration = false;
-                            throw new ModConfigurationException($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}");
+                            var handlingMode = mod.NeosMod.HandleIncompatibleConfigurationVersions(definition.Version, version);
+                            switch (handlingMode)
+                            {
+                                case IncompatibleConfigurationHandlingOption.CLOBBER:
+                                    Logger.WarnInternal($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}. Clobbering old config and starting fresh.");
+                                    return new ModConfiguration(mod, definition, values);
+                                case IncompatibleConfigurationHandlingOption.ERROR:
+                                    // fall through to default
+                                default:
+                                    mod.AllowSavingConfiguration = false;
+                                    throw new ModConfigurationException($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}");
+                            }
                         }
                         foreach (ModConfigurationKey key in definition.ConfigurationItemDefinitions)
                         {
@@ -344,5 +364,21 @@ namespace NeosModLoader
         internal ModConfigurationException(string message, Exception innerException) : base(message, innerException)
         {
         }
+    }
+
+    /// <summary>
+    /// Defines handling of incompatible configuration versions
+    /// </summary>
+    public enum IncompatibleConfigurationHandlingOption
+    {
+        /// <summary>
+        /// Fail to read the config, and block saving over the config on disk.
+        /// </summary>
+        ERROR,
+
+        /// <summary>
+        /// Destroy the saved config and start over from scratch.
+        /// </summary>
+        CLOBBER,
     }
 }

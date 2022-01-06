@@ -53,7 +53,7 @@ public class NeosModConfigurationExample : NeosMod
 ```
 
 ### Defining a Configuration
-Mods that wish to use a configuration must define the optional `GetConfigurationDefinition()` method. This method requires you return a `ModConfigurationDefinition` instance, which can only be obtained by calling `DefineConfiguration()`. `DefineConfiguration()` requires two parameters: a version and a list of configuration keys. The version should be a [semantic version](https://semver.org/)—in summary the major version should be bumped for breaking changes, and the minor version should be bumped for new configuration keys. NeosModLoader uses this version number to check the saved configuration against your definition and ensure they are compatible. Configuration keys will be discussed in the next section.
+Mods that wish to use a configuration must define the optional `GetConfigurationDefinition()` method. This method requires you return a `ModConfigurationDefinition` instance, which can only be obtained by calling `DefineConfiguration()`. `DefineConfiguration()` requires two parameters: a version and a list of configuration keys. The version should be a [semantic version](semver)—in summary the major version should be bumped for breaking changes, and the minor version should be bumped for new configuration keys. NeosModLoader uses this version number to check the saved configuration against your definition and ensure they are compatible. Configuration keys will be discussed in the next section.
 
 ### Configuration Keys
 Configuration keys define the values your mod's config can store. The relevant class is `ModConfigurationKey<T>`, which has the following constructor:
@@ -78,6 +78,32 @@ The `ModConfiguration` is guaranteed to be the same instance for all calls to `N
 The `ModConfiguration` class provides two events you can subscribe to:
 - The static event `OnAnyConfigurationChanged` is called if any config value for any mod changed.
 - The instance event `OnThisConfigurationChanged` is called if one of the values in this mod's config changed.
+
+### Handling Incompatible Configuration Versions
+You can override a `HandleIncompatibleConfigurationVersions()` function in your NeosMod to define how incompatible versions are handled. You have two options:
+- `IncompatibleConfigurationHandlingOption.ERROR`: Fail to read the config, and block saving over the config on disk.
+- `IncompatibleConfigurationHandlingOption.CLOBBER`: Destroy the saved config and start over from scratch.
+
+If you do not override `HandleIncompatibleConfigurationVersions()`, the default is to return `ERROR` on all incompatibilities. `HandleIncompatibleConfigurationVersions` is only called for configs that are detected to be incompatible under [semantic versioning][semver].
+
+Here's an example implementation that can detect mod downgrades and conditionally avoid clobbering your new config:
+```csharp
+public override IncompatibleConfigurationHandlingOption HandleIncompatibleConfigurationVersions(Version serializedVersion, Version definedVersion)
+{
+    if (serializedVersion > definedVersion)
+    {
+        // someone has dared to downgrade my mod
+        // this will break the old version instead of nuking my config
+        return IncompatibleConfigurationHandlingOption.ERROR;
+    }
+    else
+    {
+        // there's an old incompatible config version on disk
+        // lets just nuke it instead of breaking
+        return IncompatibleConfigurationHandlingOption.CLOBBER;
+    }
+}
+```
 
 Both of these events use the following delegate:
 ```csharp
@@ -118,3 +144,5 @@ void EnumerateConfigs()
 }
 ```
 Worth noting here is that as you lack the typed config definition, this API works with raw untyped objects. The API performs its own type checking behind the scenes to prevent incorrect types from being written.
+
+[semver]: https://semver.org/
