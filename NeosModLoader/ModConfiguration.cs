@@ -270,8 +270,12 @@ namespace NeosModLoader
                         }
                         foreach (ModConfigurationKey key in definition.ConfigurationItemDefinitions)
                         {
-                            object value = json[VALUES_JSON_KEY][key.Name].ToObject(key.ValueType());
-                            values.Add(key, value);
+                            JToken token = json[VALUES_JSON_KEY][key.Name];
+                            if (token != null)
+                            {
+                                object value = token.ToObject(key.ValueType());
+                                values.Add(key, value);
+                            }
                         }
                     }
                 }
