@@ -21,7 +21,7 @@ namespace NeosModLoader
         public List<ModConfigurationKey> ConfigurationItemDefinitions
         {
             get { return configurationItemDefinitions; }
-            private set { configurationItemDefinitions = value; } 
+            private set { configurationItemDefinitions = value; }
         }
 
         internal ModConfigurationDefinition(NeosModBase owner, Version version, List<ModConfigurationKey> configurationItemDefinitions)
