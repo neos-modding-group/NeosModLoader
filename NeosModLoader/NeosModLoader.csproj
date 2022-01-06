@@ -48,10 +48,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DebugInfo.cs" />
-    <Compile Include="Configuration.cs" />
     <Compile Include="ExecutionHook.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="ModConfigurationDefinition.cs" />
+    <Compile Include="ModConfigurationKey.cs" />
     <Compile Include="ModLoader.cs" />
+    <Compile Include="ModLoaderConfiguration.cs" />
     <Compile Include="NeosMod.cs" />
     <Compile Include="NeosVersionReset.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
