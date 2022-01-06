@@ -141,7 +141,7 @@ namespace NeosModLoader
                     using (JsonTextReader reader = new JsonTextReader(file))
                     {
                         JObject json = JObject.Load(reader);
-                        Version version = json[VERSION_JSON_KEY].ToObject<Version>();
+                        Version version = new Version(json[VERSION_JSON_KEY].ToObject<string>());
                         if (!AreVersionsCompatible(version, definition.Version))
                         {
                             mod.AllowSavingConfiguration = false;
@@ -169,7 +169,7 @@ namespace NeosModLoader
             return new ModConfiguration(mod, definition, values);
         }
 
-        internal void Save()
+        public void Save()
         {
             // prevent saving if we've determined something is amiss with the configuration
             if (!LoadedNeosMod.AllowSavingConfiguration)
@@ -180,7 +180,7 @@ namespace NeosModLoader
             ModConfigurationDefinition definition = LoadedNeosMod.NeosMod.GetConfigurationDefinition();
 
             JObject json = new JObject();
-            json[VERSION_JSON_KEY] = JToken.FromObject(definition.Version);
+            json[VERSION_JSON_KEY] = JToken.FromObject(definition.Version.ToString());
 
             JObject valueMap = new JObject();
             foreach (KeyValuePair<ModConfigurationKey, object> entry in Values)
