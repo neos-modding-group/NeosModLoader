@@ -86,6 +86,42 @@ namespace NeosModLoader
             return true;
         }
 
+        public bool TryGetValue(ModConfigurationKey key, out object value)
+        {
+            return Values.TryGetValue(key, out value);
+        }
+
+        public bool TryGetValue<T>(ModConfigurationKey<T> key, out T value)
+        {
+            if (Values.TryGetValue(key, out object valueObject))
+            {
+                value = (T)valueObject;
+                return true;
+            }
+            else
+            {
+                value = default(T);
+                return false;
+            }
+        }
+
+        public void Set(ModConfigurationKey key, object value)
+        {
+            if (key.ValueType().IsAssignableFrom(value.GetType()))
+            {
+                Values[key] = value;
+            }
+            else
+            {
+                throw new ArgumentException($"{value.GetType()} cannot be assigned to {key.ValueType()}");
+            }
+        }
+
+        public void Set<T>(ModConfigurationKey<T> key, T value)
+        {
+            Values[key] = value;
+        }
+
         internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
         {
             ModConfigurationDefinition definition = mod.NeosMod.GetConfigurationDefinition();
