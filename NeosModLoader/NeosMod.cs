@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
+
 namespace NeosModLoader
 {
-    public abstract class NeosMod
+    // contains members that only the modloader or the mod itself are intended to access
+    public abstract class NeosMod : NeosModBase
     {
         public static void Debug(string message) => Logger.DebugExternal(message);
         public static void Debug(object message) => Logger.DebugExternal(message.ToString());
@@ -15,9 +19,13 @@ namespace NeosModLoader
         public static void Error(object message) => Logger.ErrorExternal(message.ToString());
         public static void Error(params object[] messages) => Logger.ErrorList(messages);
         public virtual void OnEngineInit() { }
-        public abstract string Name { get; }
-        public abstract string Author { get; }
-        public abstract string Version { get; }
-        public virtual string Link { get; }
+        public virtual ModConfigurationDefinition GetConfigurationDefinition()
+        {
+            return null;
+        }
+        public ModConfigurationDefinition DefineConfiguration(Version version, List<ModConfigurationKey> configurationItemDefinitions)
+        {
+            return new ModConfigurationDefinition(this, version, configurationItemDefinitions);
+        }
     }
 }

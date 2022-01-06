@@ -50,10 +50,13 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModAssembly.cs" />
+    <Compile Include="LoadedNeosMod.cs" />
+    <Compile Include="NeosModBase.cs" />
     <Compile Include="DebugInfo.cs" />
     <Compile Include="ExecutionHook.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="ModConfigurationDefinition.cs" />
+    <Compile Include="ModConfiguration.cs" />
     <Compile Include="ModConfigurationKey.cs" />
     <Compile Include="ModLoader.cs" />
     <Compile Include="ModLoaderConfiguration.cs" />

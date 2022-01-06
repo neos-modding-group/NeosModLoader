@@ -103,14 +103,13 @@ namespace NeosModLoader
 
         private static string SourceFromStackTrace()
         {
-            Dictionary<Assembly, NeosMod> loadedMods = ModLoader.LoadedMods;
             // skip three frames: SourceFromStackTrace(), MsgExternal(), Msg()
             StackTrace stackTrace = new StackTrace(3);
             for (int i = 0; i < stackTrace.FrameCount; i++)
             {
                 Assembly assembly = stackTrace.GetFrame(i).GetMethod().DeclaringType.Assembly;
                 NeosMod mod;
-                if (loadedMods.TryGetValue(assembly, out mod))
+                if (ModLoader.AssemblyLookupMap.TryGetValue(assembly, out mod))
                 {
                     return mod.Name;
                 }

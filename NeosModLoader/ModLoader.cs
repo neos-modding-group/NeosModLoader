@@ -11,7 +11,21 @@ namespace NeosModLoader
     {
         public static readonly string VERSION = "1.5.0";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
-        internal static Dictionary<Assembly, NeosMod> LoadedMods { get; } = new Dictionary<Assembly, NeosMod>();
+        internal static List<LoadedNeosMod> LoadedMods { get; } = new List<LoadedNeosMod>();
+        internal static Dictionary<Assembly, NeosMod> AssemblyLookupMap = new Dictionary<Assembly, NeosMod>();
+        internal static Dictionary<NeosModBase, LoadedNeosMod> ModBaseLookupMap = new Dictionary<NeosModBase, LoadedNeosMod>();
+        internal static Dictionary<string, LoadedNeosMod> ModNameLookupMap = new Dictionary<string, LoadedNeosMod>();
+
+        /// <summary>
+        /// Allows reading metadata for all loaded mods
+        /// </summary>
+        /// <returns>A new list containing each loaded mod</returns>
+        public static IEnumerable<NeosModBase> Mods()
+        {
+            return LoadedMods
+                .Select(m => (NeosModBase)m.NeosMod)
+                .ToList();
+        }
 
         internal static void LoadMods()
         {
@@ -57,6 +71,8 @@ namespace NeosModLoader
                 return;
             }
 
+            ModConfiguration.EnsureDirectoryExists();
+
             // mods assemblies are all loaded before hooking begins so mods can interconnect if needed
             foreach (ModAssembly mod in modsToLoad)
             {
@@ -70,8 +86,24 @@ namespace NeosModLoader
                 }
             }
 
-            // call OnEngineInit() for each mod
+            // call Initialize() each mod
             foreach (ModAssembly mod in modsToLoad)
+            {
+                try
+                {
+                    LoadedNeosMod loaded = InitializeMod(mod);
+                    if (loaded != null)
+                    {
+                        RegisterMod(loaded);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.ErrorInternal($"Unexpected exception initializing mod from {mod.File}:\n{e}");
+                }
+            }
+
+            foreach (LoadedNeosMod mod in LoadedMods)
             {
                 try
                 {
@@ -79,7 +111,7 @@ namespace NeosModLoader
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorInternal($"Unexpected exception loading mod from {mod.File}:\n{e}");
+                    Logger.ErrorInternal($"Unexpected exception initializing mod {mod.NeosMod.Name} from {mod.ModAssembly.File}:\n{e}");
                 }
             }
 
@@ -106,6 +138,24 @@ namespace NeosModLoader
                     }
                 }
             }
+        }
+
+        private static void RegisterMod(LoadedNeosMod mod)
+        {
+            try
+            {
+                ModNameLookupMap.Add(mod.NeosMod.Name, mod);
+            }
+            catch (ArgumentException)
+            {
+                LoadedNeosMod existing = ModNameLookupMap[mod.NeosMod.Name];
+                Logger.ErrorInternal($"{mod.ModAssembly.File} declares duplicate mod {mod.NeosMod.Name} already declared in {existing.ModAssembly.File}. The new mod will be ignored.");
+                return;
+            }
+
+            LoadedMods.Add(mod);
+            AssemblyLookupMap.Add(mod.ModAssembly.Assembly, mod.NeosMod);
+            ModBaseLookupMap.Add(mod.NeosMod, mod);
         }
 
         private static string TypesForOwner(Patches patches, string owner)
@@ -138,21 +188,24 @@ namespace NeosModLoader
             mod.Assembly = assembly;
         }
 
-        private static void HookMod(ModAssembly mod)
+        // loads mod class and mod config
+        private static LoadedNeosMod InitializeMod(ModAssembly mod)
         {
             if (mod.Assembly == null)
             {
-                return;
+                return null;
             }
 
             Type[] modClasses = mod.Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && NEOS_MOD_TYPE.IsAssignableFrom(t)).ToArray();
             if (modClasses.Length == 0)
             {
                 Logger.ErrorInternal($"no mods found in {mod.File}");
+                return null;
             }
             else if (modClasses.Length != 1)
             {
                 Logger.ErrorInternal($"more than one mod found in {mod.File}. no mods will be loaded.");
+                return null;
             }
             else
             {
@@ -165,33 +218,30 @@ namespace NeosModLoader
                 catch (Exception e)
                 {
                     Logger.ErrorInternal($"error instantiating mod {modClass.FullName} from {mod.File}:\n{e}");
-                    return;
+                    return null;
                 }
                 if (neosMod == null)
                 {
                     Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.File}");
-                    return;
+                    return null;
                 }
-                LoadedMods.Add(mod.Assembly, neosMod);
-                Logger.MsgInternal($"loaded mod {neosMod.Name} {neosMod.Version} from {mod.File}");
-                try
-                {
-                    neosMod.OnEngineInit();
-                }
-                catch (Exception e)
-                {
-                    Logger.ErrorInternal($"mod {modClass.FullName} from {mod.File} threw error from OnEngineInit():\n{e}");
-                }
+
+                LoadedNeosMod loadedMod = new LoadedNeosMod(neosMod, mod);
+                loadedMod.ModConfiguration = ModConfiguration.LoadConfigForMod(loadedMod);
+                return loadedMod;
             }
         }
 
-        private class ModAssembly
+        private static void HookMod(LoadedNeosMod mod)
         {
-            public string File { get; }
-            public Assembly Assembly { get; set; }
-            public ModAssembly(string file)
+            Logger.MsgInternal($"loaded mod {mod.NeosMod.Name} {mod.NeosMod.Version} from {mod.ModAssembly.File}");
+            try
             {
-                File = file;
+                mod.NeosMod.OnEngineInit();
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorInternal($"mod {mod.NeosMod.Name} from {mod.ModAssembly.File} threw error from OnEngineInit():\n{e}");
             }
         }
     }
