@@ -1,6 +1,6 @@
 # NeosModLoader Configuration System
 
-NeosModLoader provides a built-in configuration system that can be used to persist configuration values for mods.
+NeosModLoader provides a built-in configuration system that can be used to persist configuration values for mods. **This configuration system only exists in NeosModLoader 1.5.0 and later!**
 
 Operations provided:
 - Reading value of a config key
