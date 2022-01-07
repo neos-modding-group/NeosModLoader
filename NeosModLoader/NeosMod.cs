@@ -39,9 +39,9 @@ namespace NeosModLoader
         /// <param name="version">The semantic version of the configuration definition</param>
         /// <param name="configurationItemDefinitions">A list of configuration items</param>
         /// <returns></returns>
-        public ModConfigurationDefinition DefineConfiguration(Version version, List<ModConfigurationKey> configurationItemDefinitions)
+        public ModConfigurationDefinition DefineConfiguration(Version version, IEnumerable<ModConfigurationKey> configurationItemDefinitions)
         {
-            return new ModConfigurationDefinition(this, version, configurationItemDefinitions);
+            return new ModConfigurationDefinition(this, version, new HashSet<ModConfigurationKey>(configurationItemDefinitions));
         }
 
         /// <summary>

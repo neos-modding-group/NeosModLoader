@@ -10,7 +10,7 @@ namespace NeosModLoader
     {
         NeosModBase Owner { get; }
         Version Version { get; }
-        List<ModConfigurationKey> ConfigurationItemDefinitions { get; }
+        HashSet<ModConfigurationKey> ConfigurationItemDefinitions { get; }
     }
 
     /// <summary>
@@ -28,19 +28,19 @@ namespace NeosModLoader
         /// </summary>
         public Version Version { get; private set; }
 
-        private List<ModConfigurationKey> configurationItemDefinitions;
+        private HashSet<ModConfigurationKey> configurationItemDefinitions;
 
         /// <summary>
-        /// The list of coniguration keys defined in this configuration definition
+        /// The set of coniguration keys defined in this configuration definition
         /// </summary>
-        public List<ModConfigurationKey> ConfigurationItemDefinitions
+        public HashSet<ModConfigurationKey> ConfigurationItemDefinitions
         {
-            // clone the list because I don't trust giving public API users shallow copies one bit
-            get { return new List<ModConfigurationKey>(configurationItemDefinitions); }
+            // clone the collection because I don't trust giving public API users shallow copies one bit
+            get { return new HashSet<ModConfigurationKey>(configurationItemDefinitions); }
             private set { configurationItemDefinitions = value; }
         }
 
-        internal ModConfigurationDefinition(NeosModBase owner, Version version, List<ModConfigurationKey> configurationItemDefinitions)
+        internal ModConfigurationDefinition(NeosModBase owner, Version version, HashSet<ModConfigurationKey> configurationItemDefinitions)
         {
             Owner = owner;
             Version = version;
@@ -72,9 +72,9 @@ namespace NeosModLoader
         public Version Version => Definition.Version;
 
         /// <summary>
-        /// The list of coniguration keys defined in this configuration definition
+        /// The set of coniguration keys defined in this configuration definition
         /// </summary>
-        public List<ModConfigurationKey> ConfigurationItemDefinitions => Definition.ConfigurationItemDefinitions;
+        public HashSet<ModConfigurationKey> ConfigurationItemDefinitions => Definition.ConfigurationItemDefinitions;
 
         /// <summary>
         /// The delegate that is called for configuration change events.
@@ -131,6 +131,53 @@ namespace NeosModLoader
         }
 
         /// <summary>
+        /// Check if a key is defined in this config
+        /// </summary>
+        /// <param name="key">the key to check</param>
+        /// <returns>true if the key is defined</returns>
+        public bool IsKeyDefined(ModConfigurationKey key)
+        {
+            return ConfigurationItemDefinitions.Contains(key);
+        }
+
+        /// <summary>
+        /// Get a value, throwing an exception if the key is not found
+        /// </summary>
+        /// <param name="key">The key to find</param>
+        /// <returns>The found value</returns>
+        /// <exception cref="KeyNotFoundException">key does not exist in the collection</exception>
+        public object GetValue(ModConfigurationKey key)
+        {
+            if (IsKeyDefined(key) && TryGetValue(key, out object value))
+            {
+                return value;
+            }
+            else
+            {
+                throw new KeyNotFoundException($"{key.Name} not found in {LoadedNeosMod.NeosMod.Name} configuration");
+            }
+        }
+
+        /// <summary>
+        /// Get a value, throwing an exception if the key is not found
+        /// </summary>
+        /// <typeparam name="T">The value's type</typeparam>
+        /// <param name="key">The key to find</param>
+        /// <returns>The found value</returns>
+        /// <exception cref="KeyNotFoundException">key does not exist in the collection</exception>
+        public T GetValue<T>(ModConfigurationKey<T> key)
+        {
+            if (IsKeyDefined(key) && TryGetValue(key, out T value))
+            {
+                return value;
+            }
+            else
+            {
+                throw new KeyNotFoundException($"{key.Name} not found in {LoadedNeosMod.NeosMod.Name} configuration");
+            }
+        }
+
+        /// <summary>
         /// Try to read a configuration value
         /// </summary>
         /// <param name="key">The key</param>
@@ -138,6 +185,12 @@ namespace NeosModLoader
         /// <returns>true if the value was read successfully</returns>
         public bool TryGetValue(ModConfigurationKey key, out object value)
         {
+            if (!IsKeyDefined(key))
+            {
+                value = null;
+                return false;
+            }
+
             if (Values.TryGetValue(key, out object valueObject))
             {
                 value = valueObject;
@@ -163,6 +216,12 @@ namespace NeosModLoader
         /// <returns>true if the value was read successfully</returns>
         public bool TryGetValue<T>(ModConfigurationKey<T> key, out T value)
         {
+            if (!IsKeyDefined(key))
+            {
+                value = default(T);
+                return false;
+            }
+
             if (Values.TryGetValue(key, out object valueObject))
             {
                 value = (T)valueObject;
@@ -187,10 +246,16 @@ namespace NeosModLoader
         /// <param name="eventLabel">A custom label you may assign to this event</param>
         public void Set(ModConfigurationKey key, object value, string eventLabel = null)
         {
+            if (!IsKeyDefined(key))
+            {
+                throw new KeyNotFoundException($"{key.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
+            }
+
             if (!key.Validate(value))
             {
                 throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{key.Name}\"");
             }
+
             if (key.ValueType().IsAssignableFrom(value.GetType()))
             {
                 Values[key] = value;
@@ -212,10 +277,16 @@ namespace NeosModLoader
         /// <param name="eventLabel">A custom label you may assign to this event</param>
         public void Set<T>(ModConfigurationKey<T> key, T value, string eventLabel = null)
         {
+            if (!IsKeyDefined(key))
+            {
+                throw new KeyNotFoundException($"{key.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
+            }
+
             if (!key.ValidateTyped(value))
             {
                 throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{key.Name}\"");
             }
+
             Values[key] = value;
             FireConfigurationChangedEvent(key, eventLabel);
         }
@@ -227,7 +298,14 @@ namespace NeosModLoader
         /// <returns>true if a value was successfully found and removed, false if there was no value to remove</returns>
         public bool Unset(ModConfigurationKey key)
         {
-            return Values.Remove(key);
+            if (!IsKeyDefined(key))
+            {
+                throw new KeyNotFoundException($"{key.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
+            }
+            else
+            {
+                return Values.Remove(key);
+            }
         }
 
         internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
