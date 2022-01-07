@@ -1,6 +1,4 @@
 using BaseX;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -10,7 +8,7 @@ namespace NeosModLoader
     {
         internal static void DebugExternal(string message)
         {
-            if (Configuration.get().Debug)
+            if (ModLoaderConfiguration.get().Debug)
             {
                 LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
             }
@@ -18,7 +16,7 @@ namespace NeosModLoader
 
         internal static void DebugInternal(string message)
         {
-            if (Configuration.get().Debug)
+            if (ModLoaderConfiguration.get().Debug)
             {
                 LogInternal(LogType.DEBUG, message);
             }
@@ -104,14 +102,13 @@ namespace NeosModLoader
 
         private static string SourceFromStackTrace()
         {
-            Dictionary<Assembly, NeosMod> loadedMods = ModLoader.LoadedMods;
             // skip three frames: SourceFromStackTrace(), MsgExternal(), Msg()
             StackTrace stackTrace = new StackTrace(3);
             for (int i = 0; i < stackTrace.FrameCount; i++)
             {
                 Assembly assembly = stackTrace.GetFrame(i).GetMethod().DeclaringType.Assembly;
                 NeosMod mod;
-                if (loadedMods.TryGetValue(assembly, out mod))
+                if (ModLoader.AssemblyLookupMap.TryGetValue(assembly, out mod))
                 {
                     return mod.Name;
                 }
@@ -121,10 +118,10 @@ namespace NeosModLoader
 
         private sealed class LogType
         {
-            public readonly static string DEBUG = "[DEBUG]";
-            public readonly static string INFO = "[INFO] ";
-            public readonly static string WARN = "[WARN] ";
-            public readonly static string ERROR = "[ERROR]";
+            internal readonly static string DEBUG = "[DEBUG]";
+            internal readonly static string INFO = "[INFO] ";
+            internal readonly static string WARN = "[WARN] ";
+            internal readonly static string ERROR = "[ERROR]";
         }
     }
 }

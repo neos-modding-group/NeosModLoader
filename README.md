@@ -137,6 +137,9 @@ Happens **after** `OnEngineInit()`
 - Audio initialization
 - Worlds loading, including Local home and Userspace
 
+### Mod Configuration
+NeosModLoader provides a built-in configuration system that can be used to persist configuration values for mods. More information is available in the [configuration system documentation](doc/config.md).
+
 ### Example Mod
 
 ```csharp
