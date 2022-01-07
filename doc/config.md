@@ -117,6 +117,25 @@ public override IncompatibleConfigurationHandlingOption HandleIncompatibleConfig
 }
 ```
 
+### Breaking Changes in Configuration Definition
+There are two cases to consider:
+- **Forwards Compatible**: Can mod v2 loads config v1?
+- **Backwards Compatible**: Can mod v1 loads config v2?
+
+| Action | Forwards Compatible | Backwards Compatible |
+| ------ | ------------------- | ---------------------|
+| Adding a brand new key | Yes | Yes |
+| Removing an existing key | Yes | Yes |
+| Adding, altering, or removing a key's default value | Yes | Maybe* |
+| Restricting a key's validator | Yes** | Yes |
+| Relaxing a key's validator | Yes | Maybe* |
+| Changing `internalAccessOnly` to `false` | Yes | Maybe* |
+| Changing `internalAccessOnly` to `true` | Yes** |Yes |
+| Altering a key's type (removing and re-adding later counts!) | **No** | **No** |
+
+<sup>\* NeosModLoader is compatible, but the old version of your mod's code may not be</sup>  
+<sup>\*\* Assuming the new version of your mod properly accounts for reading old configs</sup>
+
 ## Working With Other Mods' Configurations
 An example of enumerating all configs:
 ```csharp
