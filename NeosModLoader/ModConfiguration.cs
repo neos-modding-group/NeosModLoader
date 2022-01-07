@@ -194,7 +194,7 @@ namespace NeosModLoader
             if (key.ValueType().IsAssignableFrom(value.GetType()))
             {
                 Values[key] = value;
-                RaiseConfigurationChangedEvent(key, eventLabel);
+                FireConfigurationChangedEvent(key, eventLabel);
             }
             else
             {
@@ -217,7 +217,7 @@ namespace NeosModLoader
                 throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{key.Name}\"");
             }
             Values[key] = value;
-            RaiseConfigurationChangedEvent(key, eventLabel);
+            FireConfigurationChangedEvent(key, eventLabel);
         }
 
         /// <summary>
@@ -340,11 +340,11 @@ namespace NeosModLoader
             }
         }
 
-        private void RaiseConfigurationChangedEvent(ModConfigurationKey key, string label)
+        private void FireConfigurationChangedEvent(ModConfigurationKey key, string label)
         {
             try
             {
-                OnAnyConfigurationChanged?.SafeInvoke(this, new ConfigurationChangedEvent(this, key, label));
+                OnAnyConfigurationChanged?.SafeInvoke(new ConfigurationChangedEvent(this, key, label));
             }
             catch (Exception e)
             {
@@ -353,7 +353,7 @@ namespace NeosModLoader
 
             try
             {
-                OnThisConfigurationChanged?.SafeInvoke(this, new ConfigurationChangedEvent(this, key, label));
+                OnThisConfigurationChanged?.SafeInvoke(new ConfigurationChangedEvent(this, key, label));
             }
             catch (Exception e)
             {
