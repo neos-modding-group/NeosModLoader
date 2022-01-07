@@ -126,18 +126,21 @@ void EnumerateConfigs()
     foreach (NeosModBase mod in mods)
     {
         ModConfiguration config = mod.GetConfiguration();
-        foreach (ModConfigurationKey key in config.ConfigurationItemDefinitions)
+        if (config != null)
         {
-            if (!key.InternalAccessOnly)
+            foreach (ModConfigurationKey key in config.ConfigurationItemDefinitions)
             {
-                
-                if (config.TryGetValue(key, out object value))
+                if (!key.InternalAccessOnly)
                 {
-                    Msg($"{mod.Name} has configuration {key.Name} with type {key.ValueType()} and value {value}");
-                }
-                else
-                {
-                    Msg($"{mod.Name} has configuration {key.Name} with type {key.ValueType()} and no value");
+                    
+                    if (config.TryGetValue(key, out object value))
+                    {
+                        Msg($"{mod.Name} has configuration {key.Name} with type {key.ValueType()} and value {value}");
+                    }
+                    else
+                    {
+                        Msg($"{mod.Name} has configuration {key.Name} with type {key.ValueType()} and no value");
+                    }
                 }
             }
         }
