@@ -137,6 +137,9 @@ Happens **after** `OnEngineInit()`
 - Audio initialization
 - Worlds loading, including Local home and Userspace
 
+### Mod Configuration
+NeosModLoader provides a built-in configuration system that can be used to persist configuration values for mods. More information is available in the [configuration system documentation](doc/config.md).
+
 ### Example Mod
 
 ```csharp
@@ -199,6 +202,7 @@ Not all keys are required to be present. Missing keys will use the defaults outl
 | `nomods`           | `false` | If `true`, mods will not be loaded. |
 | `advertiseversion` | `false` | If `false`, your version will be spoofed and will resemble `2021.8.29.1240`. If `true`, your version will be left unaltered and will resemble `2021.8.29.1240+NeosModLoader.dll`. This version string is visible to other players under certain circumstances. |
 | `unsafe`           | `false` | If `true`, the version spoofing safety check is disabled and it will still work even if you have other Neos plugins. DO NOT load plugin components in multiplayer sessions, as it will break things and cause crashes. Plugin components should only be used in your local home or user space. |
+| `logconflicts`     | `true`  | If `true`, potential mod conflicts will be logged. If `debug` is also `true` this will be more verbose. |
 
 ## Contributing
 Issues and PRs are welcome. Please read our [Contributing Guidelines](.github/CONTRIBUTING.md)!
