@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace NeosModLoader
 {
-    internal class ModLoader
+    public class ModLoader
     {
         /// <summary>
         /// NeosModLoader's version
