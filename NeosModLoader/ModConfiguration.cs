@@ -6,17 +6,28 @@ using System.IO;
 
 namespace NeosModLoader
 {
-    internal interface IModConfiguration
+    public interface IModConfigurationDefinition
     {
+        /// <summary>
+        /// Mod that owns this configuration definition
+        /// </summary>
         NeosModBase Owner { get; }
+
+        /// <summary>
+        /// Semantic version for this configuration definition. This is used to check if the defined and saved configs are compatible
+        /// </summary>
         Version Version { get; }
-        HashSet<ModConfigurationKey> ConfigurationItemDefinitions { get; }
+
+        /// <summary>
+        /// The set of coniguration keys defined in this configuration definition
+        /// </summary>
+        ISet<ModConfigurationKey> ConfigurationItemDefinitions { get; }
     }
 
     /// <summary>
     /// Defines a mod configuration. This should be defined by a NeosMod using the NeosMod.DefineConfiguration() method.
     /// </summary>
-    public class ModConfigurationDefinition : IModConfiguration
+    public class ModConfigurationDefinition : IModConfigurationDefinition
     {
         /// <summary>
         /// Mod that owns this configuration definition
@@ -28,12 +39,12 @@ namespace NeosModLoader
         /// </summary>
         public Version Version { get; private set; }
 
-        private HashSet<ModConfigurationKey> configurationItemDefinitions;
+        private ISet<ModConfigurationKey> configurationItemDefinitions;
 
         /// <summary>
         /// The set of coniguration keys defined in this configuration definition
         /// </summary>
-        public HashSet<ModConfigurationKey> ConfigurationItemDefinitions
+        public ISet<ModConfigurationKey> ConfigurationItemDefinitions
         {
             // clone the collection because I don't trust giving public API users shallow copies one bit
             get { return new HashSet<ModConfigurationKey>(configurationItemDefinitions); }
@@ -51,7 +62,7 @@ namespace NeosModLoader
     /// <summary>
     /// The configuration for a mod. Each mod has zero or one configuration. The configuration object will never be reassigned once initialized.
     /// </summary>
-    public class ModConfiguration : IModConfiguration
+    public class ModConfiguration : IModConfigurationDefinition
     {
         private ModConfigurationDefinition Definition;
         internal Dictionary<ModConfigurationKey, object> Values { get; private set; }
@@ -74,7 +85,7 @@ namespace NeosModLoader
         /// <summary>
         /// The set of coniguration keys defined in this configuration definition
         /// </summary>
-        public HashSet<ModConfigurationKey> ConfigurationItemDefinitions => Definition.ConfigurationItemDefinitions;
+        public ISet<ModConfigurationKey> ConfigurationItemDefinitions => Definition.ConfigurationItemDefinitions;
 
         /// <summary>
         /// The delegate that is called for configuration change events.
