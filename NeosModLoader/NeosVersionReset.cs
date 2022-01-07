@@ -1,4 +1,3 @@
-using BaseX;
 using FrooxEngine;
 using HarmonyLib;
 using System;
@@ -23,7 +22,7 @@ namespace NeosModLoader
 
             if (!nmlPresent)
             {
-                throw new Exception("assertion failed: Engine.ExtraAssemblies did not contain NeosModLoader.dll");
+                throw new Exception("Assertion failed: Engine.ExtraAssemblies did not contain NeosModLoader.dll");
             }
 
             bool otherPluginsPresent = extraAssemblies.Count > 1;
@@ -44,11 +43,11 @@ namespace NeosModLoader
             }
             if (success)
             {
-                Logger.MsgInternal("version spoofing succeeded");
+                Logger.MsgInternal("Version spoofing succeeded");
             }
             else
             {
-                Logger.WarnInternal("version spoofing failed");
+                Logger.WarnInternal("Version spoofing failed");
             }
         }
 
@@ -58,13 +57,13 @@ namespace NeosModLoader
             int? vanillaProtocolVersionMaybe = GetVanillaProtocolVersion();
             if (vanillaProtocolVersionMaybe is int vanillaProtocolVersion)
             {
-                Logger.DebugInternal($"vanilla protocol version is {vanillaProtocolVersion}");
+                Logger.DebugInternal($"Vanilla protocol version is {vanillaProtocolVersion}");
                 vanillaCompatibilityHash = CalculateCompatibilityHash(vanillaProtocolVersion);
                 return SetCompatibilityHash(engine, vanillaCompatibilityHash);
             }
             else
             {
-                Logger.ErrorInternal("unable to determine vanilla protocol version");
+                Logger.ErrorInternal("Unable to determine vanilla protocol version");
                 return false;
             }
         }
@@ -73,9 +72,7 @@ namespace NeosModLoader
         {
             using (MD5CryptoServiceProvider cryptoServiceProvider = new MD5CryptoServiceProvider())
             {
-                ConcatenatedStream concatenatedStream = new ConcatenatedStream();
-                concatenatedStream.EnqueueStream(new MemoryStream(BitConverter.GetBytes(ProtocolVersion)));
-                byte[] hash = cryptoServiceProvider.ComputeHash(concatenatedStream);
+                byte[] hash = cryptoServiceProvider.ComputeHash(new MemoryStream(BitConverter.GetBytes(ProtocolVersion)));
                 return Convert.ToBase64String(hash);
             }
         }
@@ -89,12 +86,12 @@ namespace NeosModLoader
 
             if (field == null)
             {
-                Logger.WarnInternal("unable to write Engine.CompatibilityHash");
+                Logger.WarnInternal("Unable to write Engine.CompatibilityHash");
                 return false;
             }
             else
             {
-                Logger.DebugInternal($"changing compatibility hash from {engine.CompatibilityHash} to {Target}");
+                Logger.DebugInternal($"Changing compatibility hash from {engine.CompatibilityHash} to {Target}");
                 field.SetValue(engine, Target);
                 return true;
             }
@@ -110,10 +107,10 @@ namespace NeosModLoader
                 FieldInfo field = AccessTools.DeclaredField(engine.GetType(), "_versionString");
                 if (field == null)
                 {
-                    Logger.WarnInternal("unable to write Engine._versionString");
+                    Logger.WarnInternal("Unable to write Engine._versionString");
                     return false;
                 }
-                Logger.DebugInternal($"changing version string from {engine.VersionString} to {target}");
+                Logger.DebugInternal($"Changing version string from {engine.VersionString} to {target}");
                 field.SetValue(engine, target);
             }
             return true;
@@ -131,21 +128,21 @@ namespace NeosModLoader
             MethodInfo targetCallee = AccessTools.DeclaredMethod(typeof(BitConverter), nameof(BitConverter.GetBytes), new Type[] { typeof(int) });
             if (targetCallee == null)
             {
-                Logger.ErrorInternal("could not find System.BitConverter::GetBytes(System.Int32)");
+                Logger.ErrorInternal("Could not find System.BitConverter::GetBytes(System.Int32)");
                 return null;
             }
 
             MethodInfo initializeShim = AccessTools.DeclaredMethod(typeof(Engine), nameof(Engine.Initialize));
             if (initializeShim == null)
             {
-                Logger.ErrorInternal("could not find Engine.Initialize(*)");
+                Logger.ErrorInternal("Could not find Engine.Initialize(*)");
                 return null;
             }
 
             AsyncStateMachineAttribute asyncAttribute = (AsyncStateMachineAttribute)initializeShim.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
             if (asyncAttribute == null)
             {
-                Logger.ErrorInternal("could not find AsyncStateMachine for Engine.Initialize");
+                Logger.ErrorInternal("Could not find AsyncStateMachine for Engine.Initialize");
                 return null;
             }
 
@@ -156,7 +153,7 @@ namespace NeosModLoader
             MethodInfo initializeImpl = AccessTools.DeclaredMethod(asyncStateMachineType, "MoveNext");
             if (initializeImpl == null)
             {
-                Logger.ErrorInternal("could not find MoveNext method for Engine.Initialize");
+                Logger.ErrorInternal("Could not find MoveNext method for Engine.Initialize");
                 return null;
             }
 
