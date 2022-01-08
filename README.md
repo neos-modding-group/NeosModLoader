@@ -99,7 +99,7 @@ Check out this document for more detail: [Problem Solving Techniques](doc/proble
 If you are just trying to make a new component or logix node, you should use a plugin. The plugin system is specifically designed for that.
 
 If you are trying to modify Neos's existing behavior without adding any new components, NeosModLoader offers the following:
-- [LibHarmony](https://github.com/pardeike/Harmony) is a dependency of NeosModLoader, so as a mod developer you don't need to worry about making sure it's installed
+- [LibHarmony] is a dependency of NeosModLoader, so as a mod developer you don't need to worry about making sure it's installed
 - Neos Plugins normally break multiplayer compatibility. The NeosModLoader plugin has been specifically designed to remain compatible. This feature will only work if NeosModLoader.dll is the *only* plugin you are using.
 - Neos Plugins can normally execute when Local Home loads at the earliest. NeosModLoader begins executing significantly earlier, giving you more room to alter Neos's behavior before it finishes initializing.
 - Steam has a relatively small character limit on launch options, and every Neos plugin you install pushes you closer to that limit. Having more than a handful plugins will therefore prevent you from using Steam to launch the game, and NeosModLoader is unaffected by this issue.
@@ -206,3 +206,19 @@ Not all keys are required to be present. Missing keys will use the defaults outl
 
 ## Contributing
 Issues and PRs are welcome. Please read our [Contributing Guidelines](.github/CONTRIBUTING.md)!
+
+## Licensing and Credits
+
+NeosModLoader is licensed under the GNU Lesser General Public License (LGPL). See [LICENSE.txt](LICENSE.txt) for the full license.
+
+
+Third-party libraries distributed alongside NeosModLoader:
+- [LibHarmony] ([MIT License](https://github.com/pardeike/Harmony/blob/79d62b42c71d005b3cb1d94e741bfd4ce7e03a6b/LICENSE))
+
+Third-party libraries used in source:
+- [.NET](https://github.com/dotnet) (Various licenses)
+- [Neos VR](https://neos.com/) ([EULA](https://store.steampowered.com//eula/740250_eula_0))
+- [Json.NET](https://github.com/JamesNK/Newtonsoft.Json) ([MIT License](https://github.com/JamesNK/Newtonsoft.Json/blob/52190a3a3de6ef9a556583cbcb2381073e7197bc/LICENSE.md))
+
+<!--- Link References -->
+[LibHarmony]: https://github.com/pardeike/Harmony
