@@ -8,7 +8,7 @@ namespace NeosModLoader
     {
         internal static void DebugExternal(string message)
         {
-            if (ModLoaderConfiguration.get().Debug)
+            if (ModLoaderConfiguration.Get().Debug)
             {
                 LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
             }
@@ -16,7 +16,7 @@ namespace NeosModLoader
 
         internal static void DebugInternal(string message)
         {
-            if (ModLoaderConfiguration.get().Debug)
+            if (ModLoaderConfiguration.Get().Debug)
             {
                 LogInternal(LogType.DEBUG, message);
             }

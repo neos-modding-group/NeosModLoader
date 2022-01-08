@@ -14,10 +14,10 @@ namespace NeosModLoader
         /// </summary>
         public static readonly string VERSION = "1.6.1";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
-        internal static List<LoadedNeosMod> LoadedMods = new List<LoadedNeosMod>();
-        internal static Dictionary<Assembly, NeosMod> AssemblyLookupMap = new Dictionary<Assembly, NeosMod>();
-        internal static Dictionary<NeosModBase, LoadedNeosMod> ModBaseLookupMap = new Dictionary<NeosModBase, LoadedNeosMod>();
-        internal static Dictionary<string, LoadedNeosMod> ModNameLookupMap = new Dictionary<string, LoadedNeosMod>();
+        private static List<LoadedNeosMod> LoadedMods = new List<LoadedNeosMod>(); // used for mod enumeration
+        internal static Dictionary<Assembly, NeosMod> AssemblyLookupMap = new Dictionary<Assembly, NeosMod>(); // used for logging
+        internal static Dictionary<NeosModBase, LoadedNeosMod> ModBaseLookupMap = new Dictionary<NeosModBase, LoadedNeosMod>(); // used for getting mod configuration
+        private static Dictionary<string, LoadedNeosMod> ModNameLookupMap = new Dictionary<string, LoadedNeosMod>(); // used for duplicate mod checking
 
         /// <summary>
         /// Allows reading metadata for all loaded mods
@@ -32,7 +32,7 @@ namespace NeosModLoader
 
         internal static void LoadMods()
         {
-            ModLoaderConfiguration config = ModLoaderConfiguration.get();
+            ModLoaderConfiguration config = ModLoaderConfiguration.Get();
             if (config.NoMods)
             {
                 Logger.DebugInternal("mods will not be loaded due to configuration file");

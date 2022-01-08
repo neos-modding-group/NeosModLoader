@@ -4,7 +4,7 @@ using System;
 namespace NeosModLoader
 {
     [ImplementableClass(true)]
-    class ExecutionHook
+    internal class ExecutionHook
     {
 #pragma warning disable CS0169
         // fields must exist due to reflective access

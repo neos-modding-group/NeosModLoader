@@ -6,7 +6,7 @@ namespace NeosModLoader
     {
         internal static void Log()
         {
-            Logger.MsgInternal($"NeosModLoader v{ModLoader.VERSION} starting up!{(ModLoaderConfiguration.get().Debug ? " Debug logs will be shown." : "")}");
+            Logger.MsgInternal($"NeosModLoader v{ModLoader.VERSION} starting up!{(ModLoaderConfiguration.Get().Debug ? " Debug logs will be shown." : "")}");
             Logger.MsgInternal($"Using Harmony v{GetAssemblyVersion(typeof(HarmonyLib.Harmony))}");
             Logger.MsgInternal($"Using BaseX v{GetAssemblyVersion(typeof(BaseX.floatQ))}");
             Logger.MsgInternal($"Using FrooxEngine v{GetAssemblyVersion(typeof(FrooxEngine.IComponent))}");

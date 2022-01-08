@@ -10,7 +10,7 @@ namespace NeosModLoader
 
         private static ModLoaderConfiguration _configuration;
 
-        internal static ModLoaderConfiguration get()
+        internal static ModLoaderConfiguration Get()
         {
             if (_configuration == null)
             {
