@@ -44,6 +44,16 @@ namespace NeosModLoader
         /// <returns></returns>
         public ModConfigurationDefinition DefineConfiguration(Version version, IEnumerable<ModConfigurationKey> configurationItemDefinitions)
         {
+            if (version == null)
+            {
+                throw new ArgumentNullException("version must be non-null");
+            }
+
+            if (configurationItemDefinitions == null)
+            {
+                throw new ArgumentNullException("configurationItemDefinitions must be non-null");
+            }
+
             return new ModConfigurationDefinition(this, version, new HashSet<ModConfigurationKey>(configurationItemDefinitions));
         }
 

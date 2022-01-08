@@ -10,18 +10,22 @@ namespace NeosModLoader
     {
         internal ModConfigurationKey(string name, string description, bool internalAccessOnly)
         {
+            if (name == null)
+            {
+                throw new ArgumentNullException("Configuration key name must not be null");
+            }
             Name = name;
             Description = description;
             InternalAccessOnly = internalAccessOnly;
         }
 
         /// <summary>
-        /// Unique name of this config item
+        /// Unique name of this config item. Must be present.
         /// </summary>
         public string Name { get; private set; }
 
         /// <summary>
-        /// Human-readable description of this config item
+        /// Human-readable description of this config item. Should be specified by the defining mod.
         /// </summary>
         public string Description { get; private set; }
 
@@ -47,6 +51,8 @@ namespace NeosModLoader
         /// <returns>true if a default was computed</returns>
         public abstract bool TryComputeDefault(out object defaultValue);
 
+        // We only care about key name for non-defining keys.
+        // For defining keys all of the other properties (default, validator, etc.) also matter.
         public override bool Equals(object obj)
         {
             return obj is ModConfigurationKey key &&
@@ -60,6 +66,12 @@ namespace NeosModLoader
 
         private object Value;
         private bool HasValue;
+
+        /// <summary>
+        /// Each configuration item has exactly ONE defining key, and that is the key defined by the mod.
+        /// Duplicate keys can be created (they only need to share the same Name) and they'll still work
+        /// for reading configs.
+        /// </summary>
         internal ModConfigurationKey DefiningKey;
 
         internal bool TryGetValue(out object value)
@@ -104,7 +116,7 @@ namespace NeosModLoader
         /// <param name="computeDefault">Function that, if present, computes a default value for this key</param>
         /// <param name="internalAccessOnly">If true, only the owning mod should have access to this config item</param>
         /// <param name="valueValidator">Checks if a value is valid for this configuration item</param>
-        public ModConfigurationKey(string name, string description, Func<T> computeDefault = null, bool internalAccessOnly = false, Predicate<T> valueValidator = null) : base(name, description, internalAccessOnly)
+        public ModConfigurationKey(string name, string description = null, Func<T> computeDefault = null, bool internalAccessOnly = false, Predicate<T> valueValidator = null) : base(name, description, internalAccessOnly)
         {
             ComputeDefault = computeDefault;
             IsValueValid = valueValidator;

@@ -16,7 +16,6 @@ namespace NeosModLoader
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         private static List<LoadedNeosMod> LoadedMods = new List<LoadedNeosMod>(); // used for mod enumeration
         internal static Dictionary<Assembly, NeosMod> AssemblyLookupMap = new Dictionary<Assembly, NeosMod>(); // used for logging
-        internal static Dictionary<NeosModBase, LoadedNeosMod> ModBaseLookupMap = new Dictionary<NeosModBase, LoadedNeosMod>(); // used for getting mod configuration
         private static Dictionary<string, LoadedNeosMod> ModNameLookupMap = new Dictionary<string, LoadedNeosMod>(); // used for duplicate mod checking
 
         /// <summary>
@@ -163,7 +162,7 @@ namespace NeosModLoader
 
             LoadedMods.Add(mod);
             AssemblyLookupMap.Add(mod.ModAssembly.Assembly, mod.NeosMod);
-            ModBaseLookupMap.Add(mod.NeosMod, mod);
+            mod.NeosMod.loadedNeosMod = mod; // complete the circular reference (used to look up config)
         }
 
         private static string TypesForOwner(Patches patches, string owner)

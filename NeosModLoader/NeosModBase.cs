@@ -25,27 +25,16 @@ namespace NeosModLoader
         /// </summary>
         public virtual string Link { get; }
 
+        /// <summary>
+        /// A circular reference back to the LoadedNeosMod that contains this NeosModBase.
+        /// The reference is set once the mod is successfully loaded, and is null before that.
+        /// </summary>
+        internal LoadedNeosMod loadedNeosMod;
+
         /// <returns>This mod's current configuration. This method will always return the same ModConfiguration instance.</returns>
         public ModConfiguration GetConfiguration()
         {
-            return ModLoader.ModBaseLookupMap[this].ModConfiguration;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is NeosModBase @base &&
-                   Name == @base.Name &&
-                   Author == @base.Author &&
-                   Version == @base.Version;
-        }
-
-        public override int GetHashCode()
-        {
-            int hashCode = 1366530947;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Author);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Version);
-            return hashCode;
+            return loadedNeosMod?.ModConfiguration;
         }
     }
 }
