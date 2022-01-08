@@ -51,8 +51,8 @@ namespace NeosModLoader
         {
             // clone the collection because I don't trust giving public API users shallow copies one bit
             get { return new HashSet<ModConfigurationKey>(configurationItemDefinitions); }
-            private set 
-            { 
+            private set
+            {
                 if (value is HashSet<ModConfigurationKey> hashSet)
                 {
                     configurationItemDefinitions = hashSet;
@@ -376,8 +376,7 @@ namespace NeosModLoader
                                 case IncompatibleConfigurationHandlingOption.FORCE_LOAD:
                                     // continue processing
                                     break;
-                                case IncompatibleConfigurationHandlingOption.ERROR:
-                                    // fall through to default
+                                case IncompatibleConfigurationHandlingOption.ERROR: // fall through to default
                                 default:
                                     mod.AllowSavingConfiguration = false;
                                     throw new ModConfigurationException($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}");

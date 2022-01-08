@@ -6,13 +6,8 @@ namespace NeosModLoader
 {
     internal class Logger
     {
-        internal static void DebugExternal(string message)
-        {
-            if (ModLoaderConfiguration.Get().Debug)
-            {
-                LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
-            }
-        }
+        // logged for null objects
+        internal readonly static string NULL_STRING = "null";
 
         internal static void DebugInternal(string message)
         {
@@ -22,74 +17,38 @@ namespace NeosModLoader
             }
         }
 
-        internal static void DebugList(object[] messages)
+        internal static void DebugExternal(object message)
         {
-            string Source = SourceFromStackTrace();
-            foreach (object element in messages)
+            if (ModLoaderConfiguration.Get().Debug)
             {
-                LogInternal(LogType.DEBUG, element.ToString(), Source);
+                LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
             }
         }
 
-        internal static void MsgExternal(string message)
+        internal static void DebugListExternal(object[] messages)
         {
-            LogInternal(LogType.INFO, message, SourceFromStackTrace());
-        }
-
-        internal static void MsgInternal(string message)
-        {
-            LogInternal(LogType.INFO, message);
-        }
-
-        internal static void MsgList(object[] messages)
-        {
-            string Source = SourceFromStackTrace();
-            foreach (object element in messages)
+            if (ModLoaderConfiguration.Get().Debug)
             {
-                LogInternal(LogType.INFO, element.ToString(), Source);
+                LogListInternal(LogType.DEBUG, messages, SourceFromStackTrace());
             }
         }
 
-        internal static void WarnExternal(string message)
-        {
-            LogInternal(LogType.WARN, message, SourceFromStackTrace());
-        }
+        internal static void MsgInternal(string message) => LogInternal(LogType.INFO, message);
+        internal static void MsgExternal(object message) => LogInternal(LogType.INFO, message, SourceFromStackTrace());
+        internal static void MsgListExternal(object[] messages) => LogListInternal(LogType.INFO, messages, SourceFromStackTrace());
+        internal static void WarnInternal(string message) => LogInternal(LogType.WARN, message);
+        internal static void WarnExternal(object message) => LogInternal(LogType.WARN, message, SourceFromStackTrace());
+        internal static void WarnListExternal(object[] messages) => LogListInternal(LogType.WARN, messages, SourceFromStackTrace());
+        internal static void ErrorInternal(string message) => LogInternal(LogType.ERROR, message);
+        internal static void ErrorExternal(object message) => LogInternal(LogType.ERROR, message, SourceFromStackTrace());
+        internal static void ErrorListExternal(object[] messages) => LogListInternal(LogType.ERROR, messages, SourceFromStackTrace());
 
-        internal static void WarnInternal(string message)
+        private static void LogInternal(string logTypePrefix, object message, string source = null)
         {
-            LogInternal(LogType.WARN, message);
-        }
-
-        internal static void WarnList(object[] messages)
-        {
-            string Source = SourceFromStackTrace();
-            foreach (object element in messages)
+            if (message == null)
             {
-                LogInternal(LogType.WARN, element.ToString(), Source);
+                message = NULL_STRING;
             }
-        }
-
-        internal static void ErrorExternal(string message)
-        {
-            LogInternal(LogType.ERROR, message, SourceFromStackTrace());
-        }
-
-        internal static void ErrorInternal(string message)
-        {
-            LogInternal(LogType.ERROR, message);
-        }
-
-        internal static void ErrorList(object[] messages)
-        {
-            string Source = SourceFromStackTrace();
-            foreach (object element in messages)
-            {
-                LogInternal(LogType.ERROR, element.ToString(), Source);
-            }
-        }
-
-        private static void LogInternal(string logTypePrefix, string message, string source = null)
-        {
             if (source == null)
             {
                 UniLog.Log($"{logTypePrefix}[NeosModLoader] {message}");
@@ -97,6 +56,21 @@ namespace NeosModLoader
             else
             {
                 UniLog.Log($"{logTypePrefix}[NeosModLoader/{source}] {message}");
+            }
+        }
+
+        private static void LogListInternal(string logTypePrefix, object[] messages, string source)
+        {
+            if (messages == null)
+            {
+                LogInternal(logTypePrefix, NULL_STRING, source);
+            }
+            else
+            {
+                foreach (object element in messages)
+                {
+                    LogInternal(logTypePrefix, element.ToString(), source);
+                }
             }
         }
 
