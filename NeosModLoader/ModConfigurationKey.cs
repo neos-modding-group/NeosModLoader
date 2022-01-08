@@ -71,6 +71,8 @@ namespace NeosModLoader
         /// Each configuration item has exactly ONE defining key, and that is the key defined by the mod.
         /// Duplicate keys can be created (they only need to share the same Name) and they'll still work
         /// for reading configs.
+        /// 
+        /// This is a non-null self-reference for the defining key itself as soon as the definition is done initializing.
         /// </summary>
         internal ModConfigurationKey DefiningKey;
 

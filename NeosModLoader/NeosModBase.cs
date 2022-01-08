@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace NeosModLoader
+﻿namespace NeosModLoader
 {
     // contains public metadata about the mod
     public abstract class NeosModBase

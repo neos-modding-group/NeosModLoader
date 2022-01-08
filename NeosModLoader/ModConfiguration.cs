@@ -50,7 +50,7 @@ namespace NeosModLoader
         public ISet<ModConfigurationKey> ConfigurationItemDefinitions
         {
             // clone the collection because I don't trust giving public API users shallow copies one bit
-            get { return new HashSet<ModConfigurationKey>(configurationItemDefinitions); }
+            get => new HashSet<ModConfigurationKey>(configurationItemDefinitions);
             private set
             {
                 if (value is HashSet<ModConfigurationKey> hashSet)
@@ -65,7 +65,7 @@ namespace NeosModLoader
                 configurationItemDefinitionsSelfMap = new Dictionary<ModConfigurationKey, ModConfigurationKey>(configurationItemDefinitions.Count);
                 foreach (ModConfigurationKey key in configurationItemDefinitions)
                 {
-                    key.DefiningKey = key;
+                    key.DefiningKey = key; // early init this property for the defining key itself
                     configurationItemDefinitionsSelfMap.Add(key, key);
                 }
             }
@@ -73,28 +73,27 @@ namespace NeosModLoader
 
         internal bool TryGetDefiningKey(ModConfigurationKey key, out ModConfigurationKey definingKey)
         {
-            if (key.DefiningKey == null)
-            {
-                // first time we've seen this key instance: we need to hit the map
-                if (configurationItemDefinitionsSelfMap.TryGetValue(key, out definingKey))
-                {
-                    // initialize the cache for this key
-                    key.DefiningKey = definingKey;
-                    return true;
-                }
-                else
-                {
-                    // not a real key
-                    definingKey = null;
-                    return false;
-                }
-            }
-            else
+            if (key.DefiningKey != null)
             {
                 // we've already cached the defining key
                 definingKey = key.DefiningKey;
                 return true;
             }
+
+            // first time we've seen this key instance: we need to hit the map
+            if (configurationItemDefinitionsSelfMap.TryGetValue(key, out definingKey))
+            {
+                // initialize the cache for this key
+                key.DefiningKey = definingKey;
+                return true;
+            }
+            else
+            {
+                // not a real key
+                definingKey = null;
+                return false;
+            }
+
         }
 
         internal ModConfigurationDefinition(NeosModBase owner, Version version, HashSet<ModConfigurationKey> configurationItemDefinitions)
@@ -182,6 +181,7 @@ namespace NeosModLoader
                 return false;
             }
 
+            // none of the checks failed!
             return true;
         }
 
@@ -192,7 +192,34 @@ namespace NeosModLoader
         /// <returns>true if the key is defined</returns>
         public bool IsKeyDefined(ModConfigurationKey key)
         {
-            return ConfigurationItemDefinitions.Contains(key);
+            // if a key has a non-null defining key it's guaranteed a real key. Lets check for that.
+            ModConfigurationKey definingKey = key.DefiningKey;
+            if (definingKey != null)
+            {
+                return true;
+            }
+
+            // okay, the defining key was null, so lets try to get the defining key from the hashtable instead
+            if (Definition.TryGetDefiningKey(key, out definingKey))
+            {
+                // we might as well set this now that we have the real defining key
+                key.DefiningKey = definingKey;
+                return true;
+            }
+
+            // there was no definition
+            return false;
+        }
+
+        /// <summary>
+        /// Check if a key is the defining key
+        /// </summary>
+        /// <param name="key">the key to check</param>
+        /// <returns>true if the key is the defining key</returns>
+        internal bool IsKeyDefiningKey(ModConfigurationKey key)
+        {
+            // a key is the defining key if and only if its DefiningKey property references itself
+            return ReferenceEquals(key, key.DefiningKey); // this is safe because we'll throw a NRE if key is null
         }
 
         /// <summary>
@@ -240,22 +267,21 @@ namespace NeosModLoader
         /// <returns>true if the value was read successfully</returns>
         public bool TryGetValue(ModConfigurationKey key, out object value)
         {
-            if (Definition.TryGetDefiningKey(key, out ModConfigurationKey definingKey))
+            if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey definingKey))
             {
-                if (definingKey.TryGetValue(out object valueObject))
-                {
-                    value = valueObject;
-                    return true;
-                }
-                else if (definingKey.TryComputeDefault(out value))
-                {
-                    return true;
-                }
-                else
-                {
-                    value = null;
-                    return false;
-                }
+                // not in definition
+                value = null;
+                return false;
+            }
+
+            if (definingKey.TryGetValue(out object valueObject))
+            {
+                value = valueObject;
+                return true;
+            }
+            else if (definingKey.TryComputeDefault(out value))
+            {
+                return true;
             }
             else
             {
@@ -293,27 +319,23 @@ namespace NeosModLoader
         /// <param name="eventLabel">A custom label you may assign to this event</param>
         public void Set(ModConfigurationKey key, object value, string eventLabel = null)
         {
-            if (Definition.TryGetDefiningKey(key, out ModConfigurationKey definingKey))
-            {
-                if (!definingKey.Validate(value))
-                {
-                    throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{definingKey.Name}\"");
-                }
-
-                if (definingKey.ValueType().IsAssignableFrom(value.GetType()))
-                {
-                    definingKey.Set(value);
-                    FireConfigurationChangedEvent(definingKey, eventLabel);
-                }
-                else
-                {
-                    throw new ArgumentException($"{value.GetType()} cannot be assigned to {definingKey.ValueType()}");
-                }
-            }
-            else
+            if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey definingKey))
             {
                 throw new KeyNotFoundException($"{definingKey.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
             }
+
+            if (!definingKey.ValueType().IsAssignableFrom(value.GetType()))
+            {
+                throw new ArgumentException($"{value.GetType()} cannot be assigned to {definingKey.ValueType()}");
+            }
+
+            if (!definingKey.Validate(value))
+            {
+                throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{definingKey.Name}\"");
+            }
+
+            definingKey.Set(value);
+            FireConfigurationChangedEvent(definingKey, eventLabel);
         }
 
         /// <summary>
@@ -325,8 +347,20 @@ namespace NeosModLoader
         /// <param name="eventLabel">A custom label you may assign to this event</param>
         public void Set<T>(ModConfigurationKey<T> key, T value, string eventLabel = null)
         {
-            // falling back to the untyped version is fine
-            Set((ModConfigurationKey)key, value, eventLabel);
+            // the reason we don't fall back to untyped Set() here is so we can skip the type check
+
+            if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey definingKey))
+            {
+                throw new KeyNotFoundException($"{definingKey.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
+            }
+
+            if (!definingKey.Validate(value))
+            {
+                throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{definingKey.Name}\"");
+            }
+
+            definingKey.Set(value);
+            FireConfigurationChangedEvent(definingKey, eventLabel);
         }
 
         /// <summary>
@@ -410,9 +444,18 @@ namespace NeosModLoader
         }
 
         /// <summary>
+        /// Persist this configuration to disk. This method is not called automatically. Default values are not automatically saved.
+        /// </summary>
+        public void Save() // this overload is needed for binary compatibility (REMOVE IN NEXT MAJOR VERSION)
+        {
+            Save(false);
+        }
+
+        /// <summary>
         /// Persist this configuration to disk. This method is not called automatically.
         /// </summary>
-        public void Save()
+        /// <param name="saveDefaultValues">If true, default values will also be persisted</param>
+        public void Save(bool saveDefaultValues = false)
         {
             // prevent saving if we've determined something is amiss with the configuration
             if (!LoadedNeosMod.AllowSavingConfiguration)
@@ -430,12 +473,13 @@ namespace NeosModLoader
             {
                 if (key.TryGetValue(out object value))
                 {
-                    // make sure no one snuck an incorrect type into our value object
-                    if (!key.ValueType().IsAssignableFrom(value.GetType()))
-                    {
-                        throw new ModConfigurationException($"{LoadedNeosMod.NeosMod.Name} config {key.Name} has type {key.ValueType()}, but a {value.GetType()} cannot be assigned to that.");
-                    }
+                    // I don't need to typecheck this as there's no way to sneak a bad type past my Set() API
                     valueMap[key.Name] = JToken.FromObject(value);
+                }
+                else if (saveDefaultValues && key.TryComputeDefault(out object defaultValue))
+                {
+                    // I don't need to typecheck this as there's no way to sneak a bad type past my computeDefault API
+                    valueMap[key.Name] = JToken.FromObject(defaultValue);
                 }
             }
 
