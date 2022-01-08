@@ -57,6 +57,37 @@ namespace NeosModLoader
         {
             return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
         }
+
+        private object Value;
+        private bool HasValue;
+        internal ModConfigurationKey DefiningKey;
+
+        internal bool TryGetValue(out object value)
+        {
+            if (HasValue)
+            {
+                value = Value;
+                return true;
+            }
+            else
+            {
+                value = null;
+                return false;
+            }
+        }
+
+        internal void Set(object value)
+        {
+            Value = value;
+            HasValue = true;
+        }
+
+        internal bool Unset()
+        {
+            bool hadValue = HasValue;
+            HasValue = false;
+            return hadValue;
+        }
     }
 
     /// <summary>
@@ -81,6 +112,7 @@ namespace NeosModLoader
 
         private Func<T> ComputeDefault;
         private Predicate<T> IsValueValid;
+
         public override Type ValueType() => typeof(T);
 
         public override bool Validate(object value)

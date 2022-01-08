@@ -13,7 +13,7 @@ Behind the scenes, configs are saved to a `nml_config` folder in the Neos instal
 
 ## Working With Your Mod's Configuration
 
-A full example repository is provided [here](https://github.com/zkxs/NeosModConfigurationExample). The relevant code from the example is below:
+A simple example is below:
 
 ```csharp
 public class NeosModConfigurationExample : NeosMod
@@ -52,10 +52,15 @@ public class NeosModConfigurationExample : NeosMod
 }
 ```
 
-### Defining a Configuration
-Mods that wish to use a configuration must define the optional `GetConfigurationDefinition()` method. This method requires you return a `ModConfigurationDefinition` instance, which can only be obtained by calling `DefineConfiguration()`. `DefineConfiguration()` requires two parameters: a version and a list of configuration keys. The version should be a [semantic version][semver]—in summary the major version should be bumped for breaking changes, and the minor version should be bumped for new configuration keys. NeosModLoader uses this version number to check the saved configuration against your definition and ensure they are compatible. Configuration keys will be discussed in the next section.
+A full example repository that uses a few additional APIs is provided [here](https://github.com/zkxs/NeosModConfigurationExample).
 
-### Configuration Keys
+### Defining a Configuration
+Mods that wish to use a configuration must define the optional `GetConfigurationDefinition()` method. This method requires you return a `ModConfigurationDefinition` instance, which can only be obtained by calling `DefineConfiguration()`. `DefineConfiguration()` requires two parameters: a version and a list of configuration keys. 
+
+#### Configuration Version
+The version should be a [semantic version][semver]—in summary the major version should be bumped for hard breaking changes, and the minor version should be bumped if you break backwards compatibility. NeosModLoader uses this version number to check the saved configuration against your definition and ensure they are compatible.
+
+#### Configuration Keys
 Configuration keys define the values your mod's config can store. The relevant class is `ModConfigurationKey<T>`, which has the following constructor:
 ```csharp
 public ModConfigurationKey(string name, string description, Func<T> computeDefault = null, bool internalAccessOnly = false, Predicate<T> valueValidator = null)
@@ -69,10 +74,10 @@ public ModConfigurationKey(string name, string description, Func<T> computeDefau
 | valueValidator | A custom function that (if present) checks if a value is valid for this configuration item | `null` |
 
 ### Saving the Configuration
-Configurations must be saved to disk by calling the `Save()` method. NeosModLoader will *not* call this function for you. If you don't call `Save()`, your changes will still be available in memory. This allows multiple changes to be batched before you write them all to disk at once.
+Configurations must be saved to disk by calling the `ModConfiguration.Save()` method. NeosModLoader will *not* call this function for you. If you don't call `ModConfiguration.Save()`, your changes will still be available in memory. This allows multiple changes to be batched before you write them all to disk at once. Saving to disk is a relatively expensive operation and should not be performed at high frequency.
 
 ### External Changes
-The `ModConfiguration` is guaranteed to be the same instance for all calls to `NeosModBase.GetConfiguration()`. This means that other mods may modify the `ModConfiguration` instance you are working with. A `ModConfiguration.TryGetValue()` will always return the current value for that config item. If you need notice that someone else has changed one of your configs, there are events you can subscribe to.
+The `ModConfiguration` is guaranteed to be the same instance for all calls to `NeosModBase.GetConfiguration()`. This means that other mods may modify the `ModConfiguration` instance you are working with. A `ModConfiguration.TryGetValue()` call will always return the current value for that config item. If you need notice that someone else has changed one of your configs, there are events you can subscribe to. However, the `ModConfiguration.GetValue()` and `TryGetValue()` API is very inexpensive so it is fine to poll.
 
 ### Events
 The `ModConfiguration` class provides two events you can subscribe to:
@@ -87,8 +92,6 @@ A `ConfigurationChangedEvent` has the following properties:
 - `ModConfiguration Config` is the configuration the change occurred in
 - `ModConfigurationKey Key` is the specific key who's value changed
 - `string Label` is a custom label that may be set by whoever changed the configuration. This may be `null`.
-
-These events can be used to trigger actions if your configuration is externally changed.
 
 ### Handling Incompatible Configuration Versions
 You can override a `HandleIncompatibleConfigurationVersions()` function in your NeosMod to define how incompatible versions are handled. You have two options:
@@ -149,9 +152,8 @@ void EnumerateConfigs()
         {
             foreach (ModConfigurationKey key in config.ConfigurationItemDefinitions)
             {
-                if (!key.InternalAccessOnly)
+                if (!key.InternalAccessOnly) // while we COULD read internal configs, we shouldn't.
                 {
-                    
                     if (config.TryGetValue(key, out object value))
                     {
                         Msg($"{mod.Name} has configuration {key.Name} with type {key.ValueType()} and value {value}");
@@ -166,6 +168,6 @@ void EnumerateConfigs()
     }
 }
 ```
-Worth noting here is that as you lack the typed config definition, this API works with raw untyped objects. The API performs its own type checking behind the scenes to prevent incorrect types from being written.
+Worth noting here is that this API works with raw untyped objects, because as an external mod you lack the compile-time type information. The API performs its own type checking behind the scenes to prevent incorrect types from being written.
 
 [semver]: https://semver.org/

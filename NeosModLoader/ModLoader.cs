@@ -12,7 +12,7 @@ namespace NeosModLoader
         /// <summary>
         /// NeosModLoader's version
         /// </summary>
-        public static readonly string VERSION = "1.5.1";
+        public static readonly string VERSION = "1.6.0";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         internal static List<LoadedNeosMod> LoadedMods = new List<LoadedNeosMod>();
         internal static Dictionary<Assembly, NeosMod> AssemblyLookupMap = new Dictionary<Assembly, NeosMod>();
