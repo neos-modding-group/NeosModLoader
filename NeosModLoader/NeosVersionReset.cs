@@ -29,7 +29,7 @@ namespace NeosModLoader
             bool shouldSpoofCompatibility = !otherPluginsPresent || config.Unsafe;
             bool shouldSpoofVersion = !config.AdvertiseVersion && shouldSpoofCompatibility;
 
-            bool success = true;
+            bool success = !shouldSpoofCompatibility;
             if (shouldSpoofVersion)
             {
                 // we intentionally attempt to set the version string first, so if it fails the compatibilty hash is left on the original value
@@ -45,9 +45,13 @@ namespace NeosModLoader
             {
                 Logger.MsgInternal("Version spoofing succeeded");
             }
-            else
+            else if (shouldSpoofCompatibility)
             {
                 Logger.WarnInternal("Version spoofing failed");
+            }
+            else
+            {
+                Logger.WarnInternal("Version spoofing was not performed due to another plugin being present! Either remove unknown plugins or enable NeosModLoader's unsafe mode.");
             }
         }
 
