@@ -63,9 +63,8 @@ Make sure NeosModLoader is the only plugin being loaded. For safety reasons Neos
 4. If you are having an issue with NeosModLoader itself, please open [an issue](https://github.com/zkxs/NeosModLoader/issues).
 5. If you are having trouble diagnosing the issue yourself, we have a #help-and-support channel in the [Neos Modding Discord](https://discord.gg/vCDJK9xyvm).
 
-### Does NeosModLoader violate the Neos Guidelines?
-Sort answer: maybe?  
-Long answer: [see here](doc/neos_guidelines.md).
+### Is using NeosModLoader allowed?
+Yes, so long as the [Mod & Plugin Policy](https://wiki.neos.com/Mod_%26_Plugin_Policy) is followed.
 
 ### Will people know I'm using mods?
 - By default, NeosModLoader does not do anything identifiable over the network. You will appear to be running the vanilla Neos version to any component that shows your version strings or compatibility hash.
