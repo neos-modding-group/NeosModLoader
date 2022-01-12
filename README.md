@@ -8,7 +8,7 @@ If you are using the Steam version of Neos you are in the right place. If you ar
 1. Download [NeosModLoader.dll](https://github.com/zkxs/NeosModLoader/releases/latest/download/NeosModLoader.dll) to a location of your choosing. I recommend putting it in the `Libraries` folder within your Neos install directory.
 2. Place [0Harmony.dll](https://github.com/zkxs/NeosModLoader/releases/download/1.4.1/0Harmony.dll) in your Neos install directory (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR`).
 3. Add mod DLL files to a `nml_mods` folder under your Neos install directory (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\nml_mods`). You can create the folder if it's missing, or simply launch Neos once with NeosModLoader installed and it will be created automatically.
-4. Add the following to Neos's [launch options](https://wiki.neos.com/Command_Line_Arguments): `-LoadAssembly "C:\full\path\to\NeosModLoader.dll"`, substituting the path for wherever you put `NeosModLoader.dll`. You can also use a relative path here, with `Neos.exe` as the starting point.
+4. Add the following to Neos's [launch options](https://wiki.neos.com/Command_Line_Arguments): `-LoadAssembly Libraries\NeosModLoader.dll`, substituting the path for wherever you put `NeosModLoader.dll`. You can also use a relative path here, with `Neos.exe` as the starting point.
 5. Start the game. If you want to verify that NeosModLoader is working you can check the Neos logs. (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Logs`). The modloader add some very obvious logs on startup, and if they're missing something has gone wrong. Here is an [example log file](doc/example_log.log) where everything worked correctly.
 
 ### Example Directory Structure
