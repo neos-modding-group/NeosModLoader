@@ -4,19 +4,19 @@ using System.Reflection;
 
 namespace NeosModLoader
 {
-    internal class Configuration
+    internal class ModLoaderConfiguration
     {
         private static readonly string CONFIG_FILENAME = "NeosModLoader.config";
 
-        private static Configuration _configuration;
+        private static ModLoaderConfiguration _configuration;
 
-        internal static Configuration get()
+        internal static ModLoaderConfiguration Get()
         {
             if (_configuration == null)
             {
                 // the config file can just sit next to the dll. Simple.
                 string path = Path.Combine(GetAssemblyDirectory(), CONFIG_FILENAME);
-                _configuration = new Configuration();
+                _configuration = new ModLoaderConfiguration();
 
                 // .NET's ConfigurationManager is some hot trash to the point where I'm just done with it.
                 // Time to reinvent the wheel. This parses simple key=value style properties from a text file.
@@ -46,6 +46,10 @@ namespace NeosModLoader
                             else if ("advertiseversion".Equals(key) && "true".Equals(value))
                             {
                                 _configuration.AdvertiseVersion = true;
+                            }
+                            else if ("logconflicts".Equals(key) && "false".Equals(value))
+                            {
+                                _configuration.LogConflicts = false;
                             }
                         }
                     }
@@ -81,5 +85,6 @@ namespace NeosModLoader
         public bool Debug { get; private set; } = false;
         public bool NoMods { get; private set; } = false;
         public bool AdvertiseVersion { get; private set; } = false;
+        public bool LogConflicts { get; private set; } = true;
     }
 }

@@ -4,7 +4,7 @@ using System;
 namespace NeosModLoader
 {
     [ImplementableClass(true)]
-    class ExecutionHook
+    internal class ExecutionHook
     {
 #pragma warning disable CS0169
         // fields must exist due to reflective access
@@ -16,7 +16,7 @@ namespace NeosModLoader
         {
             try
             {
-                Logger.MsgInternal($"NeosModLoader v{ModLoader.VERSION} starting up!{(Configuration.get().Debug ? " Debug logs will be shown." : "")}");
+                DebugInfo.Log();
                 NeosVersionReset.Initialize();
                 ModLoader.LoadMods();
             }

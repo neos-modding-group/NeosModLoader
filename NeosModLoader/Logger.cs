@@ -1,6 +1,4 @@
 using BaseX;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -8,90 +6,49 @@ namespace NeosModLoader
 {
     internal class Logger
     {
-        internal static void DebugExternal(string message)
-        {
-            if (Configuration.get().Debug)
-            {
-                LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
-            }
-        }
+        // logged for null objects
+        internal readonly static string NULL_STRING = "null";
 
         internal static void DebugInternal(string message)
         {
-            if (Configuration.get().Debug)
+            if (ModLoaderConfiguration.Get().Debug)
             {
                 LogInternal(LogType.DEBUG, message);
             }
         }
 
-        internal static void DebugList(object[] messages)
+        internal static void DebugExternal(object message)
         {
-            string Source = SourceFromStackTrace();
-            foreach (object element in messages)
+            if (ModLoaderConfiguration.Get().Debug)
             {
-                LogInternal(LogType.DEBUG, element.ToString(), Source);
+                LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
             }
         }
 
-        internal static void MsgExternal(string message)
+        internal static void DebugListExternal(object[] messages)
         {
-            LogInternal(LogType.INFO, message, SourceFromStackTrace());
-        }
-
-        internal static void MsgInternal(string message)
-        {
-            LogInternal(LogType.INFO, message);
-        }
-
-        internal static void MsgList(object[] messages)
-        {
-            string Source = SourceFromStackTrace();
-            foreach (object element in messages)
+            if (ModLoaderConfiguration.Get().Debug)
             {
-                LogInternal(LogType.INFO, element.ToString(), Source);
+                LogListInternal(LogType.DEBUG, messages, SourceFromStackTrace());
             }
         }
 
-        internal static void WarnExternal(string message)
-        {
-            LogInternal(LogType.WARN, message, SourceFromStackTrace());
-        }
+        internal static void MsgInternal(string message) => LogInternal(LogType.INFO, message);
+        internal static void MsgExternal(object message) => LogInternal(LogType.INFO, message, SourceFromStackTrace());
+        internal static void MsgListExternal(object[] messages) => LogListInternal(LogType.INFO, messages, SourceFromStackTrace());
+        internal static void WarnInternal(string message) => LogInternal(LogType.WARN, message);
+        internal static void WarnExternal(object message) => LogInternal(LogType.WARN, message, SourceFromStackTrace());
+        internal static void WarnListExternal(object[] messages) => LogListInternal(LogType.WARN, messages, SourceFromStackTrace());
+        internal static void ErrorInternal(string message) => LogInternal(LogType.ERROR, message);
+        internal static void ErrorExternal(object message) => LogInternal(LogType.ERROR, message, SourceFromStackTrace());
+        internal static void ErrorListExternal(object[] messages) => LogListInternal(LogType.ERROR, messages, SourceFromStackTrace());
 
-        internal static void WarnInternal(string message)
+        private static void LogInternal(string logTypePrefix, object message, string source = null)
         {
-            LogInternal(LogType.WARN, message);
-        }
-
-        internal static void WarnList(object[] messages)
-        {
-            string Source = SourceFromStackTrace();
-            foreach (object element in messages)
+            if (message == null)
             {
-                LogInternal(LogType.WARN, element.ToString(), Source);
+                message = NULL_STRING;
             }
-        }
-
-        internal static void ErrorExternal(string message)
-        {
-            LogInternal(LogType.ERROR, message, SourceFromStackTrace());
-        }
-
-        internal static void ErrorInternal(string message)
-        {
-            LogInternal(LogType.ERROR, message);
-        }
-
-        internal static void ErrorList(object[] messages)
-        {
-            string Source = SourceFromStackTrace();
-            foreach (object element in messages)
-            {
-                LogInternal(LogType.ERROR, element.ToString(), Source);
-            }
-        }
-
-        private static void LogInternal(string logTypePrefix, string message, string source = null)
-        {
             if (source == null)
             {
                 UniLog.Log($"{logTypePrefix}[NeosModLoader] {message}");
@@ -102,16 +59,30 @@ namespace NeosModLoader
             }
         }
 
+        private static void LogListInternal(string logTypePrefix, object[] messages, string source)
+        {
+            if (messages == null)
+            {
+                LogInternal(logTypePrefix, NULL_STRING, source);
+            }
+            else
+            {
+                foreach (object element in messages)
+                {
+                    LogInternal(logTypePrefix, element.ToString(), source);
+                }
+            }
+        }
+
         private static string SourceFromStackTrace()
         {
-            Dictionary<Assembly, NeosMod> loadedMods = ModLoader.LoadedMods;
             // skip three frames: SourceFromStackTrace(), MsgExternal(), Msg()
             StackTrace stackTrace = new StackTrace(3);
             for (int i = 0; i < stackTrace.FrameCount; i++)
             {
                 Assembly assembly = stackTrace.GetFrame(i).GetMethod().DeclaringType.Assembly;
                 NeosMod mod;
-                if (loadedMods.TryGetValue(assembly, out mod))
+                if (ModLoader.AssemblyLookupMap.TryGetValue(assembly, out mod))
                 {
                     return mod.Name;
                 }
@@ -121,10 +92,10 @@ namespace NeosModLoader
 
         private sealed class LogType
         {
-            public readonly static string DEBUG = "[DEBUG]";
-            public readonly static string INFO = "[INFO] ";
-            public readonly static string WARN = "[WARN] ";
-            public readonly static string ERROR = "[ERROR]";
+            internal readonly static string DEBUG = "[DEBUG]";
+            internal readonly static string INFO = "[INFO] ";
+            internal readonly static string WARN = "[WARN] ";
+            internal readonly static string ERROR = "[ERROR]";
         }
     }
 }
