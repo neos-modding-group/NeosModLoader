@@ -74,7 +74,9 @@ public ModConfigurationKey(string name, string description, Func<T> computeDefau
 | valueValidator | A custom function that (if present) checks if a value is valid for this configuration item | `null` |
 
 ### Saving the Configuration
-Configurations must be saved to disk by calling the `ModConfiguration.Save()` method. NeosModLoader will *not* call this function for you. If you don't call `ModConfiguration.Save()`, your changes will still be available in memory. This allows multiple changes to be batched before you write them all to disk at once. Saving to disk is a relatively expensive operation and should not be performed at high frequency.
+Configurations must be saved to disk by calling the `ModConfiguration.Save()` method. If you don't call `ModConfiguration.Save()`, your changes will still be available in memory. This allows multiple changes to be batched before you write them all to disk at once. Saving to disk is a relatively expensive operation and should not be performed at high frequency.
+
+NeosModLoader will automatically call `Save()` for you when Neos is shutting down. This will not occur if Neos crashes, so to avoid data loss you should manually call `Save()` when appropriate.
 
 ### External Changes
 The `ModConfiguration` is guaranteed to be the same instance for all calls to `NeosModBase.GetConfiguration()`. This means that other mods may modify the `ModConfiguration` instance you are working with. A `ModConfiguration.TryGetValue()` call will always return the current value for that config item. If you need notice that someone else has changed one of your configs, there are events you can subscribe to. However, the `ModConfiguration.GetValue()` and `TryGetValue()` API is very inexpensive so it is fine to poll.

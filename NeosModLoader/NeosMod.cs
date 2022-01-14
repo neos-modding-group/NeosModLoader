@@ -42,7 +42,19 @@ namespace NeosModLoader
         /// <param name="version">The semantic version of the configuration definition</param>
         /// <param name="configurationItemDefinitions">A list of configuration items</param>
         /// <returns></returns>
-        public ModConfigurationDefinition DefineConfiguration(Version version, IEnumerable<ModConfigurationKey> configurationItemDefinitions)
+        public ModConfigurationDefinition DefineConfiguration(Version version, IEnumerable<ModConfigurationKey> configurationItemDefinitions) // needed for binary compatibility (REMOVE IN NEXT MAJOR VERSION)
+        {
+            return DefineConfiguration(version, configurationItemDefinitions, true);
+        }
+
+        /// <summary>
+        /// Create a configuration definition for this mod.
+        /// </summary>
+        /// <param name="version">The semantic version of the configuration definition</param>
+        /// <param name="configurationItemDefinitions">A list of configuration items</param>
+        /// <param name="autoSave">If false, the config will not be autosaved on Neos close</param>
+        /// <returns></returns>
+        public ModConfigurationDefinition DefineConfiguration(Version version, IEnumerable<ModConfigurationKey> configurationItemDefinitions, bool autoSave = true)
         {
             if (version == null)
             {
@@ -54,7 +66,7 @@ namespace NeosModLoader
                 throw new ArgumentNullException("configurationItemDefinitions must be non-null");
             }
 
-            return new ModConfigurationDefinition(this, version, new HashSet<ModConfigurationKey>(configurationItemDefinitions));
+            return new ModConfigurationDefinition(this, version, new HashSet<ModConfigurationKey>(configurationItemDefinitions), autoSave);
         }
 
         /// <summary>

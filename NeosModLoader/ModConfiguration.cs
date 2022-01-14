@@ -1,8 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using FrooxEngine;
+using HarmonyLib;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace NeosModLoader
 {
@@ -40,6 +44,8 @@ namespace NeosModLoader
         public Version Version { get; private set; }
 
         private HashSet<ModConfigurationKey> configurationItemDefinitions;
+
+        internal bool AutoSave;
 
         // this is a ridiculous hack because HashSet.TryGetValue doesn't exist in .NET 4.6.2
         private Dictionary<ModConfigurationKey, ModConfigurationKey> configurationItemDefinitionsSelfMap;
@@ -96,11 +102,12 @@ namespace NeosModLoader
 
         }
 
-        internal ModConfigurationDefinition(NeosModBase owner, Version version, HashSet<ModConfigurationKey> configurationItemDefinitions)
+        internal ModConfigurationDefinition(NeosModBase owner, Version version, HashSet<ModConfigurationKey> configurationItemDefinitions, bool autoSave)
         {
             Owner = owner;
             Version = version;
             ConfigurationItemDefinitions = configurationItemDefinitions;
+            AutoSave = autoSave;
         }
     }
 
@@ -130,6 +137,8 @@ namespace NeosModLoader
         /// The set of coniguration keys defined in this configuration definition
         /// </summary>
         public ISet<ModConfigurationKey> ConfigurationItemDefinitions => Definition.ConfigurationItemDefinitions;
+
+        private bool AutoSave => Definition.AutoSave;
 
         /// <summary>
         /// The delegate that is called for configuration change events.
@@ -380,6 +389,13 @@ namespace NeosModLoader
             }
         }
 
+        private bool AnyValuesSet()
+        {
+            return ConfigurationItemDefinitions
+                .Where(key => key.HasValue)
+                .Any();
+        }
+
         internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
         {
             ModConfigurationDefinition definition = mod.NeosMod.GetConfigurationDefinition();
@@ -520,6 +536,46 @@ namespace NeosModLoader
             {
                 Logger.ErrorInternal($"An OnThisConfigurationChanged event subscriber threw an exception:\n{e}");
             }
+        }
+
+        internal static void RegisterShutdownHook(Harmony harmony)
+        {
+            try
+            {
+                MethodInfo shutdown = AccessTools.DeclaredMethod(typeof(Engine), nameof(Engine.Shutdown));
+                if (shutdown == null)
+                {
+                    Logger.ErrorInternal("Could not find method Engine.Shutdown(). Will not be able to autosave configs on close!");
+                    return;
+                }
+                MethodInfo patch = AccessTools.DeclaredMethod(typeof(ModConfiguration), nameof(ShutdownHook));
+                if (patch == null)
+                {
+                    Logger.ErrorInternal("Could not find method ModConfiguration.ShutdownHook(). Will not be able to autosave configs on close!");
+                    return;
+                }
+                harmony.Patch(shutdown, prefix: new HarmonyMethod(patch));
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorInternal($"Unexpected exception applying shutdown hook!\n{e}");
+            }
+        }
+
+        private static void ShutdownHook()
+        {
+            int count = 0;
+            ModLoader.Mods()
+                .Select(mod => mod.GetConfiguration())
+                .Where(config => config != null)
+                .Where(config => config.AutoSave)
+                .Where(config => config.AnyValuesSet())
+                .Do(config => 
+                {
+                    config.Save();
+                    count += 1;
+                });
+            Logger.MsgInternal($"Configs saved for {count} mods.");
         }
     }
 

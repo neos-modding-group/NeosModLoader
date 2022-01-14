@@ -12,7 +12,7 @@ namespace NeosModLoader
         /// <summary>
         /// NeosModLoader's version
         /// </summary>
-        public static readonly string VERSION = "1.7.1";
+        public static readonly string VERSION = "1.8.0";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         private static List<LoadedNeosMod> LoadedMods = new List<LoadedNeosMod>(); // used for mod enumeration
         internal static Dictionary<Assembly, NeosMod> AssemblyLookupMap = new Dictionary<Assembly, NeosMod>(); // used for logging
@@ -105,6 +105,9 @@ namespace NeosModLoader
                     Logger.ErrorInternal($"Unexpected exception initializing mod from {mod.File}:\n{e}");
                 }
             }
+
+            Harmony harmony = new Harmony("net.michaelripley.neosmodloader");
+            ModConfiguration.RegisterShutdownHook(harmony);
 
             foreach (LoadedNeosMod mod in LoadedMods)
             {

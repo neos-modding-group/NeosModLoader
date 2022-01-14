@@ -65,7 +65,7 @@ namespace NeosModLoader
         }
 
         private object Value;
-        private bool HasValue;
+        internal bool HasValue;
 
         /// <summary>
         /// Each configuration item has exactly ONE defining key, and that is the key defined by the mod.
