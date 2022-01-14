@@ -570,7 +570,7 @@ namespace NeosModLoader
                 .Where(config => config != null)
                 .Where(config => config.AutoSave)
                 .Where(config => config.AnyValuesSet())
-                .Do(config => 
+                .Do(config =>
                 {
                     config.Save();
                     count += 1;

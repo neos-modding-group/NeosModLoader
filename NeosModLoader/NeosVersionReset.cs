@@ -29,30 +29,37 @@ namespace NeosModLoader
             bool shouldSpoofCompatibility = !otherPluginsPresent || config.Unsafe;
             bool shouldSpoofVersion = !config.AdvertiseVersion && shouldSpoofCompatibility;
 
-            bool success = !shouldSpoofCompatibility;
             if (shouldSpoofVersion)
             {
                 // we intentionally attempt to set the version string first, so if it fails the compatibilty hash is left on the original value
                 // this is to prevent the case where a player simply doesn't know their version string is wrong
                 extraAssemblies.Clear();
-                success = SpoofVersionString(engine);
+                if (!SpoofVersionString(engine))
+                {
+                    Logger.WarnInternal("Version string spoofing failed");
+                    return;
+                }
             }
-            if (success && shouldSpoofCompatibility)
+            else
             {
-                success = SpoofCompatibilityHash(engine);
+                Logger.MsgInternal("Version string not being spoofed due to config.");
             }
-            if (success)
+
+            if (shouldSpoofCompatibility)
             {
-                Logger.MsgInternal("Version spoofing succeeded");
-            }
-            else if (shouldSpoofCompatibility)
-            {
-                Logger.WarnInternal("Version spoofing failed");
+                if (!SpoofCompatibilityHash(engine))
+                {
+                    Logger.WarnInternal("Compatibility hash spoofing failed");
+                    return;
+                }
             }
             else
             {
                 Logger.WarnInternal("Version spoofing was not performed due to another plugin being present! Either remove unknown plugins or enable NeosModLoader's unsafe mode.");
+                return;
             }
+
+            Logger.MsgInternal("Compatibility hash spoofing succeeded");
         }
 
         private static bool SpoofCompatibilityHash(Engine engine)
