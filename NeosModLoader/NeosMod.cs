@@ -30,10 +30,12 @@ namespace NeosModLoader
         /// <summary>
         /// Get the defined configuration for this mod. This should be overridden by your mod if necessary.
         /// </summary>
-        /// <returns>This mod's configuration definition. null by default.</returns>
+        /// <returns>This mod's configuration definition. calls DefineConfiguration(ModConfigurationDefinitionBuilder) by default.</returns>
         public virtual ModConfigurationDefinition GetConfigurationDefinition()
         {
-            return null;
+            ModConfigurationDefinitionBuilder builder = new ModConfigurationDefinitionBuilder(this);
+            DefineConfiguration(builder);
+            return builder.Build();
         }
 
         /// <summary>
@@ -67,6 +69,14 @@ namespace NeosModLoader
             }
 
             return new ModConfigurationDefinition(this, version, new HashSet<ModConfigurationKey>(configurationItemDefinitions), autoSave);
+        }
+
+        /// <summary>
+        /// Define this mod's configuration via a builder
+        /// </summary>
+        /// <param name="builder">A builder you can use to define the mod's configuration</param>
+        public virtual void DefineConfiguration(ModConfigurationDefinitionBuilder builder)
+        {
         }
 
         /// <summary>
