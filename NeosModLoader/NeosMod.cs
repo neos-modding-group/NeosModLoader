@@ -31,9 +31,11 @@ namespace NeosModLoader
         /// Get the defined configuration for this mod. This should be overridden by your mod if necessary.
         /// </summary>
         /// <returns>This mod's configuration definition. calls DefineConfiguration(ModConfigurationDefinitionBuilder) by default.</returns>
+        [Obsolete("This method is obsolete. Use DefineConfiguration(ModConfigurationDefinitionBuilder) instead.")] // REMOVE IN NEXT MAJOR VERSION
         public virtual ModConfigurationDefinition GetConfigurationDefinition()
         {
             ModConfigurationDefinitionBuilder builder = new ModConfigurationDefinitionBuilder(this);
+            builder.ProcessAttributes();
             DefineConfiguration(builder);
             return builder.Build();
         }
@@ -44,7 +46,8 @@ namespace NeosModLoader
         /// <param name="version">The semantic version of the configuration definition</param>
         /// <param name="configurationItemDefinitions">A list of configuration items</param>
         /// <returns></returns>
-        public ModConfigurationDefinition DefineConfiguration(Version version, IEnumerable<ModConfigurationKey> configurationItemDefinitions) // needed for binary compatibility (REMOVE IN NEXT MAJOR VERSION)
+        [Obsolete("This method is obsolete. Use DefineConfiguration(ModConfigurationDefinitionBuilder) instead.")] // REMOVE IN NEXT MAJOR VERSION
+        public ModConfigurationDefinition DefineConfiguration(Version version, IEnumerable<ModConfigurationKey> configurationItemDefinitions) // needed for binary compatibility
         {
             return DefineConfiguration(version, configurationItemDefinitions, true);
         }
@@ -56,6 +59,7 @@ namespace NeosModLoader
         /// <param name="configurationItemDefinitions">A list of configuration items</param>
         /// <param name="autoSave">If false, the config will not be autosaved on Neos close</param>
         /// <returns></returns>
+        [Obsolete("This method is obsolete. Use DefineConfiguration(ModConfigurationDefinitionBuilder) instead.")] // REMOVE IN NEXT MAJOR VERSION
         public ModConfigurationDefinition DefineConfiguration(Version version, IEnumerable<ModConfigurationKey> configurationItemDefinitions, bool autoSave = true)
         {
             if (version == null)

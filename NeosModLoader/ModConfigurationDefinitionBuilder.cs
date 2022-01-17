@@ -1,8 +1,8 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace NeosModLoader
 {
@@ -60,6 +60,28 @@ namespace NeosModLoader
         {
             AutoSaveConfig = autoSave;
             return this;
+        }
+
+        internal void ProcessAttributes()
+        {
+            var fields = AccessTools.GetDeclaredFields(Owner.GetType());
+            fields
+                .Where(field => Attribute.GetCustomAttribute(field, typeof(AutoRegisterConfigKeyAttribute)) != null)
+                .Do(ProcessField);
+        }
+
+        private void ProcessField(FieldInfo field)
+        {
+            if (!typeof(ModConfigurationKey).IsAssignableFrom(field.FieldType))
+            {
+                // wrong type
+                Logger.WarnInternal($"{Owner.Name} had an [AutoRegisterConfigKey] field of the wrong type: {field}");
+                return;
+            }
+
+            ModConfigurationKey fieldValue = (ModConfigurationKey)field.GetValue(field.IsStatic ? null : Owner);
+            Logger.DebugInternal($"{Owner.Name} autoregistering config key: {field}");
+            Keys.Add(fieldValue);
         }
 
         internal ModConfigurationDefinition Build()
