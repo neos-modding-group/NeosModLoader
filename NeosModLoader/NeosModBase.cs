@@ -32,7 +32,13 @@
         /// <returns>This mod's current configuration. This method will always return the same ModConfiguration instance.</returns>
         public ModConfiguration GetConfiguration()
         {
-            return loadedNeosMod?.ModConfiguration;
+            if (!FinishedLoading)
+            {
+                throw new ModConfigurationException($"GetConfiguration() was called before {Name} was done initializing. Consider calling GetConfiguration() from within OnEngineInit()");
+            }
+            return loadedNeosMod.ModConfiguration;
         }
+
+        internal bool FinishedLoading { get; set; }
     }
 }

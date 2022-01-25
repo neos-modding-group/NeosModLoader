@@ -166,6 +166,7 @@ namespace NeosModLoader
             LoadedMods.Add(mod);
             AssemblyLookupMap.Add(mod.ModAssembly.Assembly, mod.NeosMod);
             mod.NeosMod.loadedNeosMod = mod; // complete the circular reference (used to look up config)
+            mod.FinishedLoading = true; // used to signal that the mod is truly loaded
         }
 
         private static string TypesForOwner(Patches patches, string owner)
