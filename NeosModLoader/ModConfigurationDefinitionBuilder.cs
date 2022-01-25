@@ -9,7 +9,7 @@ namespace NeosModLoader
     public class ModConfigurationDefinitionBuilder
     {
         private NeosModBase Owner;
-        private Version ConfigVersion = null;
+        private Version ConfigVersion = new Version(1, 0, 0);
         private HashSet<ModConfigurationKey> Keys = new HashSet<ModConfigurationKey>();
         private bool AutoSaveConfig = true;
 
@@ -92,6 +92,7 @@ namespace NeosModLoader
             }
             else
             {
+                Logger.DebugInternal($"{Owner.Name} had no defined keys. Building null config.");
                 return null;
             }
         }
