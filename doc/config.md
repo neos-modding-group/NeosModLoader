@@ -1,6 +1,6 @@
 # NeosModLoader Configuration System
 
-NeosModLoader provides a built-in configuration system that can be used to persist configuration values for mods. **This configuration system only exists in NeosModLoader 1.5.0 and later!**
+NeosModLoader provides a built-in configuration system that can be used to persist configuration values for mods. **This configuration system only exists in NeosModLoader releases 1.8.0 and later!**
 
 Operations provided:
 - Reading value of a config key
@@ -10,6 +10,16 @@ Operations provided:
 - Saving a config to disk
 
 Behind the scenes, configs are saved to a `nml_config` folder in the Neos install directory. The `nml_config` folder contains JSON files, named after each mod dll that defines a config. End users and mod developers do not need to interact with this JSON directly. Mod developers should use the API exposed by NeosModLoader. End users should use interfaces exposed by configuration management mods.
+
+## Overview
+- Mods may define a configuration
+- Configuration items must be declared alongside the mod itself. You cannot change your configuration schema at runtime.
+- Configuration items may be of any type, however, there are considerations:
+  - Json.NET is used to serialize the configuration, so the type must be JSON-compatible (e.g. no circular references). Lists, Sets, and Dictionary<string, T> will work fine.
+  - Using complex types will make it more difficult for configuration manager UIs to interface with your mod. For best compatibility keep things simple (primitive types and basic collections)
+- Reading/writing configuration values is done in-memory and is extremely cheap.
+- Saving configuration to disk is more expensive but is done infrequently
+
 
 ## Working With Your Mod's Configuration
 
@@ -23,14 +33,8 @@ public class NeosModConfigurationExample : NeosMod
     public override string Version => "1.0.0";
     public override string Link => "https://github.com/zkxs/NeosModConfigurationExample";
 
+    [AutoRegisterConfigKey]
     private readonly ModConfigurationKey<int> KEY_COUNT = new ModConfigurationKey<int>("count", "Example counter", internalAccessOnly: true);
-
-    public override ModConfigurationDefinition GetConfigurationDefinition()
-    {
-        List<ModConfigurationKey> keys = new List<ModConfigurationKey>();
-        keys.Add(KEY_COUNT);
-        return DefineConfiguration(new Version(1, 0, 0), keys);
-    }
 
     public override void OnEngineInit()
     {
@@ -47,7 +51,6 @@ public class NeosModConfigurationExample : NeosMod
         }
 
         config.Set(KEY_COUNT, countValue);
-        config.Save();
     }
 }
 ```
@@ -55,10 +58,22 @@ public class NeosModConfigurationExample : NeosMod
 A full example repository that uses a few additional APIs is provided [here](https://github.com/zkxs/NeosModConfigurationExample).
 
 ### Defining a Configuration
-Mods that wish to use a configuration must define the optional `GetConfigurationDefinition()` method. This method requires you return a `ModConfigurationDefinition` instance, which can only be obtained by calling `DefineConfiguration()`. `DefineConfiguration()` requires two parameters: a version and a list of configuration keys. 
+To define a configuration simply have at least one `ModConfigurationKey` field with the `[AutoRegisterConfigKey]` attribute applied.
+
+If you need more options, implement the optional `DefineConfiguration` method in your mod. Here's an example:
+```csharp
+// this override lets us change optional settings in our configuration definition
+public override void DefineConfiguration(ModConfigurationDefinitionBuilder builder)
+{
+    builder
+        .Version(new Version(1, 0, 0)) // manually set config version (default is 1.0.0)
+        .AutoSave(false); // don't autosave on Neos shutdown (default is true)
+}
+```
+This `ModConfigurationDefinitionBuilder` allows you to change the default version and autosave values. [Version](#configuration-version) and [AutoSave](#saving-the-configuration) will be discussed in separate sections..
 
 #### Configuration Version
-The version should be a [semantic version][semver]—in summary the major version should be bumped for hard breaking changes, and the minor version should be bumped if you break backwards compatibility. NeosModLoader uses this version number to check the saved configuration against your definition and ensure they are compatible.
+You may optionally specify a version for your configuration. This is separate from your mod's version. By default, the version will be 1.0.0. The version should be a [semantic version][semver]—in summary the major version should be bumped for hard breaking changes, and the minor version should be bumped if you break backwards compatibility. NeosModLoader uses this version number to check the saved configuration against your definition and ensure they are compatible.
 
 #### Configuration Keys
 Configuration keys define the values your mod's config can store. The relevant class is `ModConfigurationKey<T>`, which has the following constructor:
@@ -74,12 +89,17 @@ public ModConfigurationKey(string name, string description, Func<T> computeDefau
 | valueValidator | A custom function that (if present) checks if a value is valid for this configuration item | `null` |
 
 ### Saving the Configuration
-Configurations must be saved to disk by calling the `ModConfiguration.Save()` method. If you don't call `ModConfiguration.Save()`, your changes will still be available in memory. This allows multiple changes to be batched before you write them all to disk at once. Saving to disk is a relatively expensive operation and should not be performed at high frequency.
+Configurations should be saved to disk by calling the `ModConfiguration.Save()` method. If you don't call `ModConfiguration.Save()`, your changes will still be available in memory. This allows multiple changes to be batched before you write them all to disk at once. Saving to disk is a relatively expensive operation and should not be performed at high frequency.
 
-NeosModLoader will automatically call `Save()` for you when Neos is shutting down. This will not occur if Neos crashes, so to avoid data loss you should manually call `Save()` when appropriate.
+NeosModLoader will automatically call `Save()` for you when Neos is shutting down. This will not occur if Neos crashes, so to avoid data loss you should manually call `Save()` when appropriate. If you'd like to opt out of this autosave-on-shutdown functionality, use the `ModConfigurationDefinitionBuilder` discussed in the [Defining a Configuration](#defining-a-configuration) section.
 
-### External Changes
-The `ModConfiguration` is guaranteed to be the same instance for all calls to `NeosModBase.GetConfiguration()`. This means that other mods may modify the `ModConfiguration` instance you are working with. A `ModConfiguration.TryGetValue()` call will always return the current value for that config item. If you need notice that someone else has changed one of your configs, there are events you can subscribe to. However, the `ModConfiguration.GetValue()` and `TryGetValue()` API is very inexpensive so it is fine to poll.
+### Getting the Configuration
+To get the configuration, call `NeosModBase.GetConfiguration()`. Some notes:
+- This will return `null` if the mod does not have a configuration.
+- You must not call `NeosModBase.GetConfiguration()` before OnEngineInit() is called, as the mod may still be initializing.
+- The returned `ModConfiguration` instance is guaranteed to be the same reference for all calls to `NeosModBase.GetConfiguration()`. Therefore, it is safe to save a reference to your `ModConfiguration`.
+- Other mods may modify the `ModConfiguration` instance you are working with.
+- A `ModConfiguration.TryGetValue()` call will always return the current value for that config item. If you need notice that someone else has changed one of your configs, there are events you can subscribe to. However, the `ModConfiguration.GetValue()` and `TryGetValue()` API is very inexpensive so it is fine to poll.
 
 ### Events
 The `ModConfiguration` class provides two events you can subscribe to:
@@ -96,7 +116,7 @@ A `ConfigurationChangedEvent` has the following properties:
 - `string Label` is a custom label that may be set by whoever changed the configuration. This may be `null`.
 
 ### Handling Incompatible Configuration Versions
-You can override a `HandleIncompatibleConfigurationVersions()` function in your NeosMod to define how incompatible versions are handled. You have two options:
+You may optionally override a `HandleIncompatibleConfigurationVersions()` function in your NeosMod to define how incompatible versions are handled. You have two options:
 - `IncompatibleConfigurationHandlingOption.ERROR`: Fail to read the config, and block saving over the config on disk.
 - `IncompatibleConfigurationHandlingOption.CLOBBER`: Destroy the saved config and start over from scratch.
 - `IncompatibleConfigurationHandlingOption.FORCE_LOAD`: Ignore the version number and load the config anyways. This may throw exceptions and break your mod.
