@@ -3,7 +3,11 @@
 A mod loader for [Neos VR](https://neos.com/).
 
 ## Installation
-If you are using the Steam version of Neos you are in the right place. If you are using the standalone version, [read these extra instructions](doc/neos_standalone_setup.md).
+If you are using the Steam version of Neos you are in the right place.
+
+If you are using the standalone version, read the [Neos Standalone Setup](doc/neos_standalone_setup.md) instructions.
+
+If you are on Linux, read the [Linux Notes](doc/linux.md).
 
 1. Download [NeosModLoader.dll](https://github.com/zkxs/NeosModLoader/releases/latest/download/NeosModLoader.dll) to Neos's `Libraries` folder (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Libraries`).
 2. Place [0Harmony.dll](https://github.com/zkxs/NeosModLoader/releases/download/1.4.1/0Harmony.dll) in your Neos install directory (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR`).
