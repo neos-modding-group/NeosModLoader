@@ -82,7 +82,7 @@ Possibility 3: NeosModLoader itself is broken, even on the latest version. This 
 
 **Fix:**
 1. Make sure you are not running more than one plugin. For safety reasons, NeosModLoader will only spoof your version if it is the only plugin running.
-2. If you absolutely need your other plugin there is a [configuration](modloader_config.md) available to force version spoofing.
+2. If you absolutely need your other plugin and understand the risks there is a [configuration](modloader_config.md) available to force version spoofing.
 
 ## A Mod is Breaking Neos
 
