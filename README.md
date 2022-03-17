@@ -11,7 +11,7 @@ If you are using the Steam version of Neos you are in the right place. If you ar
 4. Add the following to Neos's [launch options](https://wiki.neos.com/Command_Line_Arguments): `-LoadAssembly Libraries\NeosModLoader.dll`, substituting the path for wherever you put `NeosModLoader.dll`.
 5. Start the game. If you want to verify that NeosModLoader is working you can check the Neos logs. (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Logs`). The modloader adds some very obvious logs on startup, and if they're missing something has gone wrong. Here is an [example log file](doc/example_log.log) where everything worked correctly.
 
-
+If NeosModLoader isn't working after following those steps, take a look at our [troubleshooting page](doc/troubleshooting.md).
 
 ### Example Directory Structure
 Your Neos directory should now look similar to the following. Files not related to modding are not shown.
