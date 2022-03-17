@@ -28,7 +28,7 @@ Your Neos directory should now look similar to the following. Files not related 
 │       InspectorScroll.dll
 │       MotionBlurDisable.dll
 │       NeosContactsSort.dll
-        <More mods go here>
+|       <More mods go here>
 │
 └───Libraries
         NeosModLoader.dll
