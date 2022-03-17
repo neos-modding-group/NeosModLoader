@@ -32,8 +32,9 @@ If the problem is the FrooxEngine.dll path on Linux:
 
 If the problem is Windows blocking the DLL file:
 1. Right click on the NeosModLoader.dll file and open the properties.
-2. Check the unblock checkbox, and hit OK. ![add non-steam game screenshot](img/windows_unblock.png)
-3. Repeat this process for 0Harmony.dll.
+2. Check the unblock checkbox, and hit OK.  
+   ![add non-steam game screenshot](img/windows_unblock.png)
+4. Repeat this process for 0Harmony.dll.
 
 If the problem is your antivirus:
 1. Make sure your antivirus has not quarantined or deleted NeosModLoader.dll or 0Harmony.dll.
