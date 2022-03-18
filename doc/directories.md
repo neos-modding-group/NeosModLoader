@@ -44,7 +44,6 @@ If you've installed to a non-default location then finding the path is up to you
 # Drive Notes
 - The actual Neos install should be less than 1GB, but the log files can in certain cases be very large.
 - The cache can get very large, upwards of 30GB so make sure the drive you save cache to has plenty of space. Neos will benefit by having this on a faster drive (read: SSD). The cache directory can be deleted whenever you need without breaking Neos. The cache directory can be changed with the `-CachePath <file path>` launch option.
-- You will benefit from faster loading times if you store your cache on a fast SSD.
 - The data directory contains your localDB as well as locally saved assets. This can get to be around 10GB, or more if you store a lot in your local home. The data directory can be changed with the `-DataPath <file path>` launch option. Deleting this will:
   - Reset any non-cloud-synced Neos settings. This will, for example, send you back to the tutorial (unless you use `-SkipIntroTutorial`)
   - Reset your cloud home and nuke anything that was stored in it.
