@@ -5,7 +5,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NeosModLoader</RootNamespace>
     <AssemblyTitle>NeosModLoader</AssemblyTitle>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo> 
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TargetFramework>net462</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -31,6 +31,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToPlugins)'=='true'">
-      <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NeosPath)Libraries" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NeosPath)Libraries" />
   </Target>
 </Project>
