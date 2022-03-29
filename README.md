@@ -3,6 +3,7 @@
 A mod loader for [Neos VR](https://neos.com/). Consider joining our community on [Discord][Neos Modding Discord] for support, updates, and more.
 
 ## Installation
+
 If you are using the Steam version of Neos you are in the right place. If you are using the standalone version, read the [Neos Standalone Setup](doc/neos_standalone_setup.md) instructions. If you are on Linux, read the [Linux Notes](doc/linux.md).
 
 1. Download [NeosModLoader.dll](https://github.com/zkxs/NeosModLoader/releases/latest/download/NeosModLoader.dll) to Neos's `Libraries` folder (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Libraries`).
@@ -14,7 +15,9 @@ If you are using the Steam version of Neos you are in the right place. If you ar
 If NeosModLoader isn't working after following those steps, take a look at our [troubleshooting page](doc/troubleshooting.md).
 
 ### Example Directory Structure
+
 Your Neos directory should now look similar to the following. Files not related to modding are not shown.
+
 ```
 <Neos Install Directory>
 │   0Harmony.dll
@@ -35,18 +38,23 @@ Your Neos directory should now look similar to the following. Files not related 
 ```
 
 ## Finding Mods
+
 A list of known mods is available in the [Neos Mod List](https://github.com/zkxs/neos-mod-list/blob/master/README.md). New mods and updates are also announced in [our Discord][Neos Modding Discord].
 
 ## Frequently Asked Questions
+
 Many questions about what NML is and how it works are answered on our [frequently asked questions page](doc/faq.md).
 
 ## Making a Mod
+
 Check out the [Mod Creation Guide](doc/making_mods.md).
 
 ## Configuration
+
 NeosModLoader aims to have a reasonable default configuration, but certain things can be adjusted via an [optional config file](doc/modloader_config.md).
 
 ## Contributing
+
 Issues and PRs are welcome. Please read our [Contributing Guidelines](.github/CONTRIBUTING.md)!
 
 ## Licensing and Credits
@@ -54,9 +62,11 @@ Issues and PRs are welcome. Please read our [Contributing Guidelines](.github/CO
 NeosModLoader is licensed under the GNU Lesser General Public License (LGPL). See [LICENSE.txt](LICENSE.txt) for the full license.
 
 Third-party libraries distributed alongside NeosModLoader:
+
 - [LibHarmony] ([MIT License](https://github.com/pardeike/Harmony/blob/79d62b42c71d005b3cb1d94e741bfd4ce7e03a6b/LICENSE))
 
 Third-party libraries used in source:
+
 - [.NET](https://github.com/dotnet) (Various licenses)
 - [Neos VR](https://neos.com/) ([EULA](https://store.steampowered.com//eula/740250_eula_0))
 - [Json.NET](https://github.com/JamesNK/Newtonsoft.Json) ([MIT License](https://github.com/JamesNK/Newtonsoft.Json/blob/52190a3a3de6ef9a556583cbcb2381073e7197bc/LICENSE.md))

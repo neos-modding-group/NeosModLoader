@@ -6,7 +6,7 @@ The log directory on Linux is `$HOME/.local/share/Steam/steamapps/common/NeosVR/
 
 If your log contains the following, you need to set up a workaround for the issue.
 
-```
+```log
 System.IO.DirectoryNotFoundException: Could not find a part of the path "/home/myusername/.local/share/Steam/steamapps/common/NeosVR/Neos_Data\Managed/FrooxEngine.dll".
 ```
 
