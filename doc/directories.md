@@ -2,7 +2,6 @@
 
 If you've installed to a non-default location then finding the path is up to you.
 
-
 | Directory | Description |
 | --------- |------------ |
 | Neos Install Directory | Contains the game install itself, the log directory, and the libraries directory | 
@@ -24,6 +23,7 @@ If you've installed to a non-default location then finding the path is up to you
 
 
 ## Linux Native
+
 | Description | Typical Path |
 | ----------- | ------------ |
 | Neos Install Directory (Steam) | `$HOME/.local/share/Steam/steamapps/common/NeosVR` |
@@ -33,6 +33,7 @@ If you've installed to a non-default location then finding the path is up to you
 | Cache Directory |*unknown* |
 
 ## Linux Proton/WINE
+
 | Description | Typical Path |
 | ----------- | ------------ |
 | Neos Install Directory (Steam) | *unknown* |
@@ -42,6 +43,7 @@ If you've installed to a non-default location then finding the path is up to you
 | Cache Directory |*unknown* |
 
 # Drive Notes
+
 - The actual Neos install should be less than 1GB, but the log files can in certain cases be very large.
 - The cache can get very large, upwards of 30GB so make sure the drive you save cache to has plenty of space. Neos will benefit by having this on a faster drive (read: SSD). The cache directory can be deleted whenever you need without breaking Neos. The cache directory can be changed with the `-CachePath <file path>` launch option.
 - The data directory contains your localDB as well as locally saved assets. This can get to be around 10GB, or more if you store a lot in your local home. The data directory can be changed with the `-DataPath <file path>` launch option. Deleting this will:

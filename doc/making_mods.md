@@ -1,27 +1,34 @@
 # Mod Creation Guide
+
 If you have some level of familiarity with C#, getting started making mods should not be too difficult.
 
 ## Basic Visual Studio setup
+
 1. Make a new .NET library against .NET version 4.6.2. You can use 4.7.2 if you absolutely need it in order to compile, but some features may not work.
 2. Add NeosModLoader.dll as a reference.
 3. Add references to Neos libraries as needed (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Neos_Data\Managed`)
 4. Remove the reference to `System.Net.Http` as it will make the compiler angry
 
 ## Hooks
+
 ### `OnEngineInit()`
+
 Called once during FrooxEngine initialization.
 
 Happens **before** `OnEngineInit()`
+
 - Head device setup
 - Plugin initialization
 
 Happens **after** `OnEngineInit()`
+
 - Local DB initialization
 - Networking initialization
 - Audio initialization
 - Worlds loading, including Local home and Userspace
 
 ## Mod Configuration
+
 NeosModLoader provides a built-in configuration system that can be used to persist configuration values for mods. More information is available in the [configuration system documentation](config.md).
 
 ## Example Mod
@@ -56,16 +63,21 @@ namespace MyMod
     }
 }
 ```
+
 A [Template repo](https://github.com/EIA485/NeosTemplate/) is available.
+
 ## Full Example
+
 A working example mod is available here: https://github.com/zkxs/MotionBlurDisable
 
 It showcases the following:
+
 - A valid Visual Studio project setup
 - Using LibHarmony to patch a Neos method
 - Using Unity to alter all existing GameObjects of a certain type
 
 ## Additional Resources
+
 - [Quick C# Refresher](https://learnxinyminutes.com/docs/csharp/)
 - [LibHarmony Documentation](https://harmony.pardeike.net/)
 - [Unity API Documentation](https://docs.unity3d.com/ScriptReference/index.html)

@@ -1,7 +1,9 @@
 # Going Into Detail: How NeosModLoader Interfaces with Neos
+
 NeosModLoader only interfaces with Neos in two places: the hook and the compatibility hash.
 
 ## The Hook
+
 The hook is the point where Neos "hooks" into NeosModLoader, allowing it to begin execution.
 
 Typically, [plugins] use [components] to execute custom code. This is limiting as they can only begin execution once a world loads. Typically this involves putting a plugin's component into your local home.
@@ -11,6 +13,7 @@ The NeosModLoader plugin uses a different mechanism. Instead of using a componen
 This connector-based hook does not modify the Neos application, and only uses public Neos APIs.
 
 ## The Compatibility Hash
+
 [Neos plugins][plugin], when loaded, alter your client's compatibility hash from what a vanilla client would have. You cannot join a session unless your compatibility hash is an exact match with the host.
 
 Plugins are intended to add new features such as [components] and [LogiX nodes][logix] to the [data model], and altering the data model breaks multiplayer compatibility. This is why the compatibility hash exists, and why plugins alter it.

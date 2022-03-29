@@ -1,6 +1,7 @@
 # Modloader Configuration
 
 NeosModLoader aims to have a reasonable default configuration, but certain things can be adjusted via an optional config file. The config file does not create itself automatically, but you can create it yourself by making a `NeosModLoader.config` file in the same directory as `NeosModLoader.dll`. `NeosModLoader.config` is a simple text file that supports keys and values in the following format:
+
 ```
 debug=true
 nomods=false

@@ -1,7 +1,9 @@
 # Neos Standalone Setup
+
 How to have steam hour logging, mods, and NCR simultaneously
 
 ## Setup
+
 1. Grab and run [NeosPublicSetup.exe](https://assets.neos.com/install/NeosPublicSetup.exe) 
 2. Install it wherever you want to. The default `C:\Neos` location is fine if you don't have multiple drives to worry about. If you do, check the [drive notes](directories.md/#drive-notes). **Do not merge your standalone install into your Steam install!** While merging installs can technically work it can easily create more problems than it solves.  
    ![NeosPublicSetup.exe screenshot](img/NeosPublicSetup.png)
@@ -21,5 +23,6 @@ How to have steam hour logging, mods, and NCR simultaneously
 13. Launch Neos using your new non-steam game shortcut. Steam will track playtime on the Steam version of the game even though you are running the standalone version.
 
 ## Notes
+
 - You will need to run `NeosProLauncher.exe` every time you want to update. You never need actually use its launch buttons, as it does not support launch options which are required for plugins/mods.
 - The logs you're used to finding in `C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Logs` will go to `C:\Neos\app\Logs` now.
