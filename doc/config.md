@@ -22,7 +22,6 @@ Behind the scenes, configs are saved to a `nml_config` folder in the Neos instal
 - Reading/writing configuration values is done in-memory and is extremely cheap.
 - Saving configuration to disk is more expensive but is done infrequently
 
-
 ## Working With Your Mod's Configuration
 
 A simple example is below:

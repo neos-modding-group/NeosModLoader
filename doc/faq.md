@@ -33,7 +33,7 @@ Yes, so long as Neos's [Mod & Plugin Policy] is followed.
 - If you wish to opt in to using your real version string you can set `advertiseversion=true` in the NeosModLoader.config file.
 - If NeosModLoader breaks due to a bad install or a Neos update, it will be unable to hide its own existence.
 
-## Are mods safe? 
+## Are mods safe?
 
 Mods are not sandboxed in any way. In other words, they run with the same level of privilege as Neos itself. A poorly written mod could cause performance or stability issues. A maliciously designed mod could give a malicious actor a dangerous level of control over your computer. **Make sure you only use mods from sources you trust.**
 

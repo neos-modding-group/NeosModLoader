@@ -39,9 +39,10 @@ If the problem is Windows blocking the DLL file:
 1. Right click on the NeosModLoader.dll file and open the properties.
 2. Check the unblock checkbox, and hit OK.  
    ![add non-steam game screenshot](img/windows_unblock.png)
-4. Repeat this process for 0Harmony.dll.
+3. Repeat this process for 0Harmony.dll.
 
 If the problem is your antivirus:
+
 1. Make sure your antivirus has not quarantined or deleted NeosModLoader.dll or 0Harmony.dll.
 2. Add an exception to your antivirus. If you're uncomfortable adding an exception, you have options:
    - Don't run NeosModLoader.
@@ -66,10 +67,10 @@ Possibility 1: Harmony is not installed correctly.
 1. Your log contains the following:
 
    ```log
-   18:36:34.158 (  0 FPS)	[ERROR][NeosModLoader] Exception in execution hook!
+   18:36:34.158 (  0 FPS) [ERROR][NeosModLoader] Exception in execution hook!
    System.IO.FileNotFoundException: Could not load file or assembly '0Harmony, Version=2. 2.0.0, Culture=neutral, PublicKeyToken=null' or one of its dependencies.
    File name: '0Harmony, Version=2.2.0.0, Culture=neutral, PublicKeyToken=null'
-   at NeosModLoader.ExecutionHook..cctor () [0x00000] in  <67d6a64d7ebf403f83f1a8b1d8c03d22>:0 
+   at NeosModLoader.ExecutionHook..cctor () [0x00000] in  <67d6a64d7ebf403f83f1a8b1d8c03d22>:0
    ```
 
 2. Go back to the [installation instructions](../README.md#installation) and install Harmony to the correct location.
@@ -79,12 +80,13 @@ Possibility 2: You are using an old version of NeosModLoader.
 1. Check your log for a line like this:
 
   ```log
-  5:26:24 PM.823 (  0 FPS)	[INFO] [NeosModLoader] NeosModLoader v1.8.0 starting up!
+  5:26:24 PM.823 (  0 FPS) [INFO] [NeosModLoader] NeosModLoader v1.8.0 starting up!
   ```
 
 2. Verify your NeosModLoader version matches [the latest release](https://github.com/zkxs/NeosModLoader/releases/latest).
 
 Possibility 3: NeosModLoader itself is broken, even on the latest version. This can happen in rare circumstances when Neos updates.
+
 1. Please report the issue on [our Discord][Neos Modding Discord] or in [a GitHub issue](https://github.com/zkxs/NeosModLoader/issues).
 2. Wait for a fix.
 
