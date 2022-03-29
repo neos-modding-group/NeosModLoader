@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="2.2.0" />
+    <PackageReference Include="Lib.Harmony" Version="2.2.1" />
     <Reference Include="BaseX">
       <HintPath>$(NeosPath)Neos_Data\Managed\BaseX.dll</HintPath>
     </Reference>
