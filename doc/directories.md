@@ -37,9 +37,9 @@ If you've installed to a non-default location then finding the path is up to you
 | ----------- | ------------ |
 | Neos Install Directory (Steam) | `$HOME/.local/share/Steam/steamapps/common/NeosVR` |
 | Neos Install Directory (Standalone) | *unknown* |
-| Data Directory | `$HOME/.steam/steam/steamapps/compatdata/740250/pfx/drive_c/users/steamuser/AppData/LocalLow/Solirax/NeosVR` |
-| Temporary Directory | `$HOME/.steam/steam/steamapps/compatdata/740250/pfx/drive_c/users/steamuser/Temp/Solirax/NeosVR` |
-| Cache Directory | `$HOME/.steam/steam/steamapps/compatdata/740250/pfx/drive_c/users/steamuser/Temp/Solirax/NeosVR/Cache` |
+| Data Directory | `$HOME/.local/share/Steam/steamapps/compatdata/740250/pfx/drive_c/users/steamuser/AppData/LocalLow/Solirax/NeosVR` |
+| Temporary Directory | `$HOME/.local/share/Steam/steamapps/compatdata/740250/pfx/drive_c/users/steamuser/Temp/Solirax/NeosVR` |
+| Cache Directory | `$HOME/.local/share/Steam/steamapps/compatdata/740250/pfx/drive_c/users/steamuser/Temp/Solirax/NeosVR/Cache` |
 
 ## Drive Notes
 
