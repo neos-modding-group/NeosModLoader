@@ -238,6 +238,7 @@ namespace NeosModLoader
                 }
 
                 LoadedNeosMod loadedMod = new LoadedNeosMod(neosMod, mod);
+                Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.File)}) by {neosMod.Author}");
                 loadedMod.ModConfiguration = ModConfiguration.LoadConfigForMod(loadedMod);
                 return loadedMod;
             }
@@ -245,7 +246,6 @@ namespace NeosModLoader
 
         private static void HookMod(LoadedNeosMod mod)
         {
-            Logger.MsgInternal($"loaded mod {mod.NeosMod.Name} {mod.NeosMod.Version} from {mod.ModAssembly.File}");
             try
             {
                 mod.NeosMod.OnEngineInit();
