@@ -80,7 +80,6 @@ namespace NeosModLoader
             }
 
             ModConfigurationKey fieldValue = (ModConfigurationKey)field.GetValue(field.IsStatic ? null : Owner);
-            //Logger.DebugInternal($"{Owner.Name} autoregistering config key: {field}");
             Keys.Add(fieldValue);
         }
 
