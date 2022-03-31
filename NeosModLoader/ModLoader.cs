@@ -248,6 +248,7 @@ namespace NeosModLoader
 
         private static void HookMod(LoadedNeosMod mod)
         {
+            Logger.DebugInternal($"calling OnEngineInit for {mod.NeosMod.Name}");
             try
             {
                 mod.NeosMod.OnEngineInit();
