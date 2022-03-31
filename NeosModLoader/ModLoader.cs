@@ -40,7 +40,7 @@ namespace NeosModLoader
 
             string modDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_mods");
 
-            Logger.DebugInternal($"loading mods from {modDirectory}");
+            Logger.MsgInternal($"loading mods from {modDirectory}");
 
             // generate list of assemblies to load
             ModAssembly[] modsToLoad = null;
@@ -108,6 +108,8 @@ namespace NeosModLoader
 
             Harmony harmony = new Harmony("net.michaelripley.neosmodloader");
             ModConfiguration.RegisterShutdownHook(harmony);
+
+            Logger.MsgInternal($"loading mods done, beginning hooks");
 
             foreach (LoadedNeosMod mod in LoadedMods)
             {
