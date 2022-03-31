@@ -80,7 +80,7 @@ namespace NeosModLoader
             }
 
             ModConfigurationKey fieldValue = (ModConfigurationKey)field.GetValue(field.IsStatic ? null : Owner);
-            Logger.DebugInternal($"{Owner.Name} autoregistering config key: {field}");
+            //Logger.DebugInternal($"{Owner.Name} autoregistering config key: {field}");
             Keys.Add(fieldValue);
         }
 
@@ -90,11 +90,7 @@ namespace NeosModLoader
             {
                 return new ModConfigurationDefinition(Owner, ConfigVersion, Keys, AutoSaveConfig);
             }
-            else
-            {
-                Logger.DebugInternal($"{Owner.Name} had no defined keys. Building null config.");
-                return null;
-            }
+            return null;
         }
     }
 }
