@@ -109,8 +109,6 @@ namespace NeosModLoader
             Harmony harmony = new Harmony("net.michaelripley.neosmodloader");
             ModConfiguration.RegisterShutdownHook(harmony);
 
-            Logger.MsgInternal($"loading mods done, beginning hooks");
-
             foreach (LoadedNeosMod mod in LoadedMods)
             {
                 try
