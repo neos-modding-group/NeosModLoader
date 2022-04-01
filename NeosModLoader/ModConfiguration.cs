@@ -1,12 +1,11 @@
 ﻿using FrooxEngine;
 using HarmonyLib;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 
 namespace NeosModLoader
 {
@@ -409,35 +408,34 @@ namespace NeosModLoader
 
             try
             {
-                using (StreamReader file = File.OpenText(configFile))
+                string text = File.ReadAllText(configFile);
+
+                using (JsonDocument json = JsonDocument.Parse(text))
                 {
-                    using (JsonTextReader reader = new JsonTextReader(file))
+                    Version version = new Version(json.RootElement.GetProperty(VERSION_JSON_KEY).GetString());
+                    if (!AreVersionsCompatible(version, definition.Version))
                     {
-                        JObject json = JObject.Load(reader);
-                        Version version = new Version(json[VERSION_JSON_KEY].ToObject<string>());
-                        if (!AreVersionsCompatible(version, definition.Version))
+                        var handlingMode = mod.NeosMod.HandleIncompatibleConfigurationVersions(definition.Version, version);
+                        switch (handlingMode)
                         {
-                            var handlingMode = mod.NeosMod.HandleIncompatibleConfigurationVersions(definition.Version, version);
-                            switch (handlingMode)
-                            {
-                                case IncompatibleConfigurationHandlingOption.CLOBBER:
-                                    Logger.WarnInternal($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}. Clobbering old config and starting fresh.");
-                                    return new ModConfiguration(mod, definition);
-                                case IncompatibleConfigurationHandlingOption.FORCE_LOAD:
-                                    // continue processing
-                                    break;
-                                case IncompatibleConfigurationHandlingOption.ERROR: // fall through to default
-                                default:
-                                    mod.AllowSavingConfiguration = false;
-                                    throw new ModConfigurationException($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}");
-                            }
+                            case IncompatibleConfigurationHandlingOption.CLOBBER:
+                                Logger.WarnInternal($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}. Clobbering old config and starting fresh.");
+                                return new ModConfiguration(mod, definition);
+                            case IncompatibleConfigurationHandlingOption.FORCE_LOAD:
+                                // continue processing
+                                break;
+                            case IncompatibleConfigurationHandlingOption.ERROR: // fall through to default
+                            default:
+                                mod.AllowSavingConfiguration = false;
+                                throw new ModConfigurationException($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}");
                         }
+                    }
+                    if (json.RootElement.TryGetProperty(VALUES_JSON_KEY, out JsonElement values)) {
                         foreach (ModConfigurationKey key in definition.ConfigurationItemDefinitions)
                         {
-                            JToken token = json[VALUES_JSON_KEY][key.Name];
-                            if (token != null)
-                            {
-                                object value = token.ToObject(key.ValueType());
+                            if (values.TryGetProperty(key.Name, out JsonElement jsonValue)) {
+                                Type type = key.ValueType();
+                                object value = JsonSerializer.Deserialize(jsonValue.GetRawText(), type);
                                 key.Set(value);
                             }
                         }
@@ -481,21 +479,21 @@ namespace NeosModLoader
             }
             ModConfigurationDefinition definition = LoadedNeosMod.NeosMod.GetConfigurationDefinition();
 
-            JObject json = new JObject();
-            json[VERSION_JSON_KEY] = JToken.FromObject(definition.Version.ToString());
+            Dictionary<string, dynamic> json = new Dictionary<string, dynamic>();
+            json[VERSION_JSON_KEY] = JsonSerializer.Serialize(definition.Version.ToString());
 
-            JObject valueMap = new JObject();
+            Dictionary<string, dynamic> valueMap = new Dictionary<string, dynamic>();
             foreach (ModConfigurationKey key in ConfigurationItemDefinitions)
             {
                 if (key.TryGetValue(out object value))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my Set() API
-                    valueMap[key.Name] = JToken.FromObject(value);
+                    valueMap[key.Name] = JsonSerializer.Serialize(value);
                 }
                 else if (saveDefaultValues && key.TryComputeDefault(out object defaultValue))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my computeDefault API
-                    valueMap[key.Name] = JToken.FromObject(defaultValue);
+                    valueMap[key.Name] = JsonSerializer.Serialize(defaultValue);
                 }
             }
 
@@ -504,15 +502,10 @@ namespace NeosModLoader
             string configFile = GetModConfigPath(LoadedNeosMod);
             using (FileStream file = File.OpenWrite(configFile))
             {
+                string jsonString = JsonSerializer.Serialize(json);
                 using (StreamWriter streamWriter = new StreamWriter(file))
                 {
-                    using (JsonTextWriter jsonTextWriter = new JsonTextWriter(streamWriter))
-                    {
-                        json.WriteTo(jsonTextWriter);
-
-                        // I actually cannot believe I have to truncate the file myself
-                        file.SetLength(file.Position);
-                    }
+                    streamWriter.Write(jsonString);
                 }
             }
         }

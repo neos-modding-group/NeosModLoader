@@ -25,8 +25,11 @@
     <Reference Include="FrooxEngine">
       <HintPath>$(NeosPath)Neos_Data\Managed\FrooxEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>$(NeosPath)Neos_Data\Managed\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="System.Text.Json">
+      <HintPath>$(NeosPath)Neos_Data\Managed\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>$(NeosPath)Neos_Data\Managed\System.Memory.dll</HintPath>
     </Reference>
   </ItemGroup>
 

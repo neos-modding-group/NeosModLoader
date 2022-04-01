@@ -10,7 +10,7 @@ namespace NeosModLoader
             Logger.MsgInternal($"Using Harmony v{GetAssemblyVersion(typeof(HarmonyLib.Harmony))}");
             Logger.MsgInternal($"Using BaseX v{GetAssemblyVersion(typeof(BaseX.floatQ))}");
             Logger.MsgInternal($"Using FrooxEngine v{GetAssemblyVersion(typeof(FrooxEngine.IComponent))}");
-            Logger.MsgInternal($"Using Json.NET v{GetAssemblyVersion(typeof(Newtonsoft.Json.JsonSerializer))}");
+            Logger.MsgInternal($"Using System.Text.Json v{GetAssemblyVersion(typeof(System.Text.Json.JsonElement))}");
         }
 
         private static string GetAssemblyVersion(Type typeFromAssembly)
