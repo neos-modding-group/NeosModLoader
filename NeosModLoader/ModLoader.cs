@@ -248,7 +248,7 @@ namespace NeosModLoader
 
         private static void HookMod(LoadedNeosMod mod)
         {
-            SplashChanger.SetCustom($"Starting mod {mod.NeosMod.Name}");
+            SplashChanger.SetCustom($"Starting mod [{mod.NeosMod.Name}/{mod.NeosMod.Version}]");
             Logger.DebugInternal($"calling OnEngineInit() for [{mod.NeosMod.Name}]");
             try
             {
