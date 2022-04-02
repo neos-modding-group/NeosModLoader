@@ -16,9 +16,11 @@ namespace NeosModLoader
         {
             try
             {
+                SplashChanger.SetCustom("Initializing");
                 DebugInfo.Log();
                 NeosVersionReset.Initialize();
                 ModLoader.LoadMods();
+                SplashChanger.SetCustom("Loaded");
             }
             catch (Exception e) // it's important that this doesn't send exceptions back to Neos
             {

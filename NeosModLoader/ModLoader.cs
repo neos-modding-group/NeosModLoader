@@ -37,6 +37,7 @@ namespace NeosModLoader
                 Logger.DebugInternal("mods will not be loaded due to configuration file");
                 return;
             }
+            SplashChanger.SetCustom("Looking for mods");
 
             string modDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_mods");
 
@@ -236,6 +237,7 @@ namespace NeosModLoader
                     Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.File}");
                     return null;
                 }
+                SplashChanger.SetCustom($"Loading mod [{neosMod.Name}/{neosMod.Version}]");
 
                 LoadedNeosMod loadedMod = new LoadedNeosMod(neosMod, mod);
                 Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.File)}) by {neosMod.Author}");
@@ -246,6 +248,7 @@ namespace NeosModLoader
 
         private static void HookMod(LoadedNeosMod mod)
         {
+            SplashChanger.SetCustom($"Starting mod {mod.NeosMod.Name}");
             Logger.DebugInternal($"calling OnEngineInit() for [{mod.NeosMod.Name}]");
             try
             {
