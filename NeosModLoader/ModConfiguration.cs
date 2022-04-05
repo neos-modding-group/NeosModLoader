@@ -480,7 +480,7 @@ namespace NeosModLoader
             ModConfigurationDefinition definition = LoadedNeosMod.NeosMod.GetConfigurationDefinition();
 
             Dictionary<string, dynamic> json = new Dictionary<string, dynamic>();
-            json[VERSION_JSON_KEY] = JsonSerializer.Serialize(definition.Version.ToString());
+            json[VERSION_JSON_KEY] = definition.Version.ToString();
 
             Dictionary<string, dynamic> valueMap = new Dictionary<string, dynamic>();
             foreach (ModConfigurationKey key in ConfigurationItemDefinitions)
@@ -488,12 +488,12 @@ namespace NeosModLoader
                 if (key.TryGetValue(out object value))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my Set() API
-                    valueMap[key.Name] = JsonSerializer.Serialize(value);
+                    valueMap[key.Name] = value;
                 }
                 else if (saveDefaultValues && key.TryComputeDefault(out object defaultValue))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my computeDefault API
-                    valueMap[key.Name] = JsonSerializer.Serialize(defaultValue);
+                    valueMap[key.Name] = defaultValue;
                 }
             }
 
