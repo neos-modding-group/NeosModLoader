@@ -506,6 +506,9 @@ namespace NeosModLoader
                 using (StreamWriter streamWriter = new StreamWriter(file))
                 {
                     streamWriter.Write(jsonString);
+
+                    // I actually cannot believe I have to truncate the file myself
+                    file.SetLength(file.Position); 
                 }
             }
         }
