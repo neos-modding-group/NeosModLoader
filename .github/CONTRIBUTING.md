@@ -10,10 +10,6 @@ If you are reporting a bug, please include a log, or at the very least the relev
 
 If you want your PR to be approved and merged quickly, please read the following:
 
-### Branches
-
-PRs should be made onto the `dev` branch. PRs made on to other branches, including master, will be subject to delays as changing their base branch to `dev` may introduce merge conflicts.
-
 ### Code Style
 
 If your PR does not follow the project's code style it **will not be approved**. I expect contributors to be capable of fixing code style issues on their own.
