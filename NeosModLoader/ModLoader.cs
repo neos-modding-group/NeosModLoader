@@ -126,6 +126,8 @@ namespace NeosModLoader
             // log potential conflicts
             if (config.LogConflicts)
             {
+                SplashChanger.SetCustom("Looking for conflicts");
+
                 IEnumerable<MethodBase> patchedMethods = Harmony.GetAllPatchedMethods();
                 foreach (MethodBase patchedMethod in patchedMethods)
                 {
