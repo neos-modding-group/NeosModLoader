@@ -182,6 +182,7 @@ namespace NeosModLoader
 
         private static void LoadAssembly(ModAssembly mod)
         {
+            SplashChanger.SetCustom($"Loading file: {mod.File}");
             Assembly assembly;
             try
             {
@@ -237,7 +238,7 @@ namespace NeosModLoader
                     Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.File}");
                     return null;
                 }
-                SplashChanger.SetCustom($"Loading mod [{neosMod.Name}/{neosMod.Version}]");
+                SplashChanger.SetCustom($"Loading configuration for [{neosMod.Name}/{neosMod.Version}]");
 
                 LoadedNeosMod loadedMod = new LoadedNeosMod(neosMod, mod);
                 Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.File)}) by {neosMod.Author}");
