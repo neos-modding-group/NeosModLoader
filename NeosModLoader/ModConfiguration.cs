@@ -1,5 +1,6 @@
 ﻿using FrooxEngine;
 using HarmonyLib;
+using NeosModLoader.JsonConverters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -155,6 +156,26 @@ namespace NeosModLoader
         /// Called if one of the values in this mod's config changed.
         /// </summary>
         public event ConfigurationChangedEventHandler OnThisConfigurationChanged;
+
+        private static JsonSerializer jsonSerializer = createJsonSerializer();
+
+        private static JsonSerializer createJsonSerializer()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.MaxDepth = 32;
+            settings.ReferenceLoopHandling = ReferenceLoopHandling.Error;
+            settings.DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate;
+            List<JsonConverter> converters = new List<JsonConverter>();
+            IList<JsonConverter> defaultConverters = settings.Converters;
+            if (defaultConverters != null)
+            {
+                Logger.DebugInternal($"Using {defaultConverters.Count()} default json converters");
+                converters.AddRange(defaultConverters);
+            }
+            converters.Add(new NeosPrimitiveConverter());
+            settings.Converters = converters;
+            return JsonSerializer.Create(settings);
+        }
 
         private ModConfiguration(LoadedNeosMod loadedNeosMod, ModConfigurationDefinition definition)
         {
@@ -414,7 +435,7 @@ namespace NeosModLoader
                     using (JsonTextReader reader = new JsonTextReader(file))
                     {
                         JObject json = JObject.Load(reader);
-                        Version version = new Version(json[VERSION_JSON_KEY].ToObject<string>());
+                        Version version = new Version(json[VERSION_JSON_KEY].ToObject<string>(jsonSerializer));
                         if (!AreVersionsCompatible(version, definition.Version))
                         {
                             var handlingMode = mod.NeosMod.HandleIncompatibleConfigurationVersions(definition.Version, version);
@@ -437,7 +458,7 @@ namespace NeosModLoader
                             JToken token = json[VALUES_JSON_KEY][key.Name];
                             if (token != null)
                             {
-                                object value = token.ToObject(key.ValueType());
+                                object value = token.ToObject(key.ValueType(), jsonSerializer);
                                 key.Set(value);
                             }
                         }
@@ -482,7 +503,7 @@ namespace NeosModLoader
             ModConfigurationDefinition definition = LoadedNeosMod.NeosMod.GetConfigurationDefinition();
 
             JObject json = new JObject();
-            json[VERSION_JSON_KEY] = JToken.FromObject(definition.Version.ToString());
+            json[VERSION_JSON_KEY] = JToken.FromObject(definition.Version.ToString(), jsonSerializer);
 
             JObject valueMap = new JObject();
             foreach (ModConfigurationKey key in ConfigurationItemDefinitions)
@@ -490,12 +511,12 @@ namespace NeosModLoader
                 if (key.TryGetValue(out object value))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my Set() API
-                    valueMap[key.Name] = JToken.FromObject(value);
+                    valueMap[key.Name] = JToken.FromObject(value, jsonSerializer);
                 }
                 else if (saveDefaultValues && key.TryComputeDefault(out object defaultValue))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my computeDefault API
-                    valueMap[key.Name] = JToken.FromObject(defaultValue);
+                    valueMap[key.Name] = JToken.FromObject(defaultValue, jsonSerializer);
                 }
             }
 
