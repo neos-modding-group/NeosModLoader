@@ -6,10 +6,10 @@ namespace NeosModLoader
 {
     // Custom splash screen logic failing shouldn't fail the rest of the modloader.
     // Keep that in mind when editing later on.
-    public static class SplashChanger
+    internal static class SplashChanger
     {
         // Returned true means success, false means something went wrong.
-        public static bool SetCustom(string text) {
+        internal static bool SetCustom(string text) {
             if (ModLoaderConfiguration.Get().HideVisuals) return true;
             try {
                 // VerboseInit does extra logging, so turning it if off while we change the phase.
