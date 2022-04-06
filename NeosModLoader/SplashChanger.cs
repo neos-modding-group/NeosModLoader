@@ -8,6 +8,7 @@ namespace NeosModLoader
     // Keep that in mind when editing later on.
     internal static class SplashChanger
     {
+        private static bool failed = false;
         // Returned true means success, false means something went wrong.
         internal static bool SetCustom(string text) {
             if (ModLoaderConfiguration.Get().HideVisuals) return true;
@@ -23,7 +24,11 @@ namespace NeosModLoader
                     .GetValue(text, false);
                 Engine.Current.VerboseInit = ogVerboseInit;
                 return true;
-            } catch {
+            } catch (Exception ex) {
+                if (!failed) {
+                    Logger.WarnInternal("Splash change failed: " + ex.ToString());
+                    failed = true;
+                }
                 return false;
             }
         }
