@@ -39,6 +39,10 @@ namespace NeosModLoader
                             {
                                 _configuration.Debug = true;
                             }
+                            else if ("hidevisuals".Equals(key) && "true".Equals(value))
+                            {
+                                _configuration.HideVisuals = true;
+                            }
                             else if ("nomods".Equals(key) && "true".Equals(value))
                             {
                                 _configuration.NoMods = true;
@@ -83,6 +87,7 @@ namespace NeosModLoader
 
         public bool Unsafe { get; private set; } = false;
         public bool Debug { get; private set; } = false;
+        public bool HideVisuals { get; private set; } = false;
         public bool NoMods { get; private set; } = false;
         public bool AdvertiseVersion { get; private set; } = false;
         public bool LogConflicts { get; private set; } = true;

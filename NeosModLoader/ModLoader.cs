@@ -37,6 +37,7 @@ namespace NeosModLoader
                 Logger.DebugInternal("mods will not be loaded due to configuration file");
                 return;
             }
+            SplashChanger.SetCustom("Looking for mods");
 
             string modDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_mods");
 
@@ -106,6 +107,7 @@ namespace NeosModLoader
                 }
             }
 
+            SplashChanger.SetCustom("Hooking big fish");
             Harmony harmony = new Harmony("net.michaelripley.neosmodloader");
             ModConfiguration.RegisterShutdownHook(harmony);
 
@@ -124,6 +126,8 @@ namespace NeosModLoader
             // log potential conflicts
             if (config.LogConflicts)
             {
+                SplashChanger.SetCustom("Looking for conflicts");
+
                 IEnumerable<MethodBase> patchedMethods = Harmony.GetAllPatchedMethods();
                 foreach (MethodBase patchedMethod in patchedMethods)
                 {
@@ -181,6 +185,7 @@ namespace NeosModLoader
 
         private static void LoadAssembly(ModAssembly mod)
         {
+            SplashChanger.SetCustom($"Loading file: {mod.File}");
             Assembly assembly;
             try
             {
@@ -237,6 +242,7 @@ namespace NeosModLoader
                     Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.File}");
                     return null;
                 }
+                SplashChanger.SetCustom($"Loading configuration for [{neosMod.Name}/{neosMod.Version}]");
 
                 LoadedNeosMod loadedMod = new LoadedNeosMod(neosMod, mod);
                 Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.File)}) by {neosMod.Author}");
@@ -247,6 +253,7 @@ namespace NeosModLoader
 
         private static void HookMod(LoadedNeosMod mod)
         {
+            SplashChanger.SetCustom($"Starting mod [{mod.NeosMod.Name}/{mod.NeosMod.Version}]");
             Logger.DebugInternal($"calling OnEngineInit() for [{mod.NeosMod.Name}]");
             try
             {
