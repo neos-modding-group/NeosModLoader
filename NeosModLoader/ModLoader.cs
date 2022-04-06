@@ -107,6 +107,7 @@ namespace NeosModLoader
                 }
             }
 
+            SplashChanger.SetCustom("Hooking big fish");
             Harmony harmony = new Harmony("net.michaelripley.neosmodloader");
             ModConfiguration.RegisterShutdownHook(harmony);
 
