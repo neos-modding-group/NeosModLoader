@@ -172,6 +172,7 @@ namespace NeosModLoader
                 Logger.DebugInternal($"Using {defaultConverters.Count()} default json converters");
                 converters.AddRange(defaultConverters);
             }
+            converters.Add(new EnumConverter());
             converters.Add(new NeosPrimitiveConverter());
             settings.Converters = converters;
             return JsonSerializer.Create(settings);
