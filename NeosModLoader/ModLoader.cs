@@ -43,7 +43,9 @@ namespace NeosModLoader
             AssemblyFile[] modsToLoad;
             if (AssemblyLoader.LoadAssembliesFromDir("nml_mods") is AssemblyFile[] arr) {
                 modsToLoad = arr;
-            } else return;
+            } else {
+                return;
+            }
 
             ModConfiguration.EnsureDirectoryExists();
 
