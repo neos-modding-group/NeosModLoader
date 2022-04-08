@@ -11,7 +11,7 @@ namespace NeosModLoader
         {
             string assembliesDirectory = Path.Combine(Directory.GetCurrentDirectory(), dirName);
 
-            Logger.MsgInternal($"loading assemblies from {assembliesDirectory}");
+            Logger.MsgInternal($"loading assemblies from {dirName}");
 
             AssemblyFile[] assembliesToLoad = null;
             try
@@ -46,11 +46,12 @@ namespace NeosModLoader
 
         private static void LoadAssembly(AssemblyFile assemblyFile)
         {
-            SplashChanger.SetCustom($"Loading file: {assemblyFile.File}");
+            string filename = Path.GetFileName(assemblyFile.File);
+            SplashChanger.SetCustom($"Loading file: {filename}");
             Assembly assembly;
             try
             {
-                Logger.DebugInternal($"Loading assembly [{Path.GetFileName(assemblyFile.File)}]");
+                Logger.DebugInternal($"load assembly {filename}");
                 assembly = Assembly.LoadFile(assemblyFile.File);
             }
             catch (Exception e)
