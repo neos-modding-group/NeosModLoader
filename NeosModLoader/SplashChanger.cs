@@ -9,10 +9,44 @@ namespace NeosModLoader
     internal static class SplashChanger
     {
         private static bool failed = false;
-        private static readonly MethodInfo UpdatePhase = typeof(Engine)
-            .GetMethod("UpdateInitPhase", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly MethodInfo UpdateSubPhase = typeof(Engine)
-            .GetMethod("UpdateInitSubphase", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        private static MethodInfo _updatePhase = null;
+        private static MethodInfo UpdatePhase {
+            get {
+                if (_updatePhase is null) {
+                    try {
+                        _updatePhase = typeof(Engine)
+                            .GetMethod("UpdateInitPhase", BindingFlags.NonPublic | BindingFlags.Instance);
+                    } catch (Exception ex) {
+                        if (!failed)
+                        {
+                            Logger.WarnInternal("UpdatePhase not found: " + ex.ToString());
+                        }
+                        failed = true;
+                    }
+                }
+                return _updatePhase;
+            }
+        }
+        private static MethodInfo _updateSubPhase = null;
+        private static MethodInfo UpdateSubPhase {
+            get {
+                if (_updatePhase is null) {
+                    try {
+                        _updateSubPhase = typeof(Engine)
+                            .GetMethod("UpdateInitPhase", BindingFlags.NonPublic | BindingFlags.Instance);
+                    } catch (Exception ex) {
+                        if (!failed)
+                        {
+                            Logger.WarnInternal("UpdateSubPhase not found: " + ex.ToString());
+                        }
+                        failed = true;
+                    }
+                }
+                return _updateSubPhase;
+            }
+        }
+
         // Returned true means success, false means something went wrong.
         internal static bool SetCustom(string text)
         {
