@@ -83,11 +83,11 @@ Possibility 2: You are using an old version of NeosModLoader.
   5:26:24 PM.823 (  0 FPS) [INFO] [NeosModLoader] NeosModLoader v1.8.0 starting up!
   ```
 
-2. Verify your NeosModLoader version matches [the latest release](https://github.com/zkxs/NeosModLoader/releases/latest).
+2. Verify your NeosModLoader version matches [the latest release](https://github.com/neos-modding-group/NeosModLoader/releases/latest).
 
 Possibility 3: NeosModLoader itself is broken, even on the latest version. This can happen in rare circumstances when Neos updates.
 
-1. Please report the issue on [our Discord][Neos Modding Discord] or in [a GitHub issue](https://github.com/zkxs/NeosModLoader/issues).
+1. Please report the issue on [our Discord][Neos Modding Discord] or in [a GitHub issue](https://github.com/neos-modding-group/NeosModLoader/issues).
 2. Wait for a fix.
 
 ## Multiplayer Compatibility is Broken, but Everything Else Works
@@ -118,7 +118,7 @@ If you are not sure which mod is broken, follow the below steps:
 1. Check the logs (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Logs`). They should indicate which mod is failing. If the logs don't help, then continue with the following steps.
 2. Disable NeosModLoader by removing the `-LoadAssembly Libraries\NeosModLoader.dll` launch option. If Neos is still having problems while completely unmodified, you can get support on the [Neos Discord](https://discordapp.com/invite/GQ92NUu5). **You should not ask the Neos Discord for help with mods.**
 3. If you only experience the problem while modded, try uninstalling all of your mods and re-installing them one by one. Once you find the problematic mod reach out it its developers.
-4. If the issue appears to be with NeosModLoader itself, please open [an issue](https://github.com/zkxs/NeosModLoader/issues).
+4. If the issue appears to be with NeosModLoader itself, please open [an issue](https://github.com/neos-modding-group/NeosModLoader/issues).
 
 ## I Need More Help
 

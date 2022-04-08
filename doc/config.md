@@ -32,7 +32,7 @@ public class NeosModConfigurationExample : NeosMod
     public override string Name => "NeosModConfigurationExample";
     public override string Author => "runtime";
     public override string Version => "1.0.0";
-    public override string Link => "https://github.com/zkxs/NeosModConfigurationExample";
+    public override string Link => "https://github.com/neos-modding-group/NeosModConfigurationExample";
 
     [AutoRegisterConfigKey]
     private readonly ModConfigurationKey<int> KEY_COUNT = new ModConfigurationKey<int>("count", "Example counter", internalAccessOnly: true);
@@ -56,7 +56,7 @@ public class NeosModConfigurationExample : NeosMod
 }
 ```
 
-A full example repository that uses a few additional APIs is provided [here](https://github.com/zkxs/NeosModConfigurationExample).
+A full example repository that uses a few additional APIs is provided [here](https://github.com/neos-modding-group/NeosModConfigurationExample).
 
 ### Defining a Configuration
 
