@@ -420,6 +420,7 @@ namespace NeosModLoader
 
         internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
         {
+            // intentional call to an obsolete method. This will need reorganizing in the next major version.
             ModConfigurationDefinition definition = mod.NeosMod.GetConfigurationDefinition();
             if (definition == null)
             {
@@ -501,10 +502,9 @@ namespace NeosModLoader
                 Logger.WarnInternal($"Config for {LoadedNeosMod.NeosMod.Name} will NOT be saved due to a safety check failing. This is probably due to you downgrading a mod.");
                 return;
             }
-            ModConfigurationDefinition definition = LoadedNeosMod.NeosMod.GetConfigurationDefinition();
 
             JObject json = new JObject();
-            json[VERSION_JSON_KEY] = JToken.FromObject(definition.Version.ToString(), jsonSerializer);
+            json[VERSION_JSON_KEY] = JToken.FromObject(Definition.Version.ToString(), jsonSerializer);
 
             JObject valueMap = new JObject();
             foreach (ModConfigurationKey key in ConfigurationItemDefinitions)
