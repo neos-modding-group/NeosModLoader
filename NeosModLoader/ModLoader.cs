@@ -39,40 +39,11 @@ namespace NeosModLoader
             }
             SplashChanger.SetCustom("Looking for mods");
 
-            string modDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_mods");
-
-            Logger.MsgInternal($"loading mods from {modDirectory}");
-
             // generate list of assemblies to load
-            AssemblyFile[] modsToLoad = null;
-            try
-            {
-                modsToLoad = Directory.GetFiles(modDirectory, "*.dll")
-                    .Select(file => new AssemblyFile(file))
-                    .ToArray();
-
-                Array.Sort(modsToLoad, (a, b) => string.CompareOrdinal(a.File, b.File));
-            }
-            catch (Exception e)
-            {
-                if (e is DirectoryNotFoundException)
-                {
-                    Logger.MsgInternal("mod directory not found, creating it now.");
-                    try
-                    {
-                        Directory.CreateDirectory(modDirectory);
-                    }
-                    catch (Exception e2)
-                    {
-                        Logger.ErrorInternal($"Error creating mod directory:\n{e2}");
-                    }
-                }
-                else
-                {
-                    Logger.ErrorInternal($"Error enumerating mod directory:\n{e}");
-                }
-                return;
-            }
+            AssemblyFile[] modsToLoad;
+            if (AssemblyLoader.GetAssembliesFromDir("nml_mods") is AssemblyFile[] arr) {
+                modsToLoad = arr;
+            } else return;
 
             ModConfiguration.EnsureDirectoryExists();
 
@@ -81,7 +52,7 @@ namespace NeosModLoader
             {
                 try
                 {
-                    LoadAssembly(mod);
+                    AssemblyLoader.LoadAssembly(mod);
                 }
                 catch (Exception e)
                 {
@@ -181,28 +152,6 @@ namespace NeosModLoader
             int transpilerCount = patches.Transpilers.Where(ownerEquals).Count();
             int finalizerCount = patches.Finalizers.Where(ownerEquals).Count();
             return $"prefix={prefixCount}; postfix={postfixCount}; transpiler={transpilerCount}; finalizer={finalizerCount}";
-        }
-
-        private static void LoadAssembly(AssemblyFile mod)
-        {
-            SplashChanger.SetCustom($"Loading file: {mod.File}");
-            Assembly assembly;
-            try
-            {
-                Logger.DebugInternal($"Loading assembly [{Path.GetFileName(mod.File)}]");
-                assembly = Assembly.LoadFile(mod.File);
-            }
-            catch (Exception e)
-            {
-                Logger.ErrorInternal($"error loading assembly from {mod.File}: {e}");
-                return;
-            }
-            if (assembly == null)
-            {
-                Logger.ErrorInternal($"unexpected null loading assembly from {mod.File}");
-                return;
-            }
-            mod.Assembly = assembly;
         }
 
         // loads mod class and mod config
