@@ -16,6 +16,8 @@ namespace NeosModLoader
         {
             try
             {
+                SplashChanger.SetCustom("Loading libraries");
+                AssemblyLoader.LoadAssembliesFromDir("nml_libs");
                 SplashChanger.SetCustom("Initializing");
                 DebugInfo.Log();
                 NeosVersionReset.Initialize();
