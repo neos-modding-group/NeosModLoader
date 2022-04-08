@@ -44,11 +44,11 @@ namespace NeosModLoader
             Logger.MsgInternal($"loading mods from {modDirectory}");
 
             // generate list of assemblies to load
-            ModAssembly[] modsToLoad = null;
+            AssemblyFile[] modsToLoad = null;
             try
             {
                 modsToLoad = Directory.GetFiles(modDirectory, "*.dll")
-                    .Select(file => new ModAssembly(file))
+                    .Select(file => new AssemblyFile(file))
                     .ToArray();
 
                 Array.Sort(modsToLoad, (a, b) => string.CompareOrdinal(a.File, b.File));
@@ -77,7 +77,7 @@ namespace NeosModLoader
             ModConfiguration.EnsureDirectoryExists();
 
             // mods assemblies are all loaded before hooking begins so mods can interconnect if needed
-            foreach (ModAssembly mod in modsToLoad)
+            foreach (AssemblyFile mod in modsToLoad)
             {
                 try
                 {
@@ -90,7 +90,7 @@ namespace NeosModLoader
             }
 
             // call Initialize() each mod
-            foreach (ModAssembly mod in modsToLoad)
+            foreach (AssemblyFile mod in modsToLoad)
             {
                 try
                 {
@@ -183,7 +183,7 @@ namespace NeosModLoader
             return $"prefix={prefixCount}; postfix={postfixCount}; transpiler={transpilerCount}; finalizer={finalizerCount}";
         }
 
-        private static void LoadAssembly(ModAssembly mod)
+        private static void LoadAssembly(AssemblyFile mod)
         {
             SplashChanger.SetCustom($"Loading file: {mod.File}");
             Assembly assembly;
@@ -206,7 +206,7 @@ namespace NeosModLoader
         }
 
         // loads mod class and mod config
-        private static LoadedNeosMod InitializeMod(ModAssembly mod)
+        private static LoadedNeosMod InitializeMod(AssemblyFile mod)
         {
             if (mod.Assembly == null)
             {
