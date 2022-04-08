@@ -20,7 +20,6 @@ Your Neos directory should now look similar to the following. Files not related 
 
 ```
 <Neos Install Directory>
-│   0Harmony.dll
 │   Neos.exe
 │   NeosLauncher.exe
 │
@@ -32,10 +31,15 @@ Your Neos directory should now look similar to the following. Files not related 
 │       MotionBlurDisable.dll
 │       NeosContactsSort.dll
 |       <More mods go here>
+├───nml_libs
+│       0Harmony.dll
+|       <More libs go here>
 │
 └───Libraries
         NeosModLoader.dll
 ```
+
+Note that the libraries can also be in the root of the Neos install directory if you prefer, but the loading of those happens outside of NML itself.
 
 ## Finding Mods
 
