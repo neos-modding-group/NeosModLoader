@@ -1,6 +1,0 @@
-{
-	"editor.formatOnSaveMode": "modifications",
-	"editor.insertSpaces": true,
-	"editor.tabSize": 4,
-	"csharp.format.enable": false
-}
