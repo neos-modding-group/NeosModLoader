@@ -31,7 +31,7 @@ namespace NeosModLoader
         private static MethodInfo _updateSubPhase = null;
         private static MethodInfo UpdateSubPhase {
             get {
-                if (_updatePhase is null) {
+                if (_updateSubPhase is null) {
                     try {
                         _updateSubPhase = typeof(Engine)
                             .GetMethod("UpdateInitPhase", BindingFlags.NonPublic | BindingFlags.Instance);
