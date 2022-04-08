@@ -34,7 +34,7 @@ namespace NeosModLoader
         [Obsolete("This method is obsolete. Use DefineConfiguration(ModConfigurationDefinitionBuilder) instead.")] // REMOVE IN NEXT MAJOR VERSION
         public virtual ModConfigurationDefinition GetConfigurationDefinition()
         {
-            ModConfigurationDefinitionBuilder builder = new ModConfigurationDefinitionBuilder(this);
+            ModConfigurationDefinitionBuilder builder = new(this);
             builder.ProcessAttributes();
             DefineConfiguration(builder);
             return builder.Build();

@@ -13,7 +13,7 @@ namespace NeosModLoader
             Logger.MsgInternal($"Using Json.NET v{GetAssemblyVersion(typeof(Newtonsoft.Json.JsonSerializer))}");
         }
 
-        private static string GetAssemblyVersion(Type typeFromAssembly)
+        private static string? GetAssemblyVersion(Type typeFromAssembly)
         {
             return typeFromAssembly.Assembly.GetName()?.Version?.ToString();
         }

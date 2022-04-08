@@ -43,7 +43,7 @@ namespace NeosModLoader
         internal static void ErrorExternal(object message) => LogInternal(LogType.ERROR, message, SourceFromStackTrace());
         internal static void ErrorListExternal(object[] messages) => LogListInternal(LogType.ERROR, messages, SourceFromStackTrace());
 
-        private static void LogInternal(string logTypePrefix, object message, string source = null)
+        private static void LogInternal(string logTypePrefix, object message, string? source = null)
         {
             if (message == null)
             {
@@ -59,7 +59,7 @@ namespace NeosModLoader
             }
         }
 
-        private static void LogListInternal(string logTypePrefix, object[] messages, string source)
+        private static void LogListInternal(string logTypePrefix, object[] messages, string? source)
         {
             if (messages == null)
             {
@@ -74,15 +74,14 @@ namespace NeosModLoader
             }
         }
 
-        private static string SourceFromStackTrace()
+        private static string? SourceFromStackTrace()
         {
             // skip three frames: SourceFromStackTrace(), MsgExternal(), Msg()
-            StackTrace stackTrace = new StackTrace(3);
+            StackTrace stackTrace = new(3);
             for (int i = 0; i < stackTrace.FrameCount; i++)
             {
                 Assembly assembly = stackTrace.GetFrame(i).GetMethod().DeclaringType.Assembly;
-                NeosMod mod;
-                if (ModLoader.AssemblyLookupMap.TryGetValue(assembly, out mod))
+                if (ModLoader.AssemblyLookupMap.TryGetValue(assembly, out NeosMod mod))
                 {
                     return mod.Name;
                 }

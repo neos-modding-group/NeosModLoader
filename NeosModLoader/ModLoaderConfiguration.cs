@@ -8,7 +8,7 @@ namespace NeosModLoader
     {
         private static readonly string CONFIG_FILENAME = "NeosModLoader.config";
 
-        private static ModLoaderConfiguration _configuration;
+        private static ModLoaderConfiguration? _configuration;
 
         internal static ModLoaderConfiguration Get()
         {
@@ -84,7 +84,7 @@ namespace NeosModLoader
         private static string GetAssemblyDirectory()
         {
             string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            UriBuilder uri = new UriBuilder(codeBase);
+            UriBuilder uri = new(codeBase);
             string path = Uri.UnescapeDataString(uri.Path);
             return Path.GetDirectoryName(path);
         }

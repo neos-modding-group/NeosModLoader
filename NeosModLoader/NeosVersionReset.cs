@@ -81,11 +81,9 @@ namespace NeosModLoader
 
         private static string CalculateCompatibilityHash(int ProtocolVersion)
         {
-            using (MD5CryptoServiceProvider cryptoServiceProvider = new MD5CryptoServiceProvider())
-            {
-                byte[] hash = cryptoServiceProvider.ComputeHash(new MemoryStream(BitConverter.GetBytes(ProtocolVersion)));
-                return Convert.ToBase64String(hash);
-            }
+            using MD5CryptoServiceProvider cryptoServiceProvider = new();
+            byte[] hash = cryptoServiceProvider.ComputeHash(new MemoryStream(BitConverter.GetBytes(ProtocolVersion)));
+            return Convert.ToBase64String(hash);
         }
 
         private static bool SetCompatibilityHash(Engine engine, string Target)

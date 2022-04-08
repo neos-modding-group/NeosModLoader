@@ -11,11 +11,11 @@ namespace NeosModLoader.JsonConverters
             return objectType.IsEnum;
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             // handle old behavior where enums were serialized as underlying type
             Type underlyingType = Enum.GetUnderlyingType(objectType);
-            if (TryConvert(reader.Value, underlyingType, out object deserialized))
+            if (TryConvert(reader.Value, underlyingType, out object? deserialized))
             {
                 Logger.DebugInternal($"Deserializing a BaseX type: {objectType} from a {reader.Value.GetType()}");
                 return deserialized;
@@ -36,7 +36,7 @@ namespace NeosModLoader.JsonConverters
             writer.WriteValue(serialized);
         }
 
-        private bool TryConvert(object value, Type newType, out object converted)
+        private bool TryConvert(object value, Type newType, out object? converted)
         {
             try
             {

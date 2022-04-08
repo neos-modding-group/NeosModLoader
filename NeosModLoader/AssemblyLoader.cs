@@ -1,26 +1,23 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace NeosModLoader
 {
     internal static class AssemblyLoader
     {
-        private static AssemblyFile[] GetAssembliesFromDir(string dirName)
+        private static string[]? GetAssemblyPathsFromDir(string dirName)
         {
             string assembliesDirectory = Path.Combine(Directory.GetCurrentDirectory(), dirName);
 
             Logger.MsgInternal($"loading assemblies from {dirName}");
 
-            AssemblyFile[] assembliesToLoad = null;
+            string[]? assembliesToLoad = null;
             try
             {
-                assembliesToLoad = Directory.GetFiles(assembliesDirectory, "*.dll")
-                    .Select(file => new AssemblyFile(file))
-                    .ToArray();
-
-                Array.Sort(assembliesToLoad, (a, b) => string.CompareOrdinal(a.File, b.File));
+                assembliesToLoad = Directory.GetFiles(assembliesDirectory, "*.dll");
+                Array.Sort(assembliesToLoad, (a, b) => string.CompareOrdinal(a, b));
             }
             catch (Exception e)
             {
@@ -44,46 +41,48 @@ namespace NeosModLoader
             return assembliesToLoad;
         }
 
-        private static void LoadAssembly(AssemblyFile assemblyFile)
+        private static Assembly? LoadAssembly(string filepath)
         {
-            string filename = Path.GetFileName(assemblyFile.File);
+            string filename = Path.GetFileName(filepath);
             SplashChanger.SetCustom($"Loading file: {filename}");
             Assembly assembly;
             try
             {
                 Logger.DebugInternal($"load assembly {filename}");
-                assembly = Assembly.LoadFile(assemblyFile.File);
+                assembly = Assembly.LoadFile(filepath);
             }
             catch (Exception e)
             {
-                Logger.ErrorInternal($"error loading assembly from {assemblyFile.File}: {e}");
-                return;
+                Logger.ErrorInternal($"error loading assembly from {filepath}: {e}");
+                return null;
             }
             if (assembly == null)
             {
-                Logger.ErrorInternal($"unexpected null loading assembly from {assemblyFile.File}");
-                return;
+                Logger.ErrorInternal($"unexpected null loading assembly from {filepath}");
+                return null;
             }
-            assemblyFile.Assembly = assembly;
+            return assembly;
         }
 
         internal static AssemblyFile[] LoadAssembliesFromDir(string dirName) {
-            var assembliesOrNull = GetAssembliesFromDir(dirName);
-            if (assembliesOrNull is AssemblyFile[] assembliesToLoad) {
-                foreach (AssemblyFile assemblyFile in assembliesToLoad)
+            List<AssemblyFile> assemblyFiles = new();
+            if (GetAssemblyPathsFromDir(dirName) is string[] assemblyPaths) {
+                foreach (string assemblyFilepath in assemblyPaths)
                 {
                     try
                     {
-                        LoadAssembly(assemblyFile);
+                        if (LoadAssembly(assemblyFilepath) is Assembly assembly) {
+                            assemblyFiles.Add(new AssemblyFile(assemblyFilepath, assembly));
+                        }
                     }
                     catch (Exception e)
                     {
-                        Logger.ErrorInternal($"Unexpected exception loading assembly from {assemblyFile.File}:\n{e}");
+                        Logger.ErrorInternal($"Unexpected exception loading assembly from {assemblyFilepath}:\n{e}");
                     }
                 }
             }
 
-            return assembliesOrNull;
+            return assemblyFiles.ToArray();
         }
     }
 }
