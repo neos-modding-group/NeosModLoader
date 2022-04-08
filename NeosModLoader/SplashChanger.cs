@@ -1,6 +1,6 @@
 using FrooxEngine;
-using HarmonyLib;
 using System;
+using System.Reflection;
 
 namespace NeosModLoader
 {
@@ -9,6 +9,44 @@ namespace NeosModLoader
     internal static class SplashChanger
     {
         private static bool failed = false;
+
+        private static MethodInfo _updatePhase = null;
+        private static MethodInfo UpdatePhase {
+            get {
+                if (_updatePhase is null) {
+                    try {
+                        _updatePhase = typeof(Engine)
+                            .GetMethod("UpdateInitPhase", BindingFlags.NonPublic | BindingFlags.Instance);
+                    } catch (Exception ex) {
+                        if (!failed)
+                        {
+                            Logger.WarnInternal("UpdatePhase not found: " + ex.ToString());
+                        }
+                        failed = true;
+                    }
+                }
+                return _updatePhase;
+            }
+        }
+        private static MethodInfo _updateSubPhase = null;
+        private static MethodInfo UpdateSubPhase {
+            get {
+                if (_updatePhase is null) {
+                    try {
+                        _updateSubPhase = typeof(Engine)
+                            .GetMethod("UpdateInitPhase", BindingFlags.NonPublic | BindingFlags.Instance);
+                    } catch (Exception ex) {
+                        if (!failed)
+                        {
+                            Logger.WarnInternal("UpdateSubPhase not found: " + ex.ToString());
+                        }
+                        failed = true;
+                    }
+                }
+                return _updateSubPhase;
+            }
+        }
+
         // Returned true means success, false means something went wrong.
         internal static bool SetCustom(string text)
         {
@@ -18,12 +56,8 @@ namespace NeosModLoader
                 // VerboseInit does extra logging, so turning it if off while we change the phase.
                 bool ogVerboseInit = Engine.Current.VerboseInit;
                 Engine.Current.VerboseInit = false;
-                Traverse.Create(Engine.Current)
-                    .Method("UpdateInitPhase", new Type[] { typeof(string), typeof(bool) })
-                    .GetValue("~ NeosModLoader ~", false);
-                Traverse.Create(Engine.Current)
-                    .Method("UpdateInitSubphase", new Type[] { typeof(string), typeof(bool) })
-                    .GetValue(text, false);
+                UpdatePhase.Invoke(Engine.Current, new object[] { "~ NeosModLoader ~", false });
+                UpdateSubPhase.Invoke(Engine.Current, new object[] { text, false });
                 Engine.Current.VerboseInit = ogVerboseInit;
                 return true;
             }

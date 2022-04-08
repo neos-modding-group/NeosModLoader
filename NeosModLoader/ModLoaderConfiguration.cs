@@ -47,6 +47,10 @@ namespace NeosModLoader
                             {
                                 _configuration.NoMods = true;
                             }
+                            else if ("nolibraries".Equals(key) && "true".Equals(value))
+                            {
+                                _configuration.NoLibraries = true;
+                            }
                             else if ("advertiseversion".Equals(key) && "true".Equals(value))
                             {
                                 _configuration.AdvertiseVersion = true;
@@ -89,6 +93,7 @@ namespace NeosModLoader
         public bool Debug { get; private set; } = false;
         public bool HideVisuals { get; private set; } = false;
         public bool NoMods { get; private set; } = false;
+        public bool NoLibraries { get; private set; } = false;
         public bool AdvertiseVersion { get; private set; } = false;
         public bool LogConflicts { get; private set; } = true;
     }
