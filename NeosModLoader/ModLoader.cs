@@ -41,24 +41,11 @@ namespace NeosModLoader
 
             // generate list of assemblies to load
             AssemblyFile[] modsToLoad;
-            if (AssemblyLoader.GetAssembliesFromDir("nml_mods") is AssemblyFile[] arr) {
+            if (AssemblyLoader.LoadAssembliesFromDir("nml_mods") is AssemblyFile[] arr) {
                 modsToLoad = arr;
             } else return;
 
             ModConfiguration.EnsureDirectoryExists();
-
-            // mods assemblies are all loaded before hooking begins so mods can interconnect if needed
-            foreach (AssemblyFile mod in modsToLoad)
-            {
-                try
-                {
-                    AssemblyLoader.LoadAssembly(mod);
-                }
-                catch (Exception e)
-                {
-                    Logger.ErrorInternal($"Unexpected exception loading mod assembly from {mod.File}:\n{e}");
-                }
-            }
 
             // call Initialize() each mod
             foreach (AssemblyFile mod in modsToLoad)

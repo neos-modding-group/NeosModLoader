@@ -7,9 +7,9 @@ using System.Reflection;
 
 namespace NeosModLoader
 {
-    internal class AssemblyLoader
+    internal static class AssemblyLoader
     {
-        internal static AssemblyFile[] GetAssembliesFromDir(string dirName)
+        private static AssemblyFile[] GetAssembliesFromDir(string dirName)
         {
             string assembliesDirectory = Path.Combine(Directory.GetCurrentDirectory(), dirName);
 
@@ -46,7 +46,7 @@ namespace NeosModLoader
             return assembliesToLoad;
         }
 
-        internal static void LoadAssembly(AssemblyFile assemblyFile)
+        private static void LoadAssembly(AssemblyFile assemblyFile)
         {
             SplashChanger.SetCustom($"Loading file: {assemblyFile.File}");
             Assembly assembly;
@@ -68,5 +68,23 @@ namespace NeosModLoader
             assemblyFile.Assembly = assembly;
         }
 
+        internal static AssemblyFile[] LoadAssembliesFromDir(string dirName) {
+            var assembliesOrNull = GetAssembliesFromDir(dirName);
+            if (assembliesOrNull is AssemblyFile[] assembliesToLoad) {
+                foreach (AssemblyFile assemblyFile in assembliesToLoad)
+                {
+                    try
+                    {
+                        LoadAssembly(assemblyFile);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.ErrorInternal($"Unexpected exception loading assembly from {assemblyFile.File}:\n{e}");
+                    }
+                }
+            }
+
+            return assembliesOrNull;
+        }
     }
 }
