@@ -4,7 +4,7 @@ using System;
 namespace NeosModLoader.JsonConverters
 {
     // serializes and deserializes enums as strings
-    class EnumConverter : JsonConverter
+    internal class EnumConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -15,10 +15,10 @@ namespace NeosModLoader.JsonConverters
         {
             // handle old behavior where enums were serialized as underlying type
             Type underlyingType = Enum.GetUnderlyingType(objectType);
-            if (TryConvert(reader.Value, underlyingType, out object deserialized))
+            if (TryConvert(reader.Value, underlyingType, out object? deserialized))
             {
                 Logger.DebugInternal($"Deserializing a BaseX type: {objectType} from a {reader.Value.GetType()}");
-                return deserialized;
+                return deserialized!;
             }
 
             // handle new behavior where enums are serialized as strings
@@ -36,7 +36,7 @@ namespace NeosModLoader.JsonConverters
             writer.WriteValue(serialized);
         }
 
-        private bool TryConvert(object value, Type newType, out object converted)
+        private bool TryConvert(object value, Type newType, out object? converted)
         {
             try
             {

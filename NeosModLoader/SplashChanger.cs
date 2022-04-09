@@ -10,8 +10,8 @@ namespace NeosModLoader
     {
         private static bool failed = false;
 
-        private static MethodInfo _updatePhase = null;
-        private static MethodInfo UpdatePhase {
+        private static MethodInfo? _updatePhase = null;
+        private static MethodInfo? UpdatePhase {
             get {
                 if (_updatePhase is null) {
                     try {
@@ -28,8 +28,8 @@ namespace NeosModLoader
                 return _updatePhase;
             }
         }
-        private static MethodInfo _updateSubPhase = null;
-        private static MethodInfo UpdateSubPhase {
+        private static MethodInfo? _updateSubPhase = null;
+        private static MethodInfo? UpdateSubPhase {
             get {
                 if (_updateSubPhase is null) {
                     try {
@@ -56,8 +56,8 @@ namespace NeosModLoader
                 // VerboseInit does extra logging, so turning it if off while we change the phase.
                 bool ogVerboseInit = Engine.Current.VerboseInit;
                 Engine.Current.VerboseInit = false;
-                UpdatePhase.Invoke(Engine.Current, new object[] { "~ NeosModLoader ~", false });
-                UpdateSubPhase.Invoke(Engine.Current, new object[] { text, false });
+                UpdatePhase?.Invoke(Engine.Current, new object[] { "~ NeosModLoader ~", false });
+                UpdateSubPhase?.Invoke(Engine.Current, new object[] { text, false });
                 Engine.Current.VerboseInit = ogVerboseInit;
                 return true;
             }

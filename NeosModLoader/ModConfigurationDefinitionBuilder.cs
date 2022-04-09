@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+#nullable disable
 namespace NeosModLoader
 {
     public class ModConfigurationDefinitionBuilder
     {
-        private NeosModBase Owner;
-        private Version ConfigVersion = new Version(1, 0, 0);
-        private HashSet<ModConfigurationKey> Keys = new HashSet<ModConfigurationKey>();
+        private readonly NeosModBase Owner;
+        private Version ConfigVersion = new(1, 0, 0);
+        private readonly HashSet<ModConfigurationKey> Keys = new();
         private bool AutoSaveConfig = true;
 
         internal ModConfigurationDefinitionBuilder(NeosModBase owner)

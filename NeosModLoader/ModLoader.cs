@@ -14,9 +14,9 @@ namespace NeosModLoader
         /// </summary>
         public static readonly string VERSION = "1.9.1";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
-        private static List<LoadedNeosMod> LoadedMods = new List<LoadedNeosMod>(); // used for mod enumeration
-        internal static Dictionary<Assembly, NeosMod> AssemblyLookupMap = new Dictionary<Assembly, NeosMod>(); // used for logging
-        private static Dictionary<string, LoadedNeosMod> ModNameLookupMap = new Dictionary<string, LoadedNeosMod>(); // used for duplicate mod checking
+        private static readonly List<LoadedNeosMod> LoadedMods = new(); // used for mod enumeration
+        internal static readonly Dictionary<Assembly, NeosMod> AssemblyLookupMap = new(); // used for logging
+        private static readonly Dictionary<string, LoadedNeosMod> ModNameLookupMap = new(); // used for duplicate mod checking
 
         /// <summary>
         /// Allows reading metadata for all loaded mods
@@ -54,7 +54,7 @@ namespace NeosModLoader
             {
                 try
                 {
-                    LoadedNeosMod loaded = InitializeMod(mod);
+                    LoadedNeosMod? loaded = InitializeMod(mod);
                     if (loaded != null)
                     {
                         // if loading succeeded, then we need to register the mod
@@ -68,7 +68,7 @@ namespace NeosModLoader
             }
 
             SplashChanger.SetCustom("Hooking big fish");
-            Harmony harmony = new Harmony("net.michaelripley.neosmodloader");
+            Harmony harmony = new("net.michaelripley.neosmodloader");
             ModConfiguration.RegisterShutdownHook(harmony);
 
             foreach (LoadedNeosMod mod in LoadedMods)
@@ -92,7 +92,7 @@ namespace NeosModLoader
                 foreach (MethodBase patchedMethod in patchedMethods)
                 {
                     Patches patches = Harmony.GetPatchInfo(patchedMethod);
-                    HashSet<string> owners = new HashSet<string>(patches.Owners);
+                    HashSet<string> owners = new(patches.Owners);
                     if (owners.Count > 1)
                     {
                         Logger.WarnInternal($"method \"{patchedMethod.FullDescription()}\" has been patched by the following:");
@@ -135,7 +135,7 @@ namespace NeosModLoader
 
         private static string TypesForOwner(Patches patches, string owner)
         {
-            Func<Patch, bool> ownerEquals = patch => Equals(patch.owner, owner);
+            bool ownerEquals(Patch patch) => Equals(patch.owner, owner);
             int prefixCount = patches.Prefixes.Where(ownerEquals).Count();
             int postfixCount = patches.Postfixes.Where(ownerEquals).Count();
             int transpilerCount = patches.Transpilers.Where(ownerEquals).Count();
@@ -144,7 +144,7 @@ namespace NeosModLoader
         }
 
         // loads mod class and mod config
-        private static LoadedNeosMod InitializeMod(AssemblyFile mod)
+        private static LoadedNeosMod? InitializeMod(AssemblyFile mod)
         {
             if (mod.Assembly == null)
             {
@@ -165,7 +165,7 @@ namespace NeosModLoader
             else
             {
                 Type modClass = modClasses[0];
-                NeosMod neosMod = null;
+                NeosMod? neosMod = null;
                 try
                 {
                     neosMod = (NeosMod)AccessTools.CreateInstance(modClass);
@@ -182,7 +182,7 @@ namespace NeosModLoader
                 }
                 SplashChanger.SetCustom($"Loading configuration for [{neosMod.Name}/{neosMod.Version}]");
 
-                LoadedNeosMod loadedMod = new LoadedNeosMod(neosMod, mod);
+                LoadedNeosMod loadedMod = new(neosMod, mod);
                 Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.File)}) by {neosMod.Author}");
                 loadedMod.ModConfiguration = ModConfiguration.LoadConfigForMod(loadedMod);
                 return loadedMod;
