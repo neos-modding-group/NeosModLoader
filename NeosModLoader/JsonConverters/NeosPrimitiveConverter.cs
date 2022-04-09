@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace NeosModLoader.JsonConverters
 {
-    class NeosPrimitiveConverter : JsonConverter
+    internal class NeosPrimitiveConverter : JsonConverter
     {
         private static readonly Assembly BASEX = typeof(color).Assembly;
 

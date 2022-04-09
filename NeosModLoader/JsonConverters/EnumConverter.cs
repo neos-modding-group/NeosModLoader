@@ -4,21 +4,21 @@ using System;
 namespace NeosModLoader.JsonConverters
 {
     // serializes and deserializes enums as strings
-    class EnumConverter : JsonConverter
+    internal class EnumConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
             return objectType.IsEnum;
         }
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             // handle old behavior where enums were serialized as underlying type
             Type underlyingType = Enum.GetUnderlyingType(objectType);
             if (TryConvert(reader.Value, underlyingType, out object? deserialized))
             {
                 Logger.DebugInternal($"Deserializing a BaseX type: {objectType} from a {reader.Value.GetType()}");
-                return deserialized;
+                return deserialized!;
             }
 
             // handle new behavior where enums are serialized as strings
