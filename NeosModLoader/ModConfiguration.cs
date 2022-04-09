@@ -423,8 +423,7 @@ namespace NeosModLoader
 
         internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
         {
-            // intentional call to an obsolete method. This will need reorganizing in the next major version.
-            ModConfigurationDefinition definition = mod.NeosMod.GetConfigurationDefinition();
+            ModConfigurationDefinition definition = mod.NeosMod.BuildConfigurationDefinition();
             if (definition == null)
             {
                 // if there's no definition, then there's nothing for us to do here
