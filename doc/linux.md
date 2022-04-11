@@ -1,6 +1,6 @@
 # Linux Notes
 
-NeosModLoader works on Linux, but in addtion to the [normal install steps](../README.md#installation) there are some extra steps you need to take until Neos issue [#2638](https://github.com/Neos-Metaverse/NeosPublic/issues/2638) is fixed.
+NeosModLoader works on Linux, but in addition to the [normal install steps](../README.md#installation) there are some extra steps you need to take until Neos issue [#2638](https://github.com/Neos-Metaverse/NeosPublic/issues/2638) is fixed.
 
 The log directory on Linux is `$HOME/.local/share/Steam/steamapps/common/NeosVR/Logs`
 
