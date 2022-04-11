@@ -43,7 +43,7 @@ Note that the libraries can also be in the root of the Neos install directory if
 
 ## Finding Mods
 
-A list of known mods is available in the [Neos Mod List](https://github.com/neos-modding-group/neos-mod-manifest/blob/master/README.md#mods). New mods and updates are also announced in [our Discord][Neos Modding Discord].
+A list of known mods is available in the [Neos Mod List](https://www.neosmodloader.com/mods). New mods and updates are also announced in [our Discord][Neos Modding Discord].
 
 ## Frequently Asked Questions
 
