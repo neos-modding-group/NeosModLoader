@@ -67,7 +67,7 @@ NeosModLoader is licensed under the GNU Lesser General Public License (LGPL). Se
 
 Third-party libraries distributed alongside NeosModLoader:
 
-- [LibHarmony] ([MIT License](https://github.com/pardeike/Harmony/blob/master/LICENSE))
+- [LibHarmony] ([MIT License](https://github.com/pardeike/Harmony/blob/v2.2.1.0/LICENSE))
 
 Third-party libraries used in source:
 
