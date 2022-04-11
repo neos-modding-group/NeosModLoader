@@ -7,7 +7,7 @@ A mod loader for [Neos VR](https://neos.com/). Consider joining our community on
 If you are using the Steam version of Neos you are in the right place. If you are using the standalone version, read the [Neos Standalone Setup](doc/neos_standalone_setup.md) instructions. If you are on Linux, read the [Linux Notes](doc/linux.md).
 
 1. Download [NeosModLoader.dll](https://github.com/neos-modding-group/NeosModLoader/releases/latest/download/NeosModLoader.dll) to Neos's `Libraries` folder (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Libraries`).
-2. Place [0Harmony.dll](https://github.com/neos-modding-group/NeosModLoader/releases/download/1.4.1/0Harmony.dll) in your Neos install directory (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR`).
+2. Place [0Harmony.dll](https://github.com/neos-modding-group/NeosModLoader/releases/download/1.9.1/0Harmony.dll) in your Neos install directory (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR`).
 3. Add mod DLL files to a `nml_mods` folder under your Neos install directory (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\nml_mods`). You can create the folder if it's missing, or simply launch Neos once with NeosModLoader installed and it will be created automatically.
 4. Add the following to Neos's [launch options](https://wiki.neos.com/Command_Line_Arguments): `-LoadAssembly Libraries\NeosModLoader.dll`, substituting the path for wherever you put `NeosModLoader.dll`.
 5. Start the game. If you want to verify that NeosModLoader is working you can check the Neos logs. (`C:\Program Files (x86)\Steam\steamapps\common\NeosVR\Logs`). The modloader adds some very obvious logs on startup, and if they're missing something has gone wrong. Here is an [example log file](doc/example_log.log) where everything worked correctly.
@@ -43,7 +43,7 @@ Note that the libraries can also be in the root of the Neos install directory if
 
 ## Finding Mods
 
-A list of known mods is available in the [Neos Mod List](https://github.com/zkxs/neos-mod-list/blob/master/README.md). New mods and updates are also announced in [our Discord][Neos Modding Discord].
+A list of known mods is available in the [Neos Mod List](https://github.com/neos-modding-group/neos-mod-manifest/blob/master/README.md#mods). New mods and updates are also announced in [our Discord][Neos Modding Discord].
 
 ## Frequently Asked Questions
 
@@ -67,13 +67,13 @@ NeosModLoader is licensed under the GNU Lesser General Public License (LGPL). Se
 
 Third-party libraries distributed alongside NeosModLoader:
 
-- [LibHarmony] ([MIT License](https://github.com/pardeike/Harmony/blob/79d62b42c71d005b3cb1d94e741bfd4ce7e03a6b/LICENSE))
+- [LibHarmony] ([MIT License](https://github.com/pardeike/Harmony/blob/v2.2.1.0/LICENSE))
 
 Third-party libraries used in source:
 
 - [.NET](https://github.com/dotnet) (Various licenses)
 - [Neos VR](https://neos.com/) ([EULA](https://store.steampowered.com//eula/740250_eula_0))
-- [Json.NET](https://github.com/JamesNK/Newtonsoft.Json) ([MIT License](https://github.com/JamesNK/Newtonsoft.Json/blob/52190a3a3de6ef9a556583cbcb2381073e7197bc/LICENSE.md))
+- [Json.NET](https://github.com/JamesNK/Newtonsoft.Json) ([MIT License](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md))
 
 <!--- Link References -->
 [LibHarmony]: https://github.com/pardeike/Harmony
