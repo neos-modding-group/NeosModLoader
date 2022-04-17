@@ -41,9 +41,12 @@ namespace NeosModLoader
 
             // generate list of assemblies to load
             AssemblyFile[] modsToLoad;
-            if (AssemblyLoader.LoadAssembliesFromDir("nml_mods") is AssemblyFile[] arr) {
+            if (AssemblyLoader.LoadAssembliesFromDir("nml_mods") is AssemblyFile[] arr)
+            {
                 modsToLoad = arr;
-            } else {
+            }
+            else
+            {
                 return;
             }
 

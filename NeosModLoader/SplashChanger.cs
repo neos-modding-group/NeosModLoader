@@ -11,13 +11,19 @@ namespace NeosModLoader
         private static bool failed = false;
 
         private static MethodInfo? _updatePhase = null;
-        private static MethodInfo? UpdatePhase {
-            get {
-                if (_updatePhase is null) {
-                    try {
+        private static MethodInfo? UpdatePhase
+        {
+            get
+            {
+                if (_updatePhase is null)
+                {
+                    try
+                    {
                         _updatePhase = typeof(Engine)
                             .GetMethod("UpdateInitPhase", BindingFlags.NonPublic | BindingFlags.Instance);
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         if (!failed)
                         {
                             Logger.WarnInternal("UpdatePhase not found: " + ex.ToString());
@@ -29,13 +35,19 @@ namespace NeosModLoader
             }
         }
         private static MethodInfo? _updateSubPhase = null;
-        private static MethodInfo? UpdateSubPhase {
-            get {
-                if (_updateSubPhase is null) {
-                    try {
+        private static MethodInfo? UpdateSubPhase
+        {
+            get
+            {
+                if (_updateSubPhase is null)
+                {
+                    try
+                    {
                         _updateSubPhase = typeof(Engine)
                             .GetMethod("UpdateInitPhase", BindingFlags.NonPublic | BindingFlags.Instance);
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         if (!failed)
                         {
                             Logger.WarnInternal("UpdateSubPhase not found: " + ex.ToString());
