@@ -64,14 +64,17 @@ namespace NeosModLoader
             return assembly;
         }
 
-        internal static AssemblyFile[] LoadAssembliesFromDir(string dirName) {
+        internal static AssemblyFile[] LoadAssembliesFromDir(string dirName)
+        {
             List<AssemblyFile> assemblyFiles = new();
-            if (GetAssemblyPathsFromDir(dirName) is string[] assemblyPaths) {
+            if (GetAssemblyPathsFromDir(dirName) is string[] assemblyPaths)
+            {
                 foreach (string assemblyFilepath in assemblyPaths)
                 {
                     try
                     {
-                        if (LoadAssembly(assemblyFilepath) is Assembly assembly) {
+                        if (LoadAssembly(assemblyFilepath) is Assembly assembly)
+                        {
                             assemblyFiles.Add(new AssemblyFile(assemblyFilepath, assembly));
                         }
                     }

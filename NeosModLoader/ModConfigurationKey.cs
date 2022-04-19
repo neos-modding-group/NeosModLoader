@@ -124,13 +124,23 @@ namespace NeosModLoader
         private readonly Func<T> ComputeDefault;
         private readonly Predicate<T> IsValueValid;
 
+        /// <summary>
+        /// Get the type of this key's value
+        /// </summary>
+        /// <returns>the type of this key's value</returns>
         public override Type ValueType() => typeof(T);
 
+        /// <summary>
+        /// Checks if a value is valid for this configuration item
+        /// </summary>
+        /// <param name="value">value to check</param>
+        /// <returns>true if the value is valid</returns>
         public override bool Validate(object value)
         {
-            if (value is T castValue)
+            // specifically allow nulls for class types
+            if (value is T || (value is null && !typeof(T).IsValueType))
             {
-                return ValidateTyped(castValue);
+                return ValidateTyped((T)value);
             }
             else
             {
