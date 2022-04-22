@@ -457,11 +457,21 @@ namespace NeosModLoader
                 }
                 foreach (ModConfigurationKey key in definition.ConfigurationItemDefinitions)
                 {
-                    JToken token = json[VALUES_JSON_KEY][key.Name];
-                    if (token != null)
+                    string keyName = key.Name;
+                    try
                     {
-                        object value = token.ToObject(key.ValueType(), jsonSerializer);
-                        key.Set(value);
+                        JToken token = json[VALUES_JSON_KEY][keyName];
+                        if (token != null)
+                        {
+                            object value = token.ToObject(key.ValueType(), jsonSerializer);
+                            key.Set(value);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // I know not what exceptions the JSON library will throw, but they must be contained
+                        mod.AllowSavingConfiguration = false;
+                        throw new ModConfigurationException($"Error loading {key.ValueType()} config key \"{keyName}\" for {mod.NeosMod.Name}", e);
                     }
                 }
             }
