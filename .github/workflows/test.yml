@@ -1,0 +1,35 @@
+on: [push, pull_request]
+
+env:
+  NeosPath: "${{ github.workspace }}/Libs/Latest/"
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-libs
+        uses: actions/checkout@v3
+        with:
+          repository: neos-modding-group/Reference-Assemblies
+          path: Libs
+          ssh-key: ${{ secrets.REFERENCE_ASSEMBLIES_AUTH }}
+
+      - name: dotnet-setup
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '4.6.2'
+  build:
+    needs: [setup]
+    runs-on: ubuntu-latest
+    steps:
+      - name: build
+        run: dotnet build
+  lint:
+    needs: [setup]
+    runs-on: ubuntu-latest
+    steps:
+      - name: dotnet-setup-formatter
+        run: dotnet tool install -g dotnet-format
+
+      - name: lint
+        run: dotnet format --verify-no-changes --include-generated
