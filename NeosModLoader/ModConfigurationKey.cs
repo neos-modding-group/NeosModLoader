@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#nullable disable
 namespace NeosModLoader
 {
     /// <summary>
@@ -10,11 +11,7 @@ namespace NeosModLoader
     {
         internal ModConfigurationKey(string name, string description, bool internalAccessOnly)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException("Configuration key name must not be null");
-            }
-            Name = name;
+            Name = name ?? throw new ArgumentNullException("Configuration key name must not be null");
             Description = description;
             InternalAccessOnly = internalAccessOnly;
         }
@@ -124,16 +121,26 @@ namespace NeosModLoader
             IsValueValid = valueValidator;
         }
 
-        private Func<T> ComputeDefault;
-        private Predicate<T> IsValueValid;
+        private readonly Func<T> ComputeDefault;
+        private readonly Predicate<T> IsValueValid;
 
+        /// <summary>
+        /// Get the type of this key's value
+        /// </summary>
+        /// <returns>the type of this key's value</returns>
         public override Type ValueType() => typeof(T);
 
+        /// <summary>
+        /// Checks if a value is valid for this configuration item
+        /// </summary>
+        /// <param name="value">value to check</param>
+        /// <returns>true if the value is valid</returns>
         public override bool Validate(object value)
         {
-            if (value is T castValue)
+            // specifically allow nulls for class types
+            if (value is T || (value is null && !typeof(T).IsValueType))
             {
-                return ValidateTyped(castValue);
+                return ValidateTyped((T)value);
             }
             else
             {
@@ -181,7 +188,7 @@ namespace NeosModLoader
         {
             if (ComputeDefault == null)
             {
-                defaultValue = default(T);
+                defaultValue = default;
                 return false;
             }
             else

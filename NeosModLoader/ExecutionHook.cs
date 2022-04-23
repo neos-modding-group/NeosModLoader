@@ -1,6 +1,7 @@
 using FrooxEngine;
 using System;
 
+#nullable disable
 namespace NeosModLoader
 {
     [ImplementableClass(true)]
@@ -16,9 +17,13 @@ namespace NeosModLoader
         {
             try
             {
+                SplashChanger.SetCustom("Loading libraries");
+                AssemblyLoader.LoadAssembliesFromDir("nml_libs");
+                SplashChanger.SetCustom("Initializing");
                 DebugInfo.Log();
                 NeosVersionReset.Initialize();
                 ModLoader.LoadMods();
+                SplashChanger.SetCustom("Loaded");
             }
             catch (Exception e) // it's important that this doesn't send exceptions back to Neos
             {

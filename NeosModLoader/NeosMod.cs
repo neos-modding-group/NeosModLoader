@@ -28,16 +28,25 @@ namespace NeosModLoader
         public virtual void OnEngineInit() { }
 
         /// <summary>
+        /// Build the defined configuration for this mod.
+        /// </summary>
+        /// <returns>This mod's configuration definition.</returns>
+        internal ModConfigurationDefinition BuildConfigurationDefinition()
+        {
+            ModConfigurationDefinitionBuilder builder = new(this);
+            builder.ProcessAttributes();
+            DefineConfiguration(builder);
+            return builder.Build();
+        }
+
+        /// <summary>
         /// Get the defined configuration for this mod. This should be overridden by your mod if necessary.
         /// </summary>
         /// <returns>This mod's configuration definition. calls DefineConfiguration(ModConfigurationDefinitionBuilder) by default.</returns>
         [Obsolete("This method is obsolete. Use DefineConfiguration(ModConfigurationDefinitionBuilder) instead.")] // REMOVE IN NEXT MAJOR VERSION
         public virtual ModConfigurationDefinition GetConfigurationDefinition()
         {
-            ModConfigurationDefinitionBuilder builder = new ModConfigurationDefinitionBuilder(this);
-            builder.ProcessAttributes();
-            DefineConfiguration(builder);
-            return builder.Build();
+            return BuildConfigurationDefinition();
         }
 
         /// <summary>

@@ -1,0 +1,26 @@
+on: [push, pull_request_target]
+
+env:
+  NeosPath: "${{ github.workspace }}/Libs/current/"
+
+jobs:
+  build:
+    if: github.repository == 'neos-modding-group/NeosModLoader'
+    runs-on: ubuntu-latest
+    steps:
+      - name: dotnet-setup
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x'
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: checkout-libs
+        uses: actions/checkout@v3
+        with:
+          repository: neos-modding-group/Reference-Assemblies
+          path: Libs
+          ssh-key: ${{ secrets.REFERENCE_ASSEMBLIES_AUTH }}
+      - name: build
+        run: dotnet build ./NeosModLoader.sln
+      - name: lint
+        run: dotnet format --verify-no-changes --include-generated ./NeosModLoader.sln

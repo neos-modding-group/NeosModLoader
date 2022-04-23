@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+#nullable disable
 namespace NeosModLoader
 {
     public class ModConfigurationDefinitionBuilder
     {
-        private NeosModBase Owner;
-        private Version ConfigVersion = new Version(1, 0, 0);
-        private HashSet<ModConfigurationKey> Keys = new HashSet<ModConfigurationKey>();
+        private readonly NeosModBase Owner;
+        private Version ConfigVersion = new(1, 0, 0);
+        private readonly HashSet<ModConfigurationKey> Keys = new();
         private bool AutoSaveConfig = true;
 
         internal ModConfigurationDefinitionBuilder(NeosModBase owner)
@@ -80,7 +81,6 @@ namespace NeosModLoader
             }
 
             ModConfigurationKey fieldValue = (ModConfigurationKey)field.GetValue(field.IsStatic ? null : Owner);
-            Logger.DebugInternal($"{Owner.Name} autoregistering config key: {field}");
             Keys.Add(fieldValue);
         }
 
@@ -90,11 +90,7 @@ namespace NeosModLoader
             {
                 return new ModConfigurationDefinition(Owner, ConfigVersion, Keys, AutoSaveConfig);
             }
-            else
-            {
-                Logger.DebugInternal($"{Owner.Name} had no defined keys. Building null config.");
-                return null;
-            }
+            return null;
         }
     }
 }

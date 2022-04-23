@@ -1,5 +1,6 @@
 ﻿using FrooxEngine;
 using HarmonyLib;
+using NeosModLoader.JsonConverters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+#nullable disable
 namespace NeosModLoader
 {
     public interface IModConfigurationDefinition
@@ -116,10 +118,10 @@ namespace NeosModLoader
     /// </summary>
     public class ModConfiguration : IModConfigurationDefinition
     {
-        private ModConfigurationDefinition Definition;
+        private readonly ModConfigurationDefinition Definition;
         internal LoadedNeosMod LoadedNeosMod { get; private set; }
 
-        private static string ConfigDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_config");
+        private static readonly string ConfigDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_config");
         private static readonly string VERSION_JSON_KEY = "version";
         private static readonly string VALUES_JSON_KEY = "values";
 
@@ -155,6 +157,29 @@ namespace NeosModLoader
         /// Called if one of the values in this mod's config changed.
         /// </summary>
         public event ConfigurationChangedEventHandler OnThisConfigurationChanged;
+
+        private static readonly JsonSerializer jsonSerializer = CreateJsonSerializer();
+
+        private static JsonSerializer CreateJsonSerializer()
+        {
+            JsonSerializerSettings settings = new()
+            {
+                MaxDepth = 32,
+                ReferenceLoopHandling = ReferenceLoopHandling.Error,
+                DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate
+            };
+            List<JsonConverter> converters = new();
+            IList<JsonConverter> defaultConverters = settings.Converters;
+            if (defaultConverters != null)
+            {
+                Logger.DebugInternal($"Using {defaultConverters.Count()} default json converters");
+                converters.AddRange(defaultConverters);
+            }
+            converters.Add(new EnumConverter());
+            converters.Add(new NeosPrimitiveConverter());
+            settings.Converters = converters;
+            return JsonSerializer.Create(settings);
+        }
 
         private ModConfiguration(LoadedNeosMod loadedNeosMod, ModConfigurationDefinition definition)
         {
@@ -315,7 +340,7 @@ namespace NeosModLoader
             }
             else
             {
-                value = default(T);
+                value = default;
                 return false;
             }
         }
@@ -398,7 +423,7 @@ namespace NeosModLoader
 
         internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
         {
-            ModConfigurationDefinition definition = mod.NeosMod.GetConfigurationDefinition();
+            ModConfigurationDefinition definition = mod.NeosMod.BuildConfigurationDefinition();
             if (definition == null)
             {
                 // if there's no definition, then there's nothing for us to do here
@@ -409,38 +434,44 @@ namespace NeosModLoader
 
             try
             {
-                using (StreamReader file = File.OpenText(configFile))
+                using StreamReader file = File.OpenText(configFile);
+                using JsonTextReader reader = new(file);
+                JObject json = JObject.Load(reader);
+                Version version = new(json[VERSION_JSON_KEY].ToObject<string>(jsonSerializer));
+                if (!AreVersionsCompatible(version, definition.Version))
                 {
-                    using (JsonTextReader reader = new JsonTextReader(file))
+                    var handlingMode = mod.NeosMod.HandleIncompatibleConfigurationVersions(definition.Version, version);
+                    switch (handlingMode)
                     {
-                        JObject json = JObject.Load(reader);
-                        Version version = new Version(json[VERSION_JSON_KEY].ToObject<string>());
-                        if (!AreVersionsCompatible(version, definition.Version))
+                        case IncompatibleConfigurationHandlingOption.CLOBBER:
+                            Logger.WarnInternal($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}. Clobbering old config and starting fresh.");
+                            return new ModConfiguration(mod, definition);
+                        case IncompatibleConfigurationHandlingOption.FORCE_LOAD:
+                            // continue processing
+                            break;
+                        case IncompatibleConfigurationHandlingOption.ERROR: // fall through to default
+                        default:
+                            mod.AllowSavingConfiguration = false;
+                            throw new ModConfigurationException($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}");
+                    }
+                }
+                foreach (ModConfigurationKey key in definition.ConfigurationItemDefinitions)
+                {
+                    string keyName = key.Name;
+                    try
+                    {
+                        JToken token = json[VALUES_JSON_KEY][keyName];
+                        if (token != null)
                         {
-                            var handlingMode = mod.NeosMod.HandleIncompatibleConfigurationVersions(definition.Version, version);
-                            switch (handlingMode)
-                            {
-                                case IncompatibleConfigurationHandlingOption.CLOBBER:
-                                    Logger.WarnInternal($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}. Clobbering old config and starting fresh.");
-                                    return new ModConfiguration(mod, definition);
-                                case IncompatibleConfigurationHandlingOption.FORCE_LOAD:
-                                    // continue processing
-                                    break;
-                                case IncompatibleConfigurationHandlingOption.ERROR: // fall through to default
-                                default:
-                                    mod.AllowSavingConfiguration = false;
-                                    throw new ModConfigurationException($"{mod.NeosMod.Name} saved config version is {version} which is incompatible with mod's definition version {definition.Version}");
-                            }
+                            object value = token.ToObject(key.ValueType(), jsonSerializer);
+                            key.Set(value);
                         }
-                        foreach (ModConfigurationKey key in definition.ConfigurationItemDefinitions)
-                        {
-                            JToken token = json[VALUES_JSON_KEY][key.Name];
-                            if (token != null)
-                            {
-                                object value = token.ToObject(key.ValueType());
-                                key.Set(value);
-                            }
-                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // I know not what exceptions the JSON library will throw, but they must be contained
+                        mod.AllowSavingConfiguration = false;
+                        throw new ModConfigurationException($"Error loading {key.ValueType()} config key \"{keyName}\" for {mod.NeosMod.Name}", e);
                     }
                 }
             }
@@ -479,42 +510,37 @@ namespace NeosModLoader
                 Logger.WarnInternal($"Config for {LoadedNeosMod.NeosMod.Name} will NOT be saved due to a safety check failing. This is probably due to you downgrading a mod.");
                 return;
             }
-            ModConfigurationDefinition definition = LoadedNeosMod.NeosMod.GetConfigurationDefinition();
 
-            JObject json = new JObject();
-            json[VERSION_JSON_KEY] = JToken.FromObject(definition.Version.ToString());
+            JObject json = new()
+            {
+                [VERSION_JSON_KEY] = JToken.FromObject(Definition.Version.ToString(), jsonSerializer)
+            };
 
-            JObject valueMap = new JObject();
+            JObject valueMap = new();
             foreach (ModConfigurationKey key in ConfigurationItemDefinitions)
             {
                 if (key.TryGetValue(out object value))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my Set() API
-                    valueMap[key.Name] = JToken.FromObject(value);
+                    valueMap[key.Name] = JToken.FromObject(value, jsonSerializer);
                 }
                 else if (saveDefaultValues && key.TryComputeDefault(out object defaultValue))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my computeDefault API
-                    valueMap[key.Name] = JToken.FromObject(defaultValue);
+                    valueMap[key.Name] = JToken.FromObject(defaultValue, jsonSerializer);
                 }
             }
 
             json[VALUES_JSON_KEY] = valueMap;
 
             string configFile = GetModConfigPath(LoadedNeosMod);
-            using (FileStream file = File.OpenWrite(configFile))
-            {
-                using (StreamWriter streamWriter = new StreamWriter(file))
-                {
-                    using (JsonTextWriter jsonTextWriter = new JsonTextWriter(streamWriter))
-                    {
-                        json.WriteTo(jsonTextWriter);
+            using FileStream file = File.OpenWrite(configFile);
+            using StreamWriter streamWriter = new(file);
+            using JsonTextWriter jsonTextWriter = new(streamWriter);
+            json.WriteTo(jsonTextWriter);
 
-                        // I actually cannot believe I have to truncate the file myself
-                        file.SetLength(file.Position);
-                    }
-                }
-            }
+            // I actually cannot believe I have to truncate the file myself
+            file.SetLength(file.Position);
         }
 
         private void FireConfigurationChangedEvent(ModConfigurationKey key, string label)

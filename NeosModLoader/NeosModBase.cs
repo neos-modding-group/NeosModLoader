@@ -1,4 +1,5 @@
-﻿namespace NeosModLoader
+﻿#nullable disable
+namespace NeosModLoader
 {
     // contains public metadata about the mod
     public abstract class NeosModBase

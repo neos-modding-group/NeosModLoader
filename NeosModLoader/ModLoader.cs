@@ -12,11 +12,11 @@ namespace NeosModLoader
         /// <summary>
         /// NeosModLoader's version
         /// </summary>
-        public static readonly string VERSION = "1.8.0";
+        public static readonly string VERSION = "1.9.1";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
-        private static List<LoadedNeosMod> LoadedMods = new List<LoadedNeosMod>(); // used for mod enumeration
-        internal static Dictionary<Assembly, NeosMod> AssemblyLookupMap = new Dictionary<Assembly, NeosMod>(); // used for logging
-        private static Dictionary<string, LoadedNeosMod> ModNameLookupMap = new Dictionary<string, LoadedNeosMod>(); // used for duplicate mod checking
+        private static readonly List<LoadedNeosMod> LoadedMods = new(); // used for mod enumeration
+        internal static readonly Dictionary<Assembly, NeosMod> AssemblyLookupMap = new(); // used for logging
+        private static readonly Dictionary<string, LoadedNeosMod> ModNameLookupMap = new(); // used for duplicate mod checking
 
         /// <summary>
         /// Allows reading metadata for all loaded mods
@@ -37,63 +37,27 @@ namespace NeosModLoader
                 Logger.DebugInternal("mods will not be loaded due to configuration file");
                 return;
             }
-
-            string modDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_mods");
-
-            Logger.DebugInternal($"loading mods from {modDirectory}");
+            SplashChanger.SetCustom("Looking for mods");
 
             // generate list of assemblies to load
-            ModAssembly[] modsToLoad = null;
-            try
+            AssemblyFile[] modsToLoad;
+            if (AssemblyLoader.LoadAssembliesFromDir("nml_mods") is AssemblyFile[] arr)
             {
-                modsToLoad = Directory.GetFiles(modDirectory, "*.dll")
-                    .Select(file => new ModAssembly(file))
-                    .ToArray();
-
-                Array.Sort(modsToLoad, (a, b) => string.CompareOrdinal(a.File, b.File));
+                modsToLoad = arr;
             }
-            catch (Exception e)
+            else
             {
-                if (e is DirectoryNotFoundException)
-                {
-                    Logger.MsgInternal("mod directory not found, creating it now.");
-                    try
-                    {
-                        Directory.CreateDirectory(modDirectory);
-                    }
-                    catch (Exception e2)
-                    {
-                        Logger.ErrorInternal($"Error creating mod directory:\n{e2}");
-                    }
-                }
-                else
-                {
-                    Logger.ErrorInternal($"Error enumerating mod directory:\n{e}");
-                }
                 return;
             }
 
             ModConfiguration.EnsureDirectoryExists();
 
-            // mods assemblies are all loaded before hooking begins so mods can interconnect if needed
-            foreach (ModAssembly mod in modsToLoad)
-            {
-                try
-                {
-                    LoadAssembly(mod);
-                }
-                catch (Exception e)
-                {
-                    Logger.ErrorInternal($"Unexpected exception loading mod assembly from {mod.File}:\n{e}");
-                }
-            }
-
             // call Initialize() each mod
-            foreach (ModAssembly mod in modsToLoad)
+            foreach (AssemblyFile mod in modsToLoad)
             {
                 try
                 {
-                    LoadedNeosMod loaded = InitializeMod(mod);
+                    LoadedNeosMod? loaded = InitializeMod(mod);
                     if (loaded != null)
                     {
                         // if loading succeeded, then we need to register the mod
@@ -106,7 +70,8 @@ namespace NeosModLoader
                 }
             }
 
-            Harmony harmony = new Harmony("net.michaelripley.neosmodloader");
+            SplashChanger.SetCustom("Hooking big fish");
+            Harmony harmony = new("net.michaelripley.neosmodloader");
             ModConfiguration.RegisterShutdownHook(harmony);
 
             foreach (LoadedNeosMod mod in LoadedMods)
@@ -124,11 +89,13 @@ namespace NeosModLoader
             // log potential conflicts
             if (config.LogConflicts)
             {
+                SplashChanger.SetCustom("Looking for conflicts");
+
                 IEnumerable<MethodBase> patchedMethods = Harmony.GetAllPatchedMethods();
                 foreach (MethodBase patchedMethod in patchedMethods)
                 {
                     Patches patches = Harmony.GetPatchInfo(patchedMethod);
-                    HashSet<string> owners = new HashSet<string>(patches.Owners);
+                    HashSet<string> owners = new(patches.Owners);
                     if (owners.Count > 1)
                     {
                         Logger.WarnInternal($"method \"{patchedMethod.FullDescription()}\" has been patched by the following:");
@@ -171,7 +138,7 @@ namespace NeosModLoader
 
         private static string TypesForOwner(Patches patches, string owner)
         {
-            Func<Patch, bool> ownerEquals = patch => Equals(patch.owner, owner);
+            bool ownerEquals(Patch patch) => Equals(patch.owner, owner);
             int prefixCount = patches.Prefixes.Where(ownerEquals).Count();
             int postfixCount = patches.Postfixes.Where(ownerEquals).Count();
             int transpilerCount = patches.Transpilers.Where(ownerEquals).Count();
@@ -179,28 +146,8 @@ namespace NeosModLoader
             return $"prefix={prefixCount}; postfix={postfixCount}; transpiler={transpilerCount}; finalizer={finalizerCount}";
         }
 
-        private static void LoadAssembly(ModAssembly mod)
-        {
-            Assembly assembly;
-            try
-            {
-                assembly = Assembly.LoadFile(mod.File);
-            }
-            catch (Exception e)
-            {
-                Logger.ErrorInternal($"error loading assembly from {mod.File}: {e}");
-                return;
-            }
-            if (assembly == null)
-            {
-                Logger.ErrorInternal($"unexpected null loading assembly from {mod.File}");
-                return;
-            }
-            mod.Assembly = assembly;
-        }
-
         // loads mod class and mod config
-        private static LoadedNeosMod InitializeMod(ModAssembly mod)
+        private static LoadedNeosMod? InitializeMod(AssemblyFile mod)
         {
             if (mod.Assembly == null)
             {
@@ -221,7 +168,7 @@ namespace NeosModLoader
             else
             {
                 Type modClass = modClasses[0];
-                NeosMod neosMod = null;
+                NeosMod? neosMod = null;
                 try
                 {
                     neosMod = (NeosMod)AccessTools.CreateInstance(modClass);
@@ -236,8 +183,10 @@ namespace NeosModLoader
                     Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.File}");
                     return null;
                 }
+                SplashChanger.SetCustom($"Loading configuration for [{neosMod.Name}/{neosMod.Version}]");
 
-                LoadedNeosMod loadedMod = new LoadedNeosMod(neosMod, mod);
+                LoadedNeosMod loadedMod = new(neosMod, mod);
+                Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.File)}) by {neosMod.Author}");
                 loadedMod.ModConfiguration = ModConfiguration.LoadConfigForMod(loadedMod);
                 return loadedMod;
             }
@@ -245,7 +194,8 @@ namespace NeosModLoader
 
         private static void HookMod(LoadedNeosMod mod)
         {
-            Logger.MsgInternal($"loaded mod {mod.NeosMod.Name} {mod.NeosMod.Version} from {mod.ModAssembly.File}");
+            SplashChanger.SetCustom($"Starting mod [{mod.NeosMod.Name}/{mod.NeosMod.Version}]");
+            Logger.DebugInternal($"calling OnEngineInit() for [{mod.NeosMod.Name}]");
             try
             {
                 mod.NeosMod.OnEngineInit();

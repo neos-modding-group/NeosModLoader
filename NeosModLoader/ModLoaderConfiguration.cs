@@ -8,7 +8,7 @@ namespace NeosModLoader
     {
         private static readonly string CONFIG_FILENAME = "NeosModLoader.config";
 
-        private static ModLoaderConfiguration _configuration;
+        private static ModLoaderConfiguration? _configuration;
 
         internal static ModLoaderConfiguration Get()
         {
@@ -39,9 +39,17 @@ namespace NeosModLoader
                             {
                                 _configuration.Debug = true;
                             }
+                            else if ("hidevisuals".Equals(key) && "true".Equals(value))
+                            {
+                                _configuration.HideVisuals = true;
+                            }
                             else if ("nomods".Equals(key) && "true".Equals(value))
                             {
                                 _configuration.NoMods = true;
+                            }
+                            else if ("nolibraries".Equals(key) && "true".Equals(value))
+                            {
+                                _configuration.NoLibraries = true;
                             }
                             else if ("advertiseversion".Equals(key) && "true".Equals(value))
                             {
@@ -76,14 +84,16 @@ namespace NeosModLoader
         private static string GetAssemblyDirectory()
         {
             string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            UriBuilder uri = new UriBuilder(codeBase);
+            UriBuilder uri = new(codeBase);
             string path = Uri.UnescapeDataString(uri.Path);
             return Path.GetDirectoryName(path);
         }
 
         public bool Unsafe { get; private set; } = false;
         public bool Debug { get; private set; } = false;
+        public bool HideVisuals { get; private set; } = false;
         public bool NoMods { get; private set; } = false;
+        public bool NoLibraries { get; private set; } = false;
         public bool AdvertiseVersion { get; private set; } = false;
         public bool LogConflicts { get; private set; } = true;
     }
