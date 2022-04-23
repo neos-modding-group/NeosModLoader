@@ -1,7 +1,7 @@
 <Project>
-  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" Condition="'$(SdkImported)'==''"/>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" Condition="'$(SdkPropsImported)'==''"/>
   <PropertyGroup>
-    <SdkImported>true</SdkImported>
+    <SdkPropsImported>true</SdkPropsImported>
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -22,5 +22,9 @@
     <NeosPath>$(MSBuildThisFileDirectory)NeosVR/</NeosPath>
     <NeosPath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\NeosVR\')">C:\Program Files (x86)\Steam\steamapps\common\NeosVR\</NeosPath>
     <NeosPath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/NeosVR/')">$(HOME)/.steam/steam/steamapps/common/NeosVR/</NeosPath>
+  </PropertyGroup>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" Condition="'$(SdkTargetsImported)'==''"/>
+  <PropertyGroup>
+    <SdkTargetsImported>true</SdkTargetsImported>
   </PropertyGroup>
 </Project>

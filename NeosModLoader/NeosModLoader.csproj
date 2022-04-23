@@ -1,10 +1,11 @@
 ﻿<Project>
-  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" Condition="'$(SdkImported)'==''"/>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" Condition="'$(SdkPropsImported)'==''"/>
   <PropertyGroup>
-    <SdkImported>true</SdkImported>
+    <SdkPropsImported>true</SdkPropsImported>
   </PropertyGroup>
-  <Import Project="NeosModLoaderCommonProperties.csproj"/>
+  <Import Project="NeosModLoaderCommonProperties.csproj" Condition="'$(PropsImported)'==''"/>
   <PropertyGroup>
+    <PropsImported>true</PropsImported>
     <ProjectGuid>{D4627C7F-8091-477A-ABDC-F1465D94D8D9}</ProjectGuid>
     <CopyToLibraries Condition="'$(CopyToLibraries)'==''">true</CopyToLibraries>
   </PropertyGroup>
@@ -15,5 +16,8 @@
     </Reference>
   </ItemGroup>
   <Import Project="NeosModLoaderCommonItems.csproj"/>
-  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets"/>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" Condition="'$(SdkTargetsImported)'==''"/>
+  <PropertyGroup>
+    <SdkTargetsImported>true</SdkTargetsImported>
+  </PropertyGroup>
 </Project>
