@@ -1,0 +1,19 @@
+<Project>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" Condition="'$(SdkImported)'==''"/>
+  <PropertyGroup>
+    <SdkImported>true</SdkImported>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="2.2.1" />
+    <Reference Include="BaseX">
+      <HintPath>$(NeosPath)Neos_Data\Managed\BaseX.dll</HintPath>
+    </Reference>
+    <Reference Include="FrooxEngine">
+      <HintPath>$(NeosPath)Neos_Data\Managed\FrooxEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToLibraries)'=='true'">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NeosPath)Libraries" />
+  </Target>
+</Project>

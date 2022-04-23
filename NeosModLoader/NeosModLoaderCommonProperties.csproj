@@ -1,4 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" Condition="'$(SdkImported)'==''"/>
+  <PropertyGroup>
+    <SdkImported>true</SdkImported>
+  </PropertyGroup>
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -19,18 +23,4 @@
     <NeosPath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\NeosVR\')">C:\Program Files (x86)\Steam\steamapps\common\NeosVR\</NeosPath>
     <NeosPath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/NeosVR/')">$(HOME)/.steam/steam/steamapps/common/NeosVR/</NeosPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="2.2.1" />
-    <Reference Include="BaseX">
-      <HintPath>$(NeosPath)Neos_Data\Managed\BaseX.dll</HintPath>
-    </Reference>
-    <Reference Include="FrooxEngine">
-      <HintPath>$(NeosPath)Neos_Data\Managed\FrooxEngine.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToLibraries)'=='true'">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NeosPath)Libraries" />
-  </Target>
 </Project>

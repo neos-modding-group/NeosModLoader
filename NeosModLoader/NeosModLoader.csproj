@@ -1,4 +1,9 @@
 ﻿<Project>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" Condition="'$(SdkImported)'==''"/>
+  <PropertyGroup>
+    <SdkImported>true</SdkImported>
+  </PropertyGroup>
+  <Import Project="NeosModLoaderCommonProperties.csproj"/>
   <PropertyGroup>
     <ProjectGuid>{D4627C7F-8091-477A-ABDC-F1465D94D8D9}</ProjectGuid>
     <CopyToLibraries Condition="'$(CopyToLibraries)'==''">true</CopyToLibraries>
@@ -9,5 +14,6 @@
       <HintPath>$(NeosPath)Neos_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <Import Project="NeosModLoaderCommon.csproj"/>
+  <Import Project="NeosModLoaderCommonItems.csproj"/>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets"/>
 </Project>
