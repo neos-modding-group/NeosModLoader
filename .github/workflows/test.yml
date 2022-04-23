@@ -14,8 +14,8 @@ jobs:
   libs:
     if: github.repository == 'neos-modding-group/NeosModLoader'
     runs-on: ubuntu-latest
-    steps:
     needs: [setup]
+    steps:
       - name: checkout-libs
         uses: actions/checkout@v3
         with:
