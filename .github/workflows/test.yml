@@ -7,6 +7,8 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
+      - name: checkout
+        uses: actions/checkout@v3
       - name: dotnet-setup
         uses: actions/setup-dotnet@v2
         with:
@@ -27,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: build
-        run: dotnet build ${GITHUB_WORKSPACE}/NeosModLoader.sln
+        run: dotnet build
   lint:
     needs: [setup]
     runs-on: ubuntu-latest
@@ -36,4 +38,4 @@ jobs:
         run: dotnet tool install -g dotnet-format
 
       - name: lint
-        run: dotnet format --verify-no-changes --include-generated ${GITHUB_WORKSPACE}/NeosModLoader.sln
+        run: dotnet format --verify-no-changes --include-generated
