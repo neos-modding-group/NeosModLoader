@@ -7,6 +7,7 @@
   <PropertyGroup>
     <PropsImported>true</PropsImported>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Lib.Harmony" Version="2.2.1" />
     <Reference Include="BaseX">
@@ -20,8 +21,4 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToLibraries)'=='true'">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NeosPath)Libraries" />
   </Target>
-  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" Condition="'$(SdkTargetsImported)'==''"/>
-  <PropertyGroup>
-    <SdkTargetsImported>true</SdkTargetsImported>
-  </PropertyGroup>
 </Project>

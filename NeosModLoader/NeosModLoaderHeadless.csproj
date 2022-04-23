@@ -14,8 +14,5 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <Import Project="NeosModLoaderCommonItems.csproj"/>
-  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" Condition="'$(SdkTargetsImported)'==''"/>
-  <PropertyGroup>
-    <SdkTargetsImported>true</SdkTargetsImported>
-  </PropertyGroup>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets"/>
 </Project>
