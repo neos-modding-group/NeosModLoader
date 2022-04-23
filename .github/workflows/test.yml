@@ -4,40 +4,35 @@ env:
   NeosPath: "${{ github.workspace }}/Libs/Latest/"
 
 jobs:
-  setup:
+  build:
+    if: github.repository == 'neos-modding-group/NeosModLoader'
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
       - name: dotnet-setup
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.x'
-  libs:
-    if: github.repository == 'neos-modding-group/NeosModLoader'
-    runs-on: ubuntu-latest
-    needs: [setup]
-    steps:
+      - name: checkout
+        uses: actions/checkout@v3
       - name: checkout-libs
         uses: actions/checkout@v3
         with:
           repository: neos-modding-group/Reference-Assemblies
           path: Libs
           ssh-key: ${{ secrets.REFERENCE_ASSEMBLIES_AUTH }}
-  build:
-    needs: [setup, libs]
-    runs-on: ubuntu-latest
-    steps:
       - name: build
         run: dotnet build ./NeosModLoader.sln
   lint:
-    needs: [setup]
     runs-on: ubuntu-latest
     steps:
+      - name: dotnet-setup
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x'
+      - name: checkout
+        uses: actions/checkout@v3
       - name: dotnet-setup-formatter
         run: dotnet tool install -g dotnet-format
 
       - name: lint
-        run: |
-          ls
-          dotnet format --verify-no-changes --include-generated ./NeosModLoader.sln
+        run: dotnet format --verify-no-changes --include-generated ./NeosModLoader.sln
