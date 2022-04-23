@@ -1,5 +1,4 @@
 ﻿<Project>
-  
   <PropertyGroup>
     <ProjectGuid>{D4627C7F-8091-477A-ABDC-F1465D94D8D9}</ProjectGuid>
     <CopyToLibraries Condition="'$(CopyToLibraries)'==''">true</CopyToLibraries>
