@@ -1,39 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
   <PropertyGroup>
     <ProjectGuid>{4a54bcdf-0386-43fc-9aa5-d49ce7d33dd8}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NeosModLoader</RootNamespace>
-    <AssemblyTitle>NeosModLoader</AssemblyTitle>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo> 
-    <TargetFramework>net462</TargetFramework>
-    <FileAlignment>512</FileAlignment>
-    <LangVersion>9.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <Deterministic>true</Deterministic>
     <CopyToLibraries Condition="'$(CopyToLibraries)'==''">false</CopyToLibraries>
-    <DebugSymbols Condition="'$(Configuration)'=='Release'">false</DebugSymbols>
-    <DebugType Condition="'$(Configuration)'=='Release'">None</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(NeosPath)'==''">
-    <NeosPath>$(MSBuildThisFileDirectory)NeosVR/</NeosPath>
-    <NeosPath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\NeosVR\')">C:\Program Files (x86)\Steam\steamapps\common\NeosVR\</NeosPath>
-    <NeosPath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/NeosVR/')">$(HOME)/.steam/steam/steamapps/common/NeosVR/</NeosPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <Reference Include="BaseX">
-      <HintPath>$(NeosPath)Neos_Data\Managed\BaseX.dll</HintPath>
-    </Reference>
-    <Reference Include="FrooxEngine">
-      <HintPath>$(NeosPath)Neos_Data\Managed\FrooxEngine.dll</HintPath>
-    </Reference>
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToLibraries)'=='true'">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NeosPath)Libraries" />
-  </Target>
+  <Import Project="NeosModLoaderCommon.csproj"/>
 </Project>
