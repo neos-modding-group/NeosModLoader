@@ -23,6 +23,7 @@ jobs:
       - name: build
         run: dotnet build ./NeosModLoader.sln
   lint:
+    if: github.repository == 'neos-modding-group/NeosModLoader'
     runs-on: ubuntu-latest
     steps:
       - name: dotnet-setup
