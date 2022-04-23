@@ -1,7 +1,7 @@
 on: [push, pull_request_target]
 
 env:
-  NeosPath: "${{ github.workspace }}/Libs/Latest/"
+  NeosPath: "${{ github.workspace }}/Libs/current/"
 
 jobs:
   build:
