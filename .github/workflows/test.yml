@@ -7,6 +7,16 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
+      - name: dotnet-setup
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x'
+
+  libs:
+    if: github.repository == 'neos-modding-group/NeosModLoader'
+    runs-on: ubuntu-latest
+    steps:
+    needs: [setup]
       - name: checkout-libs
         uses: actions/checkout@v3
         with:
@@ -14,16 +24,13 @@ jobs:
           path: Libs
           ssh-key: ${{ secrets.REFERENCE_ASSEMBLIES_AUTH }}
 
-      - name: dotnet-setup
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: '6.0.x'
   build:
-    needs: [setup]
+    needs: [setup, libs]
     runs-on: ubuntu-latest
     steps:
       - name: build
         run: dotnet build NeosModLoader/NeosModLoader.csproj
+
   lint:
     needs: [setup]
     runs-on: ubuntu-latest
