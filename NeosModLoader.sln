@@ -4,6 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeosModLoader", "NeosModLoader\NeosModLoader.csproj", "{D4627C7F-8091-477A-ABDC-F1465D94D8D9}"
+Project("{3f7663fa-1fa3-408d-9ccb-26b80dae218c}") = "NeosModLoader", "NeosModLoader\NeosModLoaderHeadless.csproj", "{4a54bcdf-0386-43fc-9aa5-d49ce7d33dd8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +16,10 @@ Global
 		{D4627C7F-8091-477A-ABDC-F1465D94D8D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4627C7F-8091-477A-ABDC-F1465D94D8D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4627C7F-8091-477A-ABDC-F1465D94D8D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4a54bcdf-0386-43fc-9aa5-d49ce7d33dd8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4a54bcdf-0386-43fc-9aa5-d49ce7d33dd8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4a54bcdf-0386-43fc-9aa5-d49ce7d33dd8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4a54bcdf-0386-43fc-9aa5-d49ce7d33dd8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
