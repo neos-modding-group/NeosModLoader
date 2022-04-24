@@ -12,7 +12,7 @@ namespace NeosModLoader
         /// <summary>
         /// NeosModLoader's version
         /// </summary>
-        public static readonly string VERSION = "1.9.1";
+        public static readonly string VERSION = "1.10.0";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         private static readonly List<LoadedNeosMod> LoadedMods = new(); // used for mod enumeration
         internal static readonly Dictionary<Assembly, NeosMod> AssemblyLookupMap = new(); // used for logging
