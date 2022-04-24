@@ -5,7 +5,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NeosModLoader</RootNamespace>
-    <Headless Condition="'$(Headless)'==''">false</Headless>
+    <Headless Condition="'$(Headless)'!='true'">false</Headless>
     <AssemblyName Condition="'$(Headless)'=='false'">NeosModLoader</AssemblyName>
     <AssemblyName Condition="'$(Headless)'=='true'">NeosModLoaderHeadless</AssemblyName>
     <AssemblyTitle>$(AssemblyName)</AssemblyTitle>
