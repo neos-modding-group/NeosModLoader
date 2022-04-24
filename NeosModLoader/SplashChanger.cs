@@ -44,7 +44,7 @@ namespace NeosModLoader
                     try
                     {
                         _updateSubPhase = typeof(Engine)
-                            .GetMethod("UpdateInitPhase", BindingFlags.NonPublic | BindingFlags.Instance);
+                            .GetMethod("UpdateInitSubphase", BindingFlags.NonPublic | BindingFlags.Instance);
                     }
                     catch (Exception ex)
                     {
