@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-#nullable disable
 namespace NeosModLoader
 {
     public interface IModConfigurationDefinition
@@ -45,8 +44,6 @@ namespace NeosModLoader
         /// </summary>
         public Version Version { get; private set; }
 
-        private HashSet<ModConfigurationKey> configurationItemDefinitions;
-
         internal bool AutoSave;
 
         // this is a ridiculous hack because HashSet.TryGetValue doesn't exist in .NET 4.6.2
@@ -58,28 +55,10 @@ namespace NeosModLoader
         public ISet<ModConfigurationKey> ConfigurationItemDefinitions
         {
             // clone the collection because I don't trust giving public API users shallow copies one bit
-            get => new HashSet<ModConfigurationKey>(configurationItemDefinitions);
-            private set
-            {
-                if (value is HashSet<ModConfigurationKey> hashSet)
-                {
-                    configurationItemDefinitions = hashSet;
-                }
-                else
-                {
-                    configurationItemDefinitions = new HashSet<ModConfigurationKey>(value);
-                }
-
-                configurationItemDefinitionsSelfMap = new Dictionary<ModConfigurationKey, ModConfigurationKey>(configurationItemDefinitions.Count);
-                foreach (ModConfigurationKey key in configurationItemDefinitions)
-                {
-                    key.DefiningKey = key; // early init this property for the defining key itself
-                    configurationItemDefinitionsSelfMap.Add(key, key);
-                }
-            }
+            get => new HashSet<ModConfigurationKey>(configurationItemDefinitionsSelfMap.Keys);
         }
 
-        internal bool TryGetDefiningKey(ModConfigurationKey key, out ModConfigurationKey definingKey)
+        internal bool TryGetDefiningKey(ModConfigurationKey key, out ModConfigurationKey? definingKey)
         {
             if (key.DefiningKey != null)
             {
@@ -108,8 +87,14 @@ namespace NeosModLoader
         {
             Owner = owner;
             Version = version;
-            ConfigurationItemDefinitions = configurationItemDefinitions;
             AutoSave = autoSave;
+
+            configurationItemDefinitionsSelfMap = new Dictionary<ModConfigurationKey, ModConfigurationKey>(configurationItemDefinitions.Count);
+            foreach (ModConfigurationKey key in configurationItemDefinitions)
+            {
+                key.DefiningKey = key; // early init this property for the defining key itself
+                configurationItemDefinitionsSelfMap.Add(key, key);
+            }
         }
     }
 
@@ -151,12 +136,12 @@ namespace NeosModLoader
         /// <summary>
         /// Called if any config value for any mod changed.
         /// </summary>
-        public static event ConfigurationChangedEventHandler OnAnyConfigurationChanged;
+        public static event ConfigurationChangedEventHandler? OnAnyConfigurationChanged;
 
         /// <summary>
         /// Called if one of the values in this mod's config changed.
         /// </summary>
-        public event ConfigurationChangedEventHandler OnThisConfigurationChanged;
+        public event ConfigurationChangedEventHandler? OnThisConfigurationChanged;
 
         private static readonly JsonSerializer jsonSerializer = CreateJsonSerializer();
 
@@ -227,7 +212,7 @@ namespace NeosModLoader
         public bool IsKeyDefined(ModConfigurationKey key)
         {
             // if a key has a non-null defining key it's guaranteed a real key. Lets check for that.
-            ModConfigurationKey definingKey = key.DefiningKey;
+            ModConfigurationKey? definingKey = key.DefiningKey;
             if (definingKey != null)
             {
                 return true;
@@ -264,9 +249,9 @@ namespace NeosModLoader
         /// <exception cref="KeyNotFoundException">key does not exist in the collection</exception>
         public object GetValue(ModConfigurationKey key)
         {
-            if (TryGetValue(key, out object value))
+            if (TryGetValue(key, out object? value))
             {
-                return value;
+                return value!;
             }
             else
             {
@@ -281,9 +266,9 @@ namespace NeosModLoader
         /// <param name="key">The key to find</param>
         /// <returns>The found value</returns>
         /// <exception cref="KeyNotFoundException">key does not exist in the collection</exception>
-        public T GetValue<T>(ModConfigurationKey<T> key)
+        public T? GetValue<T>(ModConfigurationKey<T> key)
         {
-            if (TryGetValue(key, out T value))
+            if (TryGetValue(key, out T? value))
             {
                 return value;
             }
@@ -299,16 +284,16 @@ namespace NeosModLoader
         /// <param name="key">The key</param>
         /// <param name="value">The value if we succeeded, or null if we failed.</param>
         /// <returns>true if the value was read successfully</returns>
-        public bool TryGetValue(ModConfigurationKey key, out object value)
+        public bool TryGetValue(ModConfigurationKey key, out object? value)
         {
-            if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey definingKey))
+            if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey? definingKey))
             {
                 // not in definition
                 value = null;
                 return false;
             }
 
-            if (definingKey.TryGetValue(out object valueObject))
+            if (definingKey!.TryGetValue(out object? valueObject))
             {
                 value = valueObject;
                 return true;
@@ -331,11 +316,11 @@ namespace NeosModLoader
         /// <param name="key">The key</param>
         /// <param name="value">The value if we succeeded, or default(T) if we failed.</param>
         /// <returns>true if the value was read successfully</returns>
-        public bool TryGetValue<T>(ModConfigurationKey<T> key, out T value)
+        public bool TryGetValue<T>(ModConfigurationKey<T> key, out T? value)
         {
-            if (TryGetValue(key, out object valueObject))
+            if (TryGetValue(key, out object? valueObject))
             {
-                value = (T)valueObject;
+                value = (T)valueObject!;
                 return true;
             }
             else
@@ -351,14 +336,14 @@ namespace NeosModLoader
         /// <param name="key">The key</param>
         /// <param name="value">The new value</param>
         /// <param name="eventLabel">A custom label you may assign to this event</param>
-        public void Set(ModConfigurationKey key, object value, string eventLabel = null)
+        public void Set(ModConfigurationKey key, object value, string? eventLabel = null)
         {
-            if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey definingKey))
+            if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey? definingKey))
             {
-                throw new KeyNotFoundException($"{definingKey.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
+                throw new KeyNotFoundException($"{key.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
             }
 
-            if (!definingKey.ValueType().IsAssignableFrom(value.GetType()))
+            if (!definingKey!.ValueType().IsAssignableFrom(value.GetType()))
             {
                 throw new ArgumentException($"{value.GetType()} cannot be assigned to {definingKey.ValueType()}");
             }
@@ -379,16 +364,16 @@ namespace NeosModLoader
         /// <param name="key">The key</param>
         /// <param name="value">The new value</param>
         /// <param name="eventLabel">A custom label you may assign to this event</param>
-        public void Set<T>(ModConfigurationKey<T> key, T value, string eventLabel = null)
+        public void Set<T>(ModConfigurationKey<T> key, T value, string? eventLabel = null)
         {
             // the reason we don't fall back to untyped Set() here is so we can skip the type check
 
-            if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey definingKey))
+            if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey? definingKey))
             {
-                throw new KeyNotFoundException($"{definingKey.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
+                throw new KeyNotFoundException($"{key.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
             }
 
-            if (!definingKey.Validate(value))
+            if (!definingKey!.Validate(value))
             {
                 throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{definingKey.Name}\"");
             }
@@ -404,9 +389,9 @@ namespace NeosModLoader
         /// <returns>true if a value was successfully found and removed, false if there was no value to remove</returns>
         public bool Unset(ModConfigurationKey key)
         {
-            if (Definition.TryGetDefiningKey(key, out ModConfigurationKey definingKey))
+            if (Definition.TryGetDefiningKey(key, out ModConfigurationKey? definingKey))
             {
-                return definingKey.Unset();
+                return definingKey!.Unset();
             }
             else
             {
@@ -421,9 +406,9 @@ namespace NeosModLoader
                 .Any();
         }
 
-        internal static ModConfiguration LoadConfigForMod(LoadedNeosMod mod)
+        internal static ModConfiguration? LoadConfigForMod(LoadedNeosMod mod)
         {
-            ModConfigurationDefinition definition = mod.NeosMod.BuildConfigurationDefinition();
+            ModConfigurationDefinition? definition = mod.NeosMod.BuildConfigurationDefinition();
             if (definition == null)
             {
                 // if there's no definition, then there's nothing for us to do here
@@ -437,7 +422,7 @@ namespace NeosModLoader
                 using StreamReader file = File.OpenText(configFile);
                 using JsonTextReader reader = new(file);
                 JObject json = JObject.Load(reader);
-                Version version = new(json[VERSION_JSON_KEY].ToObject<string>(jsonSerializer));
+                Version version = new(json[VERSION_JSON_KEY]!.ToObject<string>(jsonSerializer));
                 if (!AreVersionsCompatible(version, definition.Version))
                 {
                     var handlingMode = mod.NeosMod.HandleIncompatibleConfigurationVersions(definition.Version, version);
@@ -460,10 +445,10 @@ namespace NeosModLoader
                     string keyName = key.Name;
                     try
                     {
-                        JToken token = json[VALUES_JSON_KEY][keyName];
+                        JToken? token = json[VALUES_JSON_KEY]?[keyName];
                         if (token != null)
                         {
-                            object value = token.ToObject(key.ValueType(), jsonSerializer);
+                            object? value = token.ToObject(key.ValueType(), jsonSerializer);
                             key.Set(value);
                         }
                     }
@@ -519,15 +504,16 @@ namespace NeosModLoader
             JObject valueMap = new();
             foreach (ModConfigurationKey key in ConfigurationItemDefinitions)
             {
-                if (key.TryGetValue(out object value))
+                if (key.TryGetValue(out object? value))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my Set() API
-                    valueMap[key.Name] = JToken.FromObject(value, jsonSerializer);
+                    valueMap[key.Name] = value == null ? null : JToken.FromObject(value, jsonSerializer);
                 }
-                else if (saveDefaultValues && key.TryComputeDefault(out object defaultValue))
+                else if (saveDefaultValues && key.TryComputeDefault(out object? defaultValue))
                 {
                     // I don't need to typecheck this as there's no way to sneak a bad type past my computeDefault API
-                    valueMap[key.Name] = JToken.FromObject(defaultValue, jsonSerializer);
+                    // like and say defaultValue can't be null because the Json.Net
+                    valueMap[key.Name] = defaultValue == null ? null : JToken.FromObject(defaultValue, jsonSerializer);
                 }
             }
 
@@ -543,7 +529,7 @@ namespace NeosModLoader
             file.SetLength(file.Position);
         }
 
-        private void FireConfigurationChangedEvent(ModConfigurationKey key, string label)
+        private void FireConfigurationChangedEvent(ModConfigurationKey key, string? label)
         {
             try
             {
@@ -594,11 +580,11 @@ namespace NeosModLoader
             ModLoader.Mods()
                 .Select(mod => mod.GetConfiguration())
                 .Where(config => config != null)
-                .Where(config => config.AutoSave)
-                .Where(config => config.AnyValuesSet())
+                .Where(config => config!.AutoSave)
+                .Where(config => config!.AnyValuesSet())
                 .Do(config =>
                 {
-                    config.Save();
+                    config!.Save();
                     count += 1;
                 });
             Logger.MsgInternal($"Configs saved for {count} mods.");

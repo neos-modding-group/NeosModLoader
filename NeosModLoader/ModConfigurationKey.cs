@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#nullable disable
 namespace NeosModLoader
 {
     /// <summary>
@@ -9,7 +8,7 @@ namespace NeosModLoader
     /// </summary>
     public abstract class ModConfigurationKey
     {
-        internal ModConfigurationKey(string name, string description, bool internalAccessOnly)
+        internal ModConfigurationKey(string name, string? description, bool internalAccessOnly)
         {
             Name = name ?? throw new ArgumentNullException("Configuration key name must not be null");
             Description = description;
@@ -24,7 +23,7 @@ namespace NeosModLoader
         /// <summary>
         /// Human-readable description of this config item. Should be specified by the defining mod.
         /// </summary>
-        public string Description { get; private set; }
+        public string? Description { get; private set; }
 
         /// <summary>
         /// If true, only the owning mod should have access to this config item
@@ -39,14 +38,14 @@ namespace NeosModLoader
         /// </summary>
         /// <param name="value">The value to check</param>
         /// <returns>true if the value is valid</returns>
-        public abstract bool Validate(object value);
+        public abstract bool Validate(object? value);
 
         /// <summary>
         /// Computes a default value for this key, if a default provider is set
         /// </summary>
         /// <param name="defaultValue">the computed default value, or null if no default provider was set</param>
         /// <returns>true if a default was computed</returns>
-        public abstract bool TryComputeDefault(out object defaultValue);
+        public abstract bool TryComputeDefault(out object? defaultValue);
 
         // We only care about key name for non-defining keys.
         // For defining keys all of the other properties (default, validator, etc.) also matter.
@@ -61,7 +60,7 @@ namespace NeosModLoader
             return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
         }
 
-        private object Value;
+        private object? Value;
         internal bool HasValue;
 
         /// <summary>
@@ -71,9 +70,9 @@ namespace NeosModLoader
         /// 
         /// This is a non-null self-reference for the defining key itself as soon as the definition is done initializing.
         /// </summary>
-        internal ModConfigurationKey DefiningKey;
+        internal ModConfigurationKey? DefiningKey;
 
-        internal bool TryGetValue(out object value)
+        internal bool TryGetValue(out object? value)
         {
             if (HasValue)
             {
@@ -87,7 +86,7 @@ namespace NeosModLoader
             }
         }
 
-        internal void Set(object value)
+        internal void Set(object? value)
         {
             Value = value;
             HasValue = true;
@@ -115,14 +114,14 @@ namespace NeosModLoader
         /// <param name="computeDefault">Function that, if present, computes a default value for this key</param>
         /// <param name="internalAccessOnly">If true, only the owning mod should have access to this config item</param>
         /// <param name="valueValidator">Checks if a value is valid for this configuration item</param>
-        public ModConfigurationKey(string name, string description = null, Func<T> computeDefault = null, bool internalAccessOnly = false, Predicate<T> valueValidator = null) : base(name, description, internalAccessOnly)
+        public ModConfigurationKey(string name, string? description = null, Func<T>? computeDefault = null, bool internalAccessOnly = false, Predicate<T?>? valueValidator = null) : base(name, description, internalAccessOnly)
         {
             ComputeDefault = computeDefault;
             IsValueValid = valueValidator;
         }
 
-        private readonly Func<T> ComputeDefault;
-        private readonly Predicate<T> IsValueValid;
+        private readonly Func<T>? ComputeDefault;
+        private readonly Predicate<T?>? IsValueValid;
 
         /// <summary>
         /// Get the type of this key's value
@@ -135,12 +134,12 @@ namespace NeosModLoader
         /// </summary>
         /// <param name="value">value to check</param>
         /// <returns>true if the value is valid</returns>
-        public override bool Validate(object value)
+        public override bool Validate(object? value)
         {
             // specifically allow nulls for class types
             if (value is T || (value is null && !typeof(T).IsValueType))
             {
-                return ValidateTyped((T)value);
+                return ValidateTyped((T?)value);
             }
             else
             {
@@ -153,7 +152,7 @@ namespace NeosModLoader
         /// </summary>
         /// <param name="value">value to check</param>
         /// <returns>true if the value is valid</returns>
-        public bool ValidateTyped(T value)
+        public bool ValidateTyped(T? value)
         {
             if (IsValueValid == null)
             {
@@ -165,9 +164,9 @@ namespace NeosModLoader
             }
         }
 
-        public override bool TryComputeDefault(out object defaultValue)
+        public override bool TryComputeDefault(out object? defaultValue)
         {
-            if (TryComputeDefaultTyped(out T defaultTypedValue))
+            if (TryComputeDefaultTyped(out T? defaultTypedValue))
             {
                 defaultValue = defaultTypedValue;
                 return true;
@@ -184,7 +183,7 @@ namespace NeosModLoader
         /// </summary>
         /// <param name="defaultValue">the computed default value, or default(T) if no default provider was set</param>
         /// <returns>true if a default was computed</returns>
-        public bool TryComputeDefaultTyped(out T defaultValue)
+        public bool TryComputeDefaultTyped(out T? defaultValue)
         {
             if (ComputeDefault == null)
             {

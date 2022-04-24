@@ -15,7 +15,7 @@ namespace NeosModLoader.JsonConverters
             return !objectType.IsEnum && BASEX.Equals(objectType.Assembly) && Coder.IsNeosPrimitive(objectType);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (reader.Value is string serialized)
             {
@@ -23,12 +23,12 @@ namespace NeosModLoader.JsonConverters
                 return typeof(Coder<>).MakeGenericType(objectType).GetMethod("DecodeFromString").Invoke(null, new object[] { serialized });
             }
 
-            throw new ArgumentException($"Could not deserialize a BaseX type: {objectType} from a {reader.Value.GetType()}");
+            throw new ArgumentException($"Could not deserialize a BaseX type: {objectType} from a {reader?.Value?.GetType()}");
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            string serialized = (string)typeof(Coder<>).MakeGenericType(value.GetType()).GetMethod("EncodeToString").Invoke(null, new object[] { value });
+            string serialized = (string)typeof(Coder<>).MakeGenericType(value!.GetType()).GetMethod("EncodeToString").Invoke(null, new object[] { value });
             writer.WriteValue(serialized);
         }
     }

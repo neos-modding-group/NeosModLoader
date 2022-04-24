@@ -11,13 +11,13 @@ namespace NeosModLoader.JsonConverters
             return objectType.IsEnum;
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             // handle old behavior where enums were serialized as underlying type
             Type underlyingType = Enum.GetUnderlyingType(objectType);
-            if (TryConvert(reader.Value, underlyingType, out object? deserialized))
+            if (TryConvert(reader!.Value!, underlyingType, out object? deserialized))
             {
-                Logger.DebugInternal($"Deserializing a BaseX type: {objectType} from a {reader.Value.GetType()}");
+                Logger.DebugInternal($"Deserializing a BaseX type: {objectType} from a {reader!.Value!.GetType()}");
                 return deserialized!;
             }
 
@@ -27,12 +27,12 @@ namespace NeosModLoader.JsonConverters
                 return Enum.Parse(objectType, serialized);
             }
 
-            throw new ArgumentException($"Could not deserialize a BaseX type: {objectType} from a {reader.Value.GetType()}. Expected underlying type was {underlyingType}");
+            throw new ArgumentException($"Could not deserialize a BaseX type: {objectType} from a {reader?.Value?.GetType()}. Expected underlying type was {underlyingType}");
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            string serialized = Enum.GetName(value.GetType(), value);
+            string serialized = Enum.GetName(value!.GetType(), value);
             writer.WriteValue(serialized);
         }
 

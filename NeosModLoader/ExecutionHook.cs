@@ -1,7 +1,6 @@
 using FrooxEngine;
 using System;
 
-#nullable disable
 namespace NeosModLoader
 {
     [ImplementableClass(true)]
@@ -9,8 +8,8 @@ namespace NeosModLoader
     {
 #pragma warning disable CS0169
         // fields must exist due to reflective access
-        private static Type __connectorType; // needed in all Neos versions
-        private static Type __connectorTypes; // needed in Neos 2021.10.17.1326 and later
+        private static Type? __connectorType; // needed in all Neos versions
+        private static Type? __connectorTypes; // needed in Neos 2021.10.17.1326 and later
 #pragma warning restore CS0169
 
         static ExecutionHook()
@@ -40,7 +39,7 @@ namespace NeosModLoader
         // type must match return type of InstantiateConnector()
         private class DummyConnector : IConnector
         {
-            public IImplementable Owner { get; private set; }
+            public IImplementable? Owner { get; private set; }
             public void ApplyChanges() { }
             public void AssignOwner(IImplementable owner) => Owner = owner;
             public void Destroy(bool destroyingWorld) { }

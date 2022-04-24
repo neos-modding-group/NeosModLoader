@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace NeosModLoader
+﻿namespace NeosModLoader
 {
     // contains public metadata about the mod
     public abstract class NeosModBase
@@ -22,22 +21,22 @@ namespace NeosModLoader
         /// <summary>
         /// Optional hyperlink to this mod's homepage
         /// </summary>
-        public virtual string Link { get; }
+        public virtual string? Link { get; }
 
         /// <summary>
         /// A circular reference back to the LoadedNeosMod that contains this NeosModBase.
         /// The reference is set once the mod is successfully loaded, and is null before that.
         /// </summary>
-        internal LoadedNeosMod loadedNeosMod;
+        internal LoadedNeosMod? loadedNeosMod;
 
         /// <returns>This mod's current configuration. This method will always return the same ModConfiguration instance.</returns>
-        public ModConfiguration GetConfiguration()
+        public ModConfiguration? GetConfiguration()
         {
             if (!FinishedLoading)
             {
                 throw new ModConfigurationException($"GetConfiguration() was called before {Name} was done initializing. Consider calling GetConfiguration() from within OnEngineInit()");
             }
-            return loadedNeosMod.ModConfiguration;
+            return loadedNeosMod?.ModConfiguration;
         }
 
         internal bool FinishedLoading { get; set; }

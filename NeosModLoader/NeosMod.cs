@@ -31,7 +31,7 @@ namespace NeosModLoader
         /// Build the defined configuration for this mod.
         /// </summary>
         /// <returns>This mod's configuration definition.</returns>
-        internal ModConfigurationDefinition BuildConfigurationDefinition()
+        internal ModConfigurationDefinition? BuildConfigurationDefinition()
         {
             ModConfigurationDefinitionBuilder builder = new(this);
             builder.ProcessAttributes();
@@ -44,7 +44,7 @@ namespace NeosModLoader
         /// </summary>
         /// <returns>This mod's configuration definition. calls DefineConfiguration(ModConfigurationDefinitionBuilder) by default.</returns>
         [Obsolete("This method is obsolete. Use DefineConfiguration(ModConfigurationDefinitionBuilder) instead.")] // REMOVE IN NEXT MAJOR VERSION
-        public virtual ModConfigurationDefinition GetConfigurationDefinition()
+        public virtual ModConfigurationDefinition? GetConfigurationDefinition()
         {
             return BuildConfigurationDefinition();
         }

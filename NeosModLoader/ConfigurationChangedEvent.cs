@@ -15,9 +15,9 @@
         /// <summary>
         /// A custom label that may be set by whoever changed the configuration
         /// </summary>
-        public string Label { get; private set; }
+        public string? Label { get; private set; }
 
-        internal ConfigurationChangedEvent(ModConfiguration config, ModConfigurationKey key, string label)
+        internal ConfigurationChangedEvent(ModConfiguration config, ModConfigurationKey key, string? label)
         {
             Config = config;
             Key = key;
