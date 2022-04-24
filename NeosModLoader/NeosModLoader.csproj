@@ -1,17 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <ProjectGuid>{D4627C7F-8091-477A-ABDC-F1465D94D8D9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NeosModLoader</RootNamespace>
-    <AssemblyTitle>NeosModLoader</AssemblyTitle>
+    <Headless Condition="'$(Headless)'!='true'">false</Headless>
+    <AssemblyName Condition="'$(Headless)'=='false'">NeosModLoader</AssemblyName>
+    <AssemblyName Condition="'$(Headless)'=='true'">NeosModLoaderHeadless</AssemblyName>
+    <AssemblyTitle>$(AssemblyName)</AssemblyTitle>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TargetFramework>net462</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <Deterministic>true</Deterministic>
-    <CopyToLibraries Condition="'$(CopyToLibraries)'==''">true</CopyToLibraries>
+    <CopyToLibraries Condition="'$(CopyToLibraries)'=='' And '$(Headless)'=='false'">true</CopyToLibraries>
+    <CopyToLibraries Condition="'$(CopyToLibraries)'=='' And '$(Headless)'=='true'">false</CopyToLibraries>
     <DebugSymbols Condition="'$(Configuration)'=='Release'">false</DebugSymbols>
     <DebugType Condition="'$(Configuration)'=='Release'">None</DebugType>
   </PropertyGroup>
@@ -24,18 +29,21 @@
 
   <ItemGroup>
     <PackageReference Include="Lib.Harmony" Version="2.2.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" Condition="'$(Headless)'=='true'" />
+    <Reference Include="Newtonsoft.Json" Condition="'$(Headless)'=='false'">
+      <HintPath>$(NeosPath)Neos_Data\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="BaseX">
       <HintPath>$(NeosPath)Neos_Data\Managed\BaseX.dll</HintPath>
     </Reference>
     <Reference Include="FrooxEngine">
       <HintPath>$(NeosPath)Neos_Data\Managed\FrooxEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>$(NeosPath)Neos_Data\Managed\Newtonsoft.Json.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToLibraries)'=='true'">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NeosPath)Libraries" />
+    <Message Text="Copied $(TargetFileName) to $(NeosPath)Libraries" Importance="high" />
   </Target>
+
 </Project>
