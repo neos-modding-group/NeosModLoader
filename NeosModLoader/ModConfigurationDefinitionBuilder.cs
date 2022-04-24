@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-#nullable disable
 namespace NeosModLoader
 {
     public class ModConfigurationDefinitionBuilder
@@ -84,7 +83,7 @@ namespace NeosModLoader
             Keys.Add(fieldValue);
         }
 
-        internal ModConfigurationDefinition Build()
+        internal ModConfigurationDefinition? Build()
         {
             if (Keys.Count > 0)
             {
