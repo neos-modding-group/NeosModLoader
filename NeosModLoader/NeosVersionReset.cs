@@ -18,11 +18,12 @@ namespace NeosModLoader
             Engine engine = Engine.Current;
 
             List<string> extraAssemblies = Engine.ExtraAssemblies;
-            bool nmlPresent = extraAssemblies.Contains("NeosModLoader.dll");
+            string assemblyFilename = Path.GetFileName(Assembly.GetExecutingAssembly().Location);
+            bool nmlPresent = extraAssemblies.Contains(assemblyFilename);
 
             if (!nmlPresent)
             {
-                throw new Exception("Assertion failed: Engine.ExtraAssemblies did not contain NeosModLoader.dll");
+                throw new Exception($"Assertion failed: Engine.ExtraAssemblies did not contain \"{assemblyFilename}\"");
             }
 
             bool otherPluginsPresent = extraAssemblies.Count > 1;
