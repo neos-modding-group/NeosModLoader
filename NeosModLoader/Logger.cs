@@ -1,6 +1,5 @@
 using BaseX;
-using System.Diagnostics;
-using System.Reflection;
+using System;
 
 namespace NeosModLoader
 {
@@ -9,9 +8,30 @@ namespace NeosModLoader
         // logged for null objects
         internal readonly static string NULL_STRING = "null";
 
+        internal static bool IsDebugEnabled()
+        {
+            return ModLoaderConfiguration.Get().Debug;
+        }
+
+        internal static void DebugFuncInternal(Func<string> messageProducer)
+        {
+            if (IsDebugEnabled())
+            {
+                LogInternal(LogType.DEBUG, messageProducer());
+            }
+        }
+
+        internal static void DebugFuncExternal(Func<string> messageProducer)
+        {
+            if (IsDebugEnabled())
+            {
+                LogInternal(LogType.DEBUG, messageProducer(), SourceFromStackTrace());
+            }
+        }
+
         internal static void DebugInternal(string message)
         {
-            if (ModLoaderConfiguration.Get().Debug)
+            if (IsDebugEnabled())
             {
                 LogInternal(LogType.DEBUG, message);
             }
@@ -19,7 +39,7 @@ namespace NeosModLoader
 
         internal static void DebugExternal(object message)
         {
-            if (ModLoaderConfiguration.Get().Debug)
+            if (IsDebugEnabled())
             {
                 LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
             }
@@ -27,7 +47,7 @@ namespace NeosModLoader
 
         internal static void DebugListExternal(object[] messages)
         {
-            if (ModLoaderConfiguration.Get().Debug)
+            if (IsDebugEnabled())
             {
                 LogListInternal(LogType.DEBUG, messages, SourceFromStackTrace());
             }
@@ -76,17 +96,8 @@ namespace NeosModLoader
 
         private static string? SourceFromStackTrace()
         {
-            // skip three frames: SourceFromStackTrace(), MsgExternal(), Msg()
-            StackTrace stackTrace = new(3);
-            for (int i = 0; i < stackTrace.FrameCount; i++)
-            {
-                Assembly assembly = stackTrace.GetFrame(i).GetMethod().DeclaringType.Assembly;
-                if (ModLoader.AssemblyLookupMap.TryGetValue(assembly, out NeosMod mod))
-                {
-                    return mod.Name;
-                }
-            }
-            return null;
+            // MsgExternal() and Msg() are above us in the stack
+            return Util.ExecutingMod(2)?.Name;
         }
 
         private sealed class LogType

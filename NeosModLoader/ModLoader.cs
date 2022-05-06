@@ -12,7 +12,7 @@ namespace NeosModLoader
         /// <summary>
         /// NeosModLoader's version
         /// </summary>
-        public static readonly string VERSION = "1.10.1";
+        public static readonly string VERSION = "1.11.0";
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         private static readonly List<LoadedNeosMod> LoadedMods = new(); // used for mod enumeration
         internal static readonly Dictionary<Assembly, NeosMod> AssemblyLookupMap = new(); // used for logging
@@ -107,7 +107,7 @@ namespace NeosModLoader
                     else if (config.Debug)
                     {
                         string owner = owners.FirstOrDefault();
-                        Logger.DebugInternal($"method \"{patchedMethod.FullDescription()}\" has been patched by \"{owner}\"");
+                        Logger.DebugFuncInternal(() => $"method \"{patchedMethod.FullDescription()}\" has been patched by \"{owner}\"");
                     }
                 }
             }
@@ -195,7 +195,7 @@ namespace NeosModLoader
         private static void HookMod(LoadedNeosMod mod)
         {
             SplashChanger.SetCustom($"Starting mod [{mod.NeosMod.Name}/{mod.NeosMod.Version}]");
-            Logger.DebugInternal($"calling OnEngineInit() for [{mod.NeosMod.Name}]");
+            Logger.DebugFuncInternal(() => $"calling OnEngineInit() for [{mod.NeosMod.Name}]");
             try
             {
                 mod.NeosMod.OnEngineInit();
