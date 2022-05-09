@@ -9,10 +9,11 @@ namespace NeosModLoader
 {
     public class ModLoader
     {
+        internal const string VERSION_CONSTANT = "1.11.0";
         /// <summary>
         /// NeosModLoader's version
         /// </summary>
-        public static readonly string VERSION = "1.11.0";
+        public static readonly string VERSION = VERSION_CONSTANT;
         private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
         private static readonly List<LoadedNeosMod> LoadedMods = new(); // used for mod enumeration
         internal static readonly Dictionary<Assembly, NeosMod> AssemblyLookupMap = new(); // used for logging
