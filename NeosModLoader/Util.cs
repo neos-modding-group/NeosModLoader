@@ -35,6 +35,9 @@ namespace NeosModLoader
         /// <summary>
         /// Used to debounce a method call. The underlying method will be called after there have been no additional calls
         /// for n milliseconds.
+        /// 
+        /// The Action<T> returned by this function has internal state used for the debouncing, so you will need to store and reuse the Action
+        /// for each call.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="func">underlying function call</param>
@@ -43,13 +46,16 @@ namespace NeosModLoader
         // credit: https://stackoverflow.com/questions/28472205/c-sharp-event-debounce
         internal static Action<T> Debounce<T>(this Action<T> func, int milliseconds)
         {
+            // this variable gets embedded in the returned Action via the magic of closures
             CancellationTokenSource? cancelTokenSource = null;
 
             return arg =>
             {
+                // if there's already a scheduled call, then cancel it
                 cancelTokenSource?.Cancel();
                 cancelTokenSource = new CancellationTokenSource();
 
+                // schedule a new call
                 Task.Delay(milliseconds, cancelTokenSource.Token)
                     .ContinueWith(t =>
                     {
