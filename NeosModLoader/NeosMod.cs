@@ -7,7 +7,7 @@ namespace NeosModLoader
     public abstract class NeosMod : NeosModBase
     {
         public static bool IsDebugEnabled() => Logger.IsDebugEnabled();
-        public static void DebugFunc(Func<string> messageProducer) => Logger.DebugFuncExternal(messageProducer);
+        public static void DebugFunc(Func<object> messageProducer) => Logger.DebugFuncExternal(messageProducer);
         public static void Debug(string message) => Logger.DebugExternal(message); // needed for binary compatibility (REMOVE IN NEXT MAJOR VERSION)
         public static void Debug(object message) => Logger.DebugExternal(message);
         public static void Debug(params object[] messages) => Logger.DebugListExternal(messages);

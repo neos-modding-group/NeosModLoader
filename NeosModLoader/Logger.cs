@@ -23,7 +23,7 @@ namespace NeosModLoader
             }
         }
 
-        internal static void DebugFuncExternal(Func<string> messageProducer)
+        internal static void DebugFuncExternal(Func<object> messageProducer)
         {
             if (IsDebugEnabled())
             {
