@@ -1,4 +1,5 @@
 using BaseX;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -9,9 +10,30 @@ namespace NeosModLoader
         // logged for null objects
         internal readonly static string NULL_STRING = "null";
 
+        internal static bool IsDebugEnabled()
+        {
+            return ModLoaderConfiguration.Get().Debug;
+        }
+
+        internal static void DebugFuncInternal(Func<string> messageProducer)
+        {
+            if (IsDebugEnabled())
+            {
+                LogInternal(LogType.DEBUG, messageProducer());
+            }
+        }
+
+        internal static void DebugFuncExternal(Func<string> messageProducer)
+        {
+            if (IsDebugEnabled())
+            {
+                LogInternal(LogType.DEBUG, messageProducer(), SourceFromStackTrace());
+            }
+        }
+
         internal static void DebugInternal(string message)
         {
-            if (ModLoaderConfiguration.Get().Debug)
+            if (IsDebugEnabled())
             {
                 LogInternal(LogType.DEBUG, message);
             }
@@ -19,7 +41,7 @@ namespace NeosModLoader
 
         internal static void DebugExternal(object message)
         {
-            if (ModLoaderConfiguration.Get().Debug)
+            if (IsDebugEnabled())
             {
                 LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
             }
@@ -27,7 +49,7 @@ namespace NeosModLoader
 
         internal static void DebugListExternal(object[] messages)
         {
-            if (ModLoaderConfiguration.Get().Debug)
+            if (IsDebugEnabled())
             {
                 LogListInternal(LogType.DEBUG, messages, SourceFromStackTrace());
             }

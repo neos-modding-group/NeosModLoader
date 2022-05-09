@@ -155,9 +155,9 @@ namespace NeosModLoader
             };
             List<JsonConverter> converters = new();
             IList<JsonConverter> defaultConverters = settings.Converters;
-            if (defaultConverters != null)
+            if (defaultConverters != null && defaultConverters.Count() != 0)
             {
-                Logger.DebugInternal($"Using {defaultConverters.Count()} default json converters");
+                Logger.DebugFuncInternal(() => $"Using {defaultConverters.Count()} default json converters");
                 converters.AddRange(defaultConverters);
             }
             converters.Add(new EnumConverter());
@@ -527,6 +527,9 @@ namespace NeosModLoader
 
             // I actually cannot believe I have to truncate the file myself
             file.SetLength(file.Position);
+            file.Flush();
+
+            Logger.DebugFuncInternal(() => $"Saved ModConfiguration for \"{LoadedNeosMod.NeosMod.Name}\""); // todo: add timekeeping from PR #38
         }
 
         private void FireConfigurationChangedEvent(ModConfigurationKey key, string? label)
