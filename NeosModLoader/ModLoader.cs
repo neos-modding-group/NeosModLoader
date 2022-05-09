@@ -107,7 +107,7 @@ namespace NeosModLoader
                     else if (config.Debug)
                     {
                         string owner = owners.FirstOrDefault();
-                        Logger.DebugFuncInternal(() => $"method \"{patchedMethod.FullDescription()}\" has been patched by \"{owner}\"");
+                        Logger.DebugInternal($"method \"{patchedMethod.FullDescription()}\" has been patched by \"{owner}\"");
                     }
                 }
             }
@@ -195,7 +195,7 @@ namespace NeosModLoader
         private static void HookMod(LoadedNeosMod mod)
         {
             SplashChanger.SetCustom($"Starting mod [{mod.NeosMod.Name}/{mod.NeosMod.Version}]");
-            Logger.DebugFuncInternal(() => $"calling OnEngineInit() for [{mod.NeosMod.Name}]");
+            Logger.DebugInternal($"calling OnEngineInit() for [{mod.NeosMod.Name}]");
             try
             {
                 mod.NeosMod.OnEngineInit();

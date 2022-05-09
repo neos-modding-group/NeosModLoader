@@ -48,7 +48,7 @@ namespace NeosModLoader
             Assembly assembly;
             try
             {
-                Logger.DebugFuncInternal(() => $"load assembly {filename}");
+                Logger.DebugInternal($"load assembly {filename}");
                 assembly = Assembly.LoadFile(filepath);
             }
             catch (Exception e)

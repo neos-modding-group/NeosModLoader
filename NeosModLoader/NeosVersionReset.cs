@@ -69,7 +69,7 @@ namespace NeosModLoader
             int? vanillaProtocolVersionMaybe = GetVanillaProtocolVersion();
             if (vanillaProtocolVersionMaybe is int vanillaProtocolVersion)
             {
-                Logger.DebugFuncInternal(() => $"Vanilla protocol version is {vanillaProtocolVersion}");
+                Logger.DebugInternal($"Vanilla protocol version is {vanillaProtocolVersion}");
                 vanillaCompatibilityHash = CalculateCompatibilityHash(vanillaProtocolVersion);
                 return SetCompatibilityHash(engine, vanillaCompatibilityHash);
             }
@@ -101,7 +101,7 @@ namespace NeosModLoader
             }
             else
             {
-                Logger.DebugFuncInternal(() => $"Changing compatibility hash from {engine.CompatibilityHash} to {Target}");
+                Logger.DebugInternal($"Changing compatibility hash from {engine.CompatibilityHash} to {Target}");
                 field.SetValue(engine, Target);
                 return true;
             }
@@ -120,7 +120,7 @@ namespace NeosModLoader
                     Logger.WarnInternal("Unable to write Engine._versionString");
                     return false;
                 }
-                Logger.DebugFuncInternal(() => $"Changing version string from {engine.VersionString} to {target}");
+                Logger.DebugInternal($"Changing version string from {engine.VersionString} to {target}");
                 field.SetValue(engine, target);
             }
             return true;
