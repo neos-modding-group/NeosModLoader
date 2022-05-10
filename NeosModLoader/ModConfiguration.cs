@@ -173,9 +173,9 @@ namespace NeosModLoader
             };
             List<JsonConverter> converters = new();
             IList<JsonConverter> defaultConverters = settings.Converters;
-            if (defaultConverters != null)
+            if (defaultConverters != null && defaultConverters.Count() != 0)
             {
-                Logger.DebugInternal($"Using {defaultConverters.Count()} default json converters");
+                Logger.DebugFuncInternal(() => $"Using {defaultConverters.Count()} default json converters");
                 converters.AddRange(defaultConverters);
             }
             converters.Add(new EnumConverter());
@@ -548,13 +548,13 @@ namespace NeosModLoader
                 }
                 else
                 {
-                    Logger.DebugInternal($"ModConfiguration.Save({saveDefaultValues}) called for \"{LoadedNeosMod.NeosMod.Name}\" by \"{callee?.Name}\" from thread with id=\"{thread.ManagedThreadId}\", name=\"{thread.Name}\", bg=\"{thread.IsBackground}\", pool=\"{thread.IsThreadPoolThread}\". Last called {elapsedMillis / 1000f}s ago.");
+                    Logger.DebugFuncInternal(() => $"ModConfiguration.Save({saveDefaultValues}) called for \"{LoadedNeosMod.NeosMod.Name}\" by \"{callee?.Name}\" from thread with id=\"{thread.ManagedThreadId}\", name=\"{thread.Name}\", bg=\"{thread.IsBackground}\", pool=\"{thread.IsThreadPoolThread}\". Last called {elapsedMillis / 1000f}s ago.");
                 }
             }
             else
             {
                 saveTimer.Start();
-                Logger.DebugInternal($"ModConfiguration.Save({saveDefaultValues}) called for \"{LoadedNeosMod.NeosMod.Name}\" by \"{callee?.Name}\" from thread with id=\"{thread.ManagedThreadId}\", name=\"{thread.Name}\", bg=\"{thread.IsBackground}\", pool=\"{thread.IsThreadPoolThread}\"");
+                Logger.DebugFuncInternal(() => $"ModConfiguration.Save({saveDefaultValues}) called for \"{LoadedNeosMod.NeosMod.Name}\" by \"{callee?.Name}\" from thread with id=\"{thread.ManagedThreadId}\", name=\"{thread.Name}\", bg=\"{thread.IsBackground}\", pool=\"{thread.IsThreadPoolThread}\"");
             }
 
             // prevent saving if we've determined something is amiss with the configuration
@@ -613,7 +613,7 @@ namespace NeosModLoader
             file.SetLength(file.Position);
             file.Flush();
 
-            Logger.DebugInternal($"Saved ModConfiguration for \"{LoadedNeosMod.NeosMod.Name}\" in {stopwatch.ElapsedMilliseconds}ms");
+            Logger.DebugFuncInternal(() => $"Saved ModConfiguration for \"{LoadedNeosMod.NeosMod.Name}\" in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void FireConfigurationChangedEvent(ModConfigurationKey key, string? label)
