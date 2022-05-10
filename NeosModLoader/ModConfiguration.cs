@@ -611,7 +611,7 @@ namespace NeosModLoader
 
             // I actually cannot believe I have to truncate the file myself
             file.SetLength(file.Position);
-            file.Flush();
+            jsonTextWriter.Flush();
 
             Logger.DebugFuncInternal(() => $"Saved ModConfiguration for \"{LoadedNeosMod.NeosMod.Name}\" in {stopwatch.ElapsedMilliseconds}ms");
         }
