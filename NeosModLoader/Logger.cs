@@ -1,7 +1,5 @@
 using BaseX;
 using System;
-using System.Diagnostics;
-using System.Reflection;
 
 namespace NeosModLoader
 {
@@ -98,17 +96,8 @@ namespace NeosModLoader
 
         private static string? SourceFromStackTrace()
         {
-            // skip three frames: SourceFromStackTrace(), MsgExternal(), Msg()
-            StackTrace stackTrace = new(3);
-            for (int i = 0; i < stackTrace.FrameCount; i++)
-            {
-                Assembly assembly = stackTrace.GetFrame(i).GetMethod().DeclaringType.Assembly;
-                if (ModLoader.AssemblyLookupMap.TryGetValue(assembly, out NeosMod mod))
-                {
-                    return mod.Name;
-                }
-            }
-            return null;
+            // MsgExternal() and Msg() are above us in the stack
+            return Util.ExecutingMod(2)?.Name;
         }
 
         private sealed class LogType

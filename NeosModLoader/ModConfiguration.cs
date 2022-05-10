@@ -5,9 +5,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NeosModLoader
 {
@@ -142,6 +145,21 @@ namespace NeosModLoader
         /// Called if one of the values in this mod's config changed.
         /// </summary>
         public event ConfigurationChangedEventHandler? OnThisConfigurationChanged;
+
+        // used to track how frequenly Save() is being called
+        private Stopwatch saveTimer = new Stopwatch();
+
+        // time that save must not be called for a save to actually go through
+        private int debounceMilliseconds = 3000;
+
+        // used to keep track of mods that spam Save():
+        // any mod that calls Save() for the a ModConfiguration within debounceMilliseconds of the previous call to the same ModConfiguration
+        // will be put into Ultimate Punishment Mode, and ALL their Save() calls, regardless of ModConfiguration, will be debounced.
+        // The naughty list is global, while the actual debouncing is per-configuration.
+        private static ISet<string> naughtySavers = new HashSet<string>();
+
+        // used to keep track of the debouncers for this configuration.
+        private Dictionary<string, Action<bool>> saveActionForCallee = new();
 
         private static readonly JsonSerializer jsonSerializer = CreateJsonSerializer();
 
@@ -480,22 +498,88 @@ namespace NeosModLoader
         /// </summary>
         public void Save() // this overload is needed for binary compatibility (REMOVE IN NEXT MAJOR VERSION)
         {
-            Save(false);
+            Save(false, false);
         }
 
         /// <summary>
         /// Persist this configuration to disk. This method is not called automatically.
         /// </summary>
         /// <param name="saveDefaultValues">If true, default values will also be persisted</param>
-        public void Save(bool saveDefaultValues = false)
+        public void Save(bool saveDefaultValues = false) // this overload is needed for binary compatibility (REMOVE IN NEXT MAJOR VERSION)
         {
+            Save(saveDefaultValues, false);
+        }
+
+
+        /// <summary>
+        /// Persist this configuration to disk. This method is not called automatically.
+        /// </summary>
+        /// <param name="saveDefaultValues">If true, default values will also be persisted</param>
+        /// <param name="immediate">Skip the debouncing and save immediately</param>
+        internal void Save(bool saveDefaultValues = false, bool immediate = false)
+        {
+
+            Thread thread = Thread.CurrentThread;
+            NeosMod? callee = Util.ExecutingMod();
+            Action<bool>? saveAction = null;
+
+            // get saved state for this callee
+            if (callee != null && naughtySavers.Contains(callee.Name) && !saveActionForCallee.TryGetValue(callee.Name, out saveAction))
+            {
+                // handle case where the callee was marked as naughty from a different ModConfiguration being spammed
+                saveAction = Util.Debounce<bool>(SaveInternal, debounceMilliseconds);
+                saveActionForCallee.Add(callee.Name, saveAction);
+            }
+
+            if (saveTimer.IsRunning)
+            {
+                float elapsedMillis = saveTimer.ElapsedMilliseconds;
+                saveTimer.Restart();
+                if (elapsedMillis < debounceMilliseconds)
+                {
+                    Logger.WarnInternal($"ModConfiguration.Save({saveDefaultValues}) called for \"{LoadedNeosMod.NeosMod.Name}\" by \"{callee?.Name}\" from thread with id=\"{thread.ManagedThreadId}\", name=\"{thread.Name}\", bg=\"{thread.IsBackground}\", pool=\"{thread.IsThreadPoolThread}\". Last called {elapsedMillis / 1000f}s ago. This is very recent! Do not spam calls to ModConfiguration.Save()! All Save() calls by this mod are now subject to a {debounceMilliseconds}ms debouncing delay.");
+                    if (saveAction == null && callee != null)
+                    {
+                        // congrats, you've switched into Ultimate Punishment Mode where now I don't trust you and your Save() calls get debounced
+                        saveAction = Util.Debounce<bool>(SaveInternal, debounceMilliseconds);
+                        saveActionForCallee.Add(callee.Name, saveAction);
+                        naughtySavers.Add(callee.Name);
+                    }
+                }
+                else
+                {
+                    Logger.DebugFuncInternal(() => $"ModConfiguration.Save({saveDefaultValues}) called for \"{LoadedNeosMod.NeosMod.Name}\" by \"{callee?.Name}\" from thread with id=\"{thread.ManagedThreadId}\", name=\"{thread.Name}\", bg=\"{thread.IsBackground}\", pool=\"{thread.IsThreadPoolThread}\". Last called {elapsedMillis / 1000f}s ago.");
+                }
+            }
+            else
+            {
+                saveTimer.Start();
+                Logger.DebugFuncInternal(() => $"ModConfiguration.Save({saveDefaultValues}) called for \"{LoadedNeosMod.NeosMod.Name}\" by \"{callee?.Name}\" from thread with id=\"{thread.ManagedThreadId}\", name=\"{thread.Name}\", bg=\"{thread.IsBackground}\", pool=\"{thread.IsThreadPoolThread}\"");
+            }
+
             // prevent saving if we've determined something is amiss with the configuration
             if (!LoadedNeosMod.AllowSavingConfiguration)
             {
-                Logger.WarnInternal($"Config for {LoadedNeosMod.NeosMod.Name} will NOT be saved due to a safety check failing. This is probably due to you downgrading a mod.");
+                Logger.WarnInternal($"ModConfiguration for {LoadedNeosMod.NeosMod.Name} will NOT be saved due to a safety check failing. This is probably due to you downgrading a mod.");
                 return;
             }
 
+            if (immediate || saveAction == null)
+            {
+                // infrequent callers get to save immediately
+                Task.Run(() => SaveInternal(saveDefaultValues));
+            }
+            else
+            {
+                // bad callers get debounced
+                saveAction(saveDefaultValues);
+            }
+        }
+
+        // performs the actual, synchronous save
+        private void SaveInternal(bool saveDefaultValues)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             JObject json = new()
             {
                 [VERSION_JSON_KEY] = JToken.FromObject(Definition.Version.ToString(), jsonSerializer)
@@ -527,9 +611,9 @@ namespace NeosModLoader
 
             // I actually cannot believe I have to truncate the file myself
             file.SetLength(file.Position);
-            file.Flush();
+            jsonTextWriter.Flush();
 
-            Logger.DebugFuncInternal(() => $"Saved ModConfiguration for \"{LoadedNeosMod.NeosMod.Name}\""); // todo: add timekeeping from PR #38
+            Logger.DebugFuncInternal(() => $"Saved ModConfiguration for \"{LoadedNeosMod.NeosMod.Name}\" in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         private void FireConfigurationChangedEvent(ModConfigurationKey key, string? label)
