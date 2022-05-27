@@ -153,7 +153,7 @@ namespace NeosModLoader
         private int debounceMilliseconds = 3000;
 
         // used to keep track of mods that spam Save():
-        // any mod that calls Save() for the a ModConfiguration within debounceMilliseconds of the previous call to the same ModConfiguration
+        // any mod that calls Save() for the ModConfiguration within debounceMilliseconds of the previous call to the same ModConfiguration
         // will be put into Ultimate Punishment Mode, and ALL their Save() calls, regardless of ModConfiguration, will be debounced.
         // The naughty list is global, while the actual debouncing is per-configuration.
         private static ISet<string> naughtySavers = new HashSet<string>();
