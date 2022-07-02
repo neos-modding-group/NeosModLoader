@@ -6,17 +6,17 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NeosModLoader</RootNamespace>
     <Headless Condition="'$(Headless)'!='true'">false</Headless>
-    <AssemblyName Condition="'$(Headless)'=='false'">NeosModLoader</AssemblyName>
-    <AssemblyName Condition="'$(Headless)'=='true'">NeosModLoaderHeadless</AssemblyName>
-    <AssemblyTitle>$(AssemblyName)</AssemblyTitle>
+    <AssemblyName>NeosModLoader</AssemblyName>
+    <AssemblyTitle Condition="'$(Headless)'=='false'">NeosModLoader</AssemblyTitle>
+    <AssemblyTitle Condition="'$(Headless)'=='true'">NeosModLoaderHeadless</AssemblyTitle>
+    <AssemblyFileName>$(AssemblyTitle).dll</AssemblyFileName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TargetFramework>net462</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <Deterministic>true</Deterministic>
-    <CopyToLibraries Condition="'$(CopyToLibraries)'=='' And '$(Headless)'=='false'">true</CopyToLibraries>
-    <CopyToLibraries Condition="'$(CopyToLibraries)'=='' And '$(Headless)'=='true'">false</CopyToLibraries>
+    <CopyToLibraries Condition="'$(CopyToLibraries)'==''">true</CopyToLibraries>
     <DebugSymbols Condition="'$(Configuration)'=='Release'">false</DebugSymbols>
     <DebugType Condition="'$(Configuration)'=='Release'">None</DebugType>
   </PropertyGroup>
@@ -42,8 +42,8 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToLibraries)'=='true'">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NeosPath)Libraries" />
-    <Message Text="Copied $(TargetFileName) to $(NeosPath)Libraries" Importance="high" />
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFiles="$(NeosPath)Libraries\$(AssemblyFileName)" />
+    <Message Text="Copied $(TargetFileName) to $(NeosPath)Libraries\$(AssemblyFileName)" Importance="high" />
   </Target>
 
 </Project>
