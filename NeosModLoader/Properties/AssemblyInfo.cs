@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -33,3 +34,7 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion(NeosModLoader.ModLoader.VERSION_CONSTANT)]
 [assembly: AssemblyFileVersion(NeosModLoader.ModLoader.VERSION_CONSTANT)]
+
+// prevent PostX from modifying my assembly, as it doesn't need anything done to it
+// this keeps PostX from overwriting my AssemblyVersionAttribute
+[module: Description("POSTX_PROCESSED")]
