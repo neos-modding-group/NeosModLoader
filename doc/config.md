@@ -170,7 +170,7 @@ There are two cases to consider:
 
 | Action | Forwards Compatible | Backwards Compatible |
 | ------ | ------------------- | ---------------------|
-| Adding a brand new key | Yes | Yes |
+| Adding a brand-new key | Yes | Yes |
 | Removing an existing key | Yes | Yes |
 | Adding, altering, or removing a key's default value | Yes | Maybe* |
 | Restricting a key's validator | Yes** | Yes |

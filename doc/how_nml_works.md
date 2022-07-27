@@ -6,7 +6,7 @@ NeosModLoader only interfaces with Neos in two places: the hook and the compatib
 
 The hook is the point where Neos "hooks" into NeosModLoader, allowing it to begin execution.
 
-Typically, [plugins] use [components] to execute custom code. This is limiting as they can only begin execution once a world loads. Typically this involves putting a plugin's component into your local home.
+Typically, [plugins] use [components] to execute custom code. This is limiting as they can only begin execution once a world loads. This usually involves putting a plugin's component into your local home.
 
 The NeosModLoader plugin uses a different mechanism. Instead of using a component, it uses a connector. Neos loads connectors during its initial setup, at which point they can begin execution. As this system is independent of world loading it is more reliable. The connector implementation is in [ExecutionHook.cs](../NeosModLoader/ExecutionHook.cs).
 
