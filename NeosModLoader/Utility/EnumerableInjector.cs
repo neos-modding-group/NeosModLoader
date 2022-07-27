@@ -36,7 +36,7 @@ namespace NeosModLoader.Utility
         private Action<TOriginal, TTransformed, bool> postItem = (original, transformed, returned) => { };
         private Action prefix = () => { };
         private Func<TOriginal, bool> preItem = item => true;
-        private Func<TOriginal, TTransformed> transformItem = item => throw new NotImplementedException("You're supposed to inser your own transformation function here!");
+        private Func<TOriginal, TTransformed> transformItem = item => throw new NotImplementedException("You're supposed to insert your own transformation function here!");
 
         /// <summary>
         /// Gets called when the wrapped enumeration returned the last item.
