@@ -1,5 +1,6 @@
 using FrooxEngine;
 using System;
+using System.Linq;
 
 namespace NeosModLoader
 {
@@ -17,7 +18,13 @@ namespace NeosModLoader
             try
             {
                 SplashChanger.SetCustom("Loading libraries");
-                AssemblyLoader.LoadAssembliesFromDir("nml_libs");
+                AssemblyFile[] loadedAssemblies = AssemblyLoader.LoadAssembliesFromDir("nml_libs");
+                if (loadedAssemblies.Length != 0)
+                {
+                    string loadedAssemblyList = string.Join("\n", loadedAssemblies.Select(a => a.Assembly.FullName));
+                    Logger.MsgInternal($"Loaded libraries from nml_libs:\n{loadedAssemblyList}");
+                }
+
                 SplashChanger.SetCustom("Initializing");
                 DebugInfo.Log();
                 NeosVersionReset.Initialize();

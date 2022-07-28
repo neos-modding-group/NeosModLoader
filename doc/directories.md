@@ -4,8 +4,8 @@ If you've installed to a non-default location then finding the path is up to you
 
 | Directory | Description |
 | --------- |------------ |
-| Neos Install Directory | Contains the game install itself, the log directory, and the libraries directory |
-| Log Directory | A `Log` directory within the Neos Install Directory. Contains the main game logs. |
+| Neos Install Directory | Contains the game install itself, the log directory, and the `Libraries` directory |
+| Log Directory | A `Logs` directory within the Neos Install Directory. Contains the main game logs. |
 | Libraries Directory | A `Libraries` directory within the  Neos Install Directory. Plugins dlls go here.
 | Data Directory | Contains the local db, Unity's player.log, and local assets directory. Location can be changed with `-DataPath <path>` argument. |
 | Temporary Directory | Contains crash logs and the cache |

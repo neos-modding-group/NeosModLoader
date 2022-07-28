@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace NeosModLoader
 {
     public class ModLoader
     {
-        internal const string VERSION_CONSTANT = "1.11.0";
+        internal const string VERSION_CONSTANT = "1.11.3";
         /// <summary>
         /// NeosModLoader's version
         /// </summary>
@@ -64,6 +65,25 @@ namespace NeosModLoader
                         // if loading succeeded, then we need to register the mod
                         RegisterMod(loaded);
                     }
+                }
+                catch (ReflectionTypeLoadException reflectionTypeLoadException)
+                {
+                    // this exception type has some inner exceptions we must also log to gain any insight into what went wrong
+                    StringBuilder sb = new();
+                    sb.AppendLine(reflectionTypeLoadException.ToString());
+                    foreach (Exception loaderException in reflectionTypeLoadException.LoaderExceptions)
+                    {
+                        sb.AppendLine($"Loader Exception: {loaderException.Message}");
+                        if (loaderException is FileNotFoundException fileNotFoundException)
+                        {
+                            if (!string.IsNullOrEmpty(fileNotFoundException.FusionLog))
+                            {
+                                sb.Append("    Fusion Log:\n    ");
+                                sb.AppendLine(fileNotFoundException.FusionLog);
+                            }
+                        }
+                    }
+                    Logger.ErrorInternal($"ReflectionTypeLoadException initializing mod from {mod.File}:\n{sb}");
                 }
                 catch (Exception e)
                 {
