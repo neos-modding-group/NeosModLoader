@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace NeosModLoader
@@ -17,7 +18,10 @@ namespace NeosModLoader
             try
             {
                 assembliesToLoad = Directory.GetFiles(assembliesDirectory, "*.dll");
-                Array.Sort(assembliesToLoad, (a, b) => string.CompareOrdinal(a, b));
+                foreach (string directory in Directory.GetDirectories(assembliesDirectory))
+                {
+                    assembliesToLoad = assembliesToLoad.Concat(GetAssemblyPathsFromDir(directory)).ToArray();
+                }
             }
             catch (Exception e)
             {
@@ -38,6 +42,7 @@ namespace NeosModLoader
                     Logger.ErrorInternal($"Error enumerating ${dirName} directory:\n{e}");
                 }
             }
+            Array.Sort(assembliesToLoad, (a, b) => string.CompareOrdinal(a, b));
             return assembliesToLoad;
         }
 
@@ -85,7 +90,8 @@ namespace NeosModLoader
                 }
             }
 
-            return assemblyFiles.ToArray();
+            // remove duplicate assemblies and return the list
+            return assemblyFiles.Distinct(AssemblyFile.AssemblyComparer).ToArray();
         }
     }
 }

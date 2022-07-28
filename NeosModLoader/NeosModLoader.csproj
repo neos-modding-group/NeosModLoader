@@ -25,6 +25,7 @@
     <NeosPath>$(MSBuildThisFileDirectory)NeosVR/</NeosPath>
     <NeosPath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\NeosVR\')">C:\Program Files (x86)\Steam\steamapps\common\NeosVR\</NeosPath>
     <NeosPath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/NeosVR/')">$(HOME)/.steam/steam/steamapps/common/NeosVR/</NeosPath>
+    <NeosPath Condition="Exists('D:/Files/Games/Neos/app/')">D:/Files/Games/Neos/app/</NeosPath>
   </PropertyGroup>
 
   <ItemGroup>
