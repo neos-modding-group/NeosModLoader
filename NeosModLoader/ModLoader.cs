@@ -207,7 +207,7 @@ namespace NeosModLoader
                 SplashChanger.SetCustom($"Loading configuration for [{neosMod.Name}/{neosMod.Version}]");
 
                 LoadedNeosMod loadedMod = new(neosMod, mod);
-                Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.File)}) by {neosMod.Author}");
+                Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.File)}) by {neosMod.Author} sha256 hash: {Util.GenerateSHA256(mod.File)}");
                 loadedMod.ModConfiguration = ModConfiguration.LoadConfigForMod(loadedMod);
                 return loadedMod;
             }
