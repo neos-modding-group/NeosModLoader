@@ -17,6 +17,7 @@ namespace NeosModLoader
             try
             {
                 assembliesToLoad = Directory.GetFiles(assembliesDirectory, "*.dll", SearchOption.AllDirectories);
+                Array.Sort(assembliesToLoad, (a, b) => string.CompareOrdinal(a, b));
             }
             catch (Exception e)
             {
@@ -37,7 +38,6 @@ namespace NeosModLoader
                     Logger.ErrorInternal($"Error enumerating ${dirName} directory:\n{e}");
                 }
             }
-            Array.Sort(assembliesToLoad, (a, b) => string.CompareOrdinal(a, b));
             return assembliesToLoad;
         }
 
