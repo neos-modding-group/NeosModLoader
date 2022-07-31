@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace NeosModLoader
@@ -17,11 +16,7 @@ namespace NeosModLoader
             string[]? assembliesToLoad = null;
             try
             {
-                assembliesToLoad = Directory.GetFiles(assembliesDirectory, "*.dll");
-                foreach (string directory in Directory.GetDirectories(assembliesDirectory))
-                {
-                    assembliesToLoad = assembliesToLoad.Concat(GetAssemblyPathsFromDir(directory)).ToArray();
-                }
+                assembliesToLoad = Directory.GetFiles(assembliesDirectory, "*.dll", SearchOption.AllDirectories);
             }
             catch (Exception e)
             {
@@ -90,8 +85,7 @@ namespace NeosModLoader
                 }
             }
 
-            // remove duplicate assemblies and return the list
-            return assemblyFiles.Distinct(AssemblyFile.AssemblyComparer).ToArray();
+            return assemblyFiles.ToArray();
         }
     }
 }
