@@ -75,6 +75,7 @@ namespace NeosModLoader
                     {
                         if (LoadAssembly(assemblyFilepath) is Assembly assembly)
                         {
+                            Logger.MsgInternal($"loading assembly with 256hash: { Util.GenerateSHA256(assemblyFilepath)}");
                             assemblyFiles.Add(new AssemblyFile(assemblyFilepath, assembly));
                         }
                     }
