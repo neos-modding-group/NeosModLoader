@@ -19,6 +19,7 @@ namespace NeosModLoader
         private static readonly List<LoadedNeosMod> LoadedMods = new(); // used for mod enumeration
         internal static readonly Dictionary<Assembly, NeosMod> AssemblyLookupMap = new(); // used for logging
         private static readonly Dictionary<string, LoadedNeosMod> ModNameLookupMap = new(); // used for duplicate mod checking
+        private static FileSystemWatcher modDirWatcher = new(@"./nml_mods", "*.dll");
 
         /// <summary>
         /// Allows reading metadata for all loaded mods
@@ -57,38 +58,7 @@ namespace NeosModLoader
             // call Initialize() each mod
             foreach (AssemblyFile mod in modsToLoad)
             {
-                try
-                {
-                    LoadedNeosMod? loaded = InitializeMod(mod);
-                    if (loaded != null)
-                    {
-                        // if loading succeeded, then we need to register the mod
-                        RegisterMod(loaded);
-                    }
-                }
-                catch (ReflectionTypeLoadException reflectionTypeLoadException)
-                {
-                    // this exception type has some inner exceptions we must also log to gain any insight into what went wrong
-                    StringBuilder sb = new();
-                    sb.AppendLine(reflectionTypeLoadException.ToString());
-                    foreach (Exception loaderException in reflectionTypeLoadException.LoaderExceptions)
-                    {
-                        sb.AppendLine($"Loader Exception: {loaderException.Message}");
-                        if (loaderException is FileNotFoundException fileNotFoundException)
-                        {
-                            if (!string.IsNullOrEmpty(fileNotFoundException.FusionLog))
-                            {
-                                sb.Append("    Fusion Log:\n    ");
-                                sb.AppendLine(fileNotFoundException.FusionLog);
-                            }
-                        }
-                    }
-                    Logger.ErrorInternal($"ReflectionTypeLoadException initializing mod from {mod.File}:\n{sb}");
-                }
-                catch (Exception e)
-                {
-                    Logger.ErrorInternal($"Unexpected exception initializing mod from {mod.File}:\n{e}");
-                }
+                TryLoadMod(mod);
             }
 
             SplashChanger.SetCustom("Hooking big fish");
@@ -111,27 +81,73 @@ namespace NeosModLoader
             if (config.LogConflicts)
             {
                 SplashChanger.SetCustom("Looking for conflicts");
+                logPotentialConflicts(config);
+            }
+        }
 
-                IEnumerable<MethodBase> patchedMethods = Harmony.GetAllPatchedMethods();
-                foreach (MethodBase patchedMethod in patchedMethods)
+        private static void logPotentialConflicts(ModLoaderConfiguration config)
+        {
+            IEnumerable<MethodBase> patchedMethods = Harmony.GetAllPatchedMethods();
+            foreach (MethodBase patchedMethod in patchedMethods)
+            {
+                Patches patches = Harmony.GetPatchInfo(patchedMethod);
+                HashSet<string> owners = new(patches.Owners);
+                if (owners.Count > 1)
                 {
-                    Patches patches = Harmony.GetPatchInfo(patchedMethod);
-                    HashSet<string> owners = new(patches.Owners);
-                    if (owners.Count > 1)
+                    Logger.WarnInternal($"method \"{patchedMethod.FullDescription()}\" has been patched by the following:");
+                    foreach (string owner in owners)
                     {
-                        Logger.WarnInternal($"method \"{patchedMethod.FullDescription()}\" has been patched by the following:");
-                        foreach (string owner in owners)
-                        {
-                            Logger.WarnInternal($"    \"{owner}\" ({TypesForOwner(patches, owner)})");
-                        }
-                    }
-                    else if (config.Debug)
-                    {
-                        string owner = owners.FirstOrDefault();
-                        Logger.DebugFuncInternal(() => $"method \"{patchedMethod.FullDescription()}\" has been patched by \"{owner}\"");
+                        Logger.WarnInternal($"    \"{owner}\" ({TypesForOwner(patches, owner)})");
                     }
                 }
+                else if (config.Debug)
+                {
+                    string owner = owners.FirstOrDefault();
+                    Logger.DebugFuncInternal(() => $"method \"{patchedMethod.FullDescription()}\" has been patched by \"{owner}\"");
+                }
             }
+        }
+
+        /// <summary>
+        /// Tries to initialize a single mod and logs any errors it encounters if it fails.
+        /// </summary>
+        /// <returns>The loaded mod or null if it failed to load it.</returns>
+        private static LoadedNeosMod? TryLoadMod(AssemblyFile mod)
+        {
+            try
+            {
+                LoadedNeosMod? loaded = InitializeMod(mod);
+                if (loaded != null)
+                {
+                    // if loading succeeded, then we need to register the mod
+                    RegisterMod(loaded);
+                    return loaded;
+                }
+            }
+            catch (ReflectionTypeLoadException reflectionTypeLoadException)
+            {
+                // this exception type has some inner exceptions we must also log to gain any insight into what went wrong
+                StringBuilder sb = new();
+                sb.AppendLine(reflectionTypeLoadException.ToString());
+                foreach (Exception loaderException in reflectionTypeLoadException.LoaderExceptions)
+                {
+                    sb.AppendLine($"Loader Exception: {loaderException.Message}");
+                    if (loaderException is FileNotFoundException fileNotFoundException)
+                    {
+                        if (!string.IsNullOrEmpty(fileNotFoundException.FusionLog))
+                        {
+                            sb.Append("    Fusion Log:\n    ");
+                            sb.AppendLine(fileNotFoundException.FusionLog);
+                        }
+                    }
+                }
+                Logger.ErrorInternal($"ReflectionTypeLoadException initializing mod from {mod.File}:\n{sb}");
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorInternal($"Unexpected exception initializing mod from {mod.File}:\n{e}");
+            }
+            return null;
         }
 
         /// <summary>
@@ -225,6 +241,48 @@ namespace NeosModLoader
             {
                 Logger.ErrorInternal($"mod {mod.NeosMod.Name} from {mod.ModAssembly.File} threw error from OnEngineInit():\n{e}");
             }
+        }
+
+        /// <summary>
+        /// Loads, initializes, registers and hooks a single mod at runtime
+        /// </summary>
+        /// <param name="path">The file path to the mod's .dll</param>
+        public static bool LoadAndInitializeNewMod(string path)
+        {
+            AssemblyFile? mod = AssemblyLoader.LoadAssemblyFile(path);
+            if (mod != null)
+            {
+                LoadedNeosMod? loadedMod = TryLoadMod(mod);
+                if (loadedMod != null)
+                {
+                    HookMod(loadedMod);
+
+                    // re-log potential conflicts
+                    ModLoaderConfiguration config = ModLoaderConfiguration.Get();
+                    if (config.LogConflicts)
+                    {
+                        logPotentialConflicts(config);
+                    }
+
+                    // display load success to the user
+                    FrooxEngine.LoadingIndicator.ShowMessage("Loaded New Mod", $"The mod '{loadedMod.Name}' has been loaded.");
+                    return true;
+                }
+            }
+            FrooxEngine.LoadingIndicator.ShowMessage("<color=#f00>Failed to Load Mod</color>", "<color=#f00>Check log for more info</color>");
+            return false;
+        }
+
+        internal static void WatchModsDirectory()
+        {
+            modDirWatcher.Created += new FileSystemEventHandler(NewModFound);
+            modDirWatcher.IncludeSubdirectories = true;
+            modDirWatcher.EnableRaisingEvents = true;
+        }
+
+        private static void NewModFound(object sender, FileSystemEventArgs e)
+        {
+            LoadAndInitializeNewMod(e.FullPath);
         }
     }
 }

@@ -64,6 +64,22 @@ namespace NeosModLoader
             return assembly;
         }
 
+        internal static AssemblyFile? LoadAssemblyFile(string filepath)
+        {
+            try
+            {
+                if (LoadAssembly(filepath) is Assembly assembly)
+                {
+                    return new AssemblyFile(filepath, assembly);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorInternal($"Unexpected exception loading assembly from {filepath}:\n{e}");
+            }
+            return null;
+        }
+
         internal static AssemblyFile[] LoadAssembliesFromDir(string dirName)
         {
             List<AssemblyFile> assemblyFiles = new();
@@ -71,16 +87,10 @@ namespace NeosModLoader
             {
                 foreach (string assemblyFilepath in assemblyPaths)
                 {
-                    try
+                    AssemblyFile? loadedAssemblyFile = LoadAssemblyFile(assemblyFilepath);
+                    if (loadedAssemblyFile != null)
                     {
-                        if (LoadAssembly(assemblyFilepath) is Assembly assembly)
-                        {
-                            assemblyFiles.Add(new AssemblyFile(assemblyFilepath, assembly));
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.ErrorInternal($"Unexpected exception loading assembly from {assemblyFilepath}:\n{e}");
+                        assemblyFiles.Add(loadedAssemblyFile);
                     }
                 }
             }

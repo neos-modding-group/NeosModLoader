@@ -30,6 +30,15 @@ namespace NeosModLoader
         public virtual void OnEngineInit() { }
 
         /// <summary>
+        /// Called once when the mod is loaded at runtime and calls OnEngineInit() for backwards compatibility.
+        /// Can be overriden by a mod to achieve custom behavior.
+        /// </summary>
+        public void OnLateInit()
+        {
+            OnEngineInit();
+        }
+
+        /// <summary>
         /// Build the defined configuration for this mod.
         /// </summary>
         /// <returns>This mod's configuration definition.</returns>
