@@ -58,7 +58,7 @@ namespace NeosModLoader
             // call Initialize() each mod
             foreach (AssemblyFile mod in modsToLoad)
             {
-                TryLoadMod(mod);
+                TryLoadMod(mod, true);
             }
 
             SplashChanger.SetCustom("Hooking big fish");
@@ -69,7 +69,7 @@ namespace NeosModLoader
             {
                 try
                 {
-                    HookMod(mod);
+                    HookMod(mod, true);
                 }
                 catch (Exception e)
                 {
@@ -112,13 +112,24 @@ namespace NeosModLoader
         /// Tries to initialize a single mod and logs any errors it encounters if it fails.
         /// </summary>
         /// <returns>The loaded mod or null if it failed to load it.</returns>
-        private static LoadedNeosMod? TryLoadMod(AssemblyFile mod)
+        private static LoadedNeosMod? TryLoadMod(AssemblyFile mod, bool atStartup)
         {
             try
             {
                 LoadedNeosMod? loaded = InitializeMod(mod);
                 if (loaded != null)
                 {
+                    if (!atStartup && !loaded.NeosMod.SupportsHotloading())
+                    {
+                        // trying to hotload a mod that doesn't support it
+                        ModLoaderConfiguration config = ModLoaderConfiguration.Get();
+                        if (!config.HotloadUnsupported)
+                        {
+                            Logger.ErrorInternal($"Cannot hotload mod that does not support it: [{loaded.NeosMod.Name}/{loaded.NeosMod.Version}]");
+                            return null;
+                        }
+                        Logger.ErrorInternal($"Hotloading mod that does not support hotloading: [{loaded.NeosMod.Name}/{loaded.NeosMod.Version}]");
+                    }
                     // if loading succeeded, then we need to register the mod
                     RegisterMod(loaded);
                     return loaded.FinishedLoading? loaded : null;
@@ -229,13 +240,21 @@ namespace NeosModLoader
             }
         }
 
-        private static void HookMod(LoadedNeosMod mod)
+        private static void HookMod(LoadedNeosMod mod, bool atStartup)
         {
             SplashChanger.SetCustom($"Starting mod [{mod.NeosMod.Name}/{mod.NeosMod.Version}]");
             Logger.DebugFuncInternal(() => $"calling OnEngineInit() for [{mod.NeosMod.Name}]");
             try
             {
-                mod.NeosMod.OnEngineInit();
+                // check if the mod supports OnInit()
+                if (mod.NeosMod.SupportsHotloading())
+                {
+                    mod.NeosMod.OnInit(atStartup);
+                }
+                else
+                {
+                    mod.NeosMod.OnEngineInit();
+                }
             }
             catch (Exception e)
             {
@@ -260,10 +279,10 @@ namespace NeosModLoader
             AssemblyFile? mod = AssemblyLoader.LoadAssemblyFile(path);
             if (mod != null)
             {
-                LoadedNeosMod? loadedMod = TryLoadMod(mod);
+                LoadedNeosMod? loadedMod = TryLoadMod(mod, false);
                 if (loadedMod != null)
                 {
-                    HookMod(loadedMod);
+                    HookMod(loadedMod, false);
 
                     // re-log potential conflicts
                     if (config.LogConflicts)
@@ -289,7 +308,7 @@ namespace NeosModLoader
         internal static void WatchModsDirectory()
         {
             ModLoaderConfiguration config = ModLoaderConfiguration.Get();
-            if (config.LateLoading)
+            if (config.Hotloading)
             {
                 modDirWatcher.Created += new FileSystemEventHandler(NewModFound);
                 modDirWatcher.IncludeSubdirectories = true;

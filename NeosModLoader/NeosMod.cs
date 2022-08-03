@@ -25,17 +25,19 @@ namespace NeosModLoader
         public static void Error(params object[] messages) => Logger.ErrorListExternal(messages);
 
         /// <summary>
-        /// Called once immediately after NeosModLoader begins execution
+        /// Is called to initialize older mods that don't support OnInit
         /// </summary>
         public virtual void OnEngineInit() { }
 
         /// <summary>
-        /// Called once when the mod is loaded at runtime and calls OnEngineInit() for backwards compatibility.
-        /// Can be overriden by a mod to achieve custom behavior.
+        /// Called once when the mod is loaded.
+        /// If a mod overrides this function, it signals to the modloader that it supports hotloading.
         /// </summary>
-        public void OnLateInit()
+        public virtual void OnInit(bool atStartup) { }
+
+        public bool SupportsHotloading()
         {
-            OnEngineInit();
+            return this.GetType().GetMethod("OnInit").DeclaringType != typeof(NeosMod);
         }
 
         /// <summary>

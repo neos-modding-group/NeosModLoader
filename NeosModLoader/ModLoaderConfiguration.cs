@@ -59,9 +59,13 @@ namespace NeosModLoader
                             {
                                 _configuration.LogConflicts = false;
                             }
-                            else if ("lateloading".Equals(key) && "false".Equals(value))
+                            else if ("hotloading".Equals(key) && "false".Equals(value))
                             {
-                                _configuration.LateLoading = false;
+                                _configuration.Hotloading = false;
+                            }
+                            else if ("hotloadunsupported".Equals(key) && "true".Equals(value))
+                            {
+                                _configuration.HotloadUnsupported = true;
                             }
                         }
                     }
@@ -100,6 +104,7 @@ namespace NeosModLoader
         public bool NoLibraries { get; private set; } = false;
         public bool AdvertiseVersion { get; private set; } = false;
         public bool LogConflicts { get; private set; } = true;
-        public bool LateLoading { get; private set; } = true;
+        public bool Hotloading { get; private set; } = true;
+        public bool HotloadUnsupported { get; private set; } = false;
     }
 }
