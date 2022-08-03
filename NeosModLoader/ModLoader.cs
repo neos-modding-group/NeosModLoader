@@ -263,7 +263,7 @@ namespace NeosModLoader
         }
 
         /// <summary>
-        /// Loads, initializes, registers and hooks a single mod at runtime.
+        /// Hotloads a single mod at runtime.
         /// Returns whether or not the mod was sucessfully loaded.
         /// </summary>
         /// <param name="path">The file path to the mod's .dll</param>
@@ -272,7 +272,7 @@ namespace NeosModLoader
             ModLoaderConfiguration config = ModLoaderConfiguration.Get();
             if (config.NoMods)
             {
-                Logger.DebugInternal("new mod was not loaded due to configuration file");
+                Logger.DebugInternal("Mod was not hotloaded due to configuration file");
                 return false;
             }
 
