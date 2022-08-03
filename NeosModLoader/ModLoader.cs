@@ -121,7 +121,7 @@ namespace NeosModLoader
                 {
                     // if loading succeeded, then we need to register the mod
                     RegisterMod(loaded);
-                    return loaded;
+                    return loaded.FinishedLoading? loaded : null;
                 }
             }
             catch (ReflectionTypeLoadException reflectionTypeLoadException)
@@ -244,7 +244,8 @@ namespace NeosModLoader
         }
 
         /// <summary>
-        /// Loads, initializes, registers and hooks a single mod at runtime
+        /// Loads, initializes, registers and hooks a single mod at runtime.
+        /// Returns whether or not the mod was sucessfully loaded.
         /// </summary>
         /// <param name="path">The file path to the mod's .dll</param>
         public static bool LoadAndInitializeNewMod(string path)
