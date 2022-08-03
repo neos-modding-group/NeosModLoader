@@ -250,6 +250,13 @@ namespace NeosModLoader
         /// <param name="path">The file path to the mod's .dll</param>
         public static bool LoadAndInitializeNewMod(string path)
         {
+            ModLoaderConfiguration config = ModLoaderConfiguration.Get();
+            if (config.NoMods)
+            {
+                Logger.DebugInternal("new mod was not loaded due to configuration file");
+                return false;
+            }
+
             AssemblyFile? mod = AssemblyLoader.LoadAssemblyFile(path);
             if (mod != null)
             {
@@ -259,26 +266,35 @@ namespace NeosModLoader
                     HookMod(loadedMod);
 
                     // re-log potential conflicts
-                    ModLoaderConfiguration config = ModLoaderConfiguration.Get();
                     if (config.LogConflicts)
                     {
                         logPotentialConflicts(config);
                     }
 
                     // display load success to the user
-                    FrooxEngine.LoadingIndicator.ShowMessage("Loaded New Mod", $"The mod '{loadedMod.Name}' has been loaded.");
+                    if (!config.HideVisuals)
+                    {
+                        FrooxEngine.LoadingIndicator.ShowMessage("Loaded New Mod", $"The mod '{loadedMod.Name}' has been loaded");
+                    }
                     return true;
                 }
             }
-            FrooxEngine.LoadingIndicator.ShowMessage("<color=#f00>Failed to Load Mod</color>", "<color=#f00>Check log for more info</color>");
+            if (!config.HideVisuals)
+            {
+                FrooxEngine.LoadingIndicator.ShowMessage("<color=#f00>Failed to Load Mod</color>", "<color=#f00>Check log for more info</color>");
+            }
             return false;
         }
 
         internal static void WatchModsDirectory()
         {
-            modDirWatcher.Created += new FileSystemEventHandler(NewModFound);
-            modDirWatcher.IncludeSubdirectories = true;
-            modDirWatcher.EnableRaisingEvents = true;
+            ModLoaderConfiguration config = ModLoaderConfiguration.Get();
+            if (config.LateLoading)
+            {
+                modDirWatcher.Created += new FileSystemEventHandler(NewModFound);
+                modDirWatcher.IncludeSubdirectories = true;
+                modDirWatcher.EnableRaisingEvents = true;
+            }
         }
 
         private static void NewModFound(object sender, FileSystemEventArgs e)
