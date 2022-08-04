@@ -48,7 +48,7 @@ namespace NeosModLoader
             Assembly assembly;
             try
             {
-                Logger.MsgInternal( $"load assembly {filename} with 256hash: {Util.GenerateSHA256(filepath)}");
+                Logger.MsgInternal( $"load assembly {filename} with sha256hash: {Util.GenerateSHA256(filepath)}");
                 assembly = Assembly.LoadFile(filepath);
             }
             catch (Exception e)
