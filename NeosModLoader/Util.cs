@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace NeosModLoader
 {
@@ -72,5 +74,15 @@ namespace NeosModLoader
         {
             return t.IsCompleted && !t.IsFaulted && !t.IsCanceled;
         }
+        
+        //credit to delta for this method https://github.com/XDelta/
+        internal static string GenerateSHA256(string filepath)
+        {
+            using var hasher = SHA256.Create();
+            using var stream = File.OpenRead(filepath);
+            var hash = hasher.ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", "");
+        }
+
     }
 }
