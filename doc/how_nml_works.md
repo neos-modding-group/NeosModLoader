@@ -1,6 +1,6 @@
 # Going Into Detail: How NeosModLoader Interfaces with Neos
 
-NeosModLoader with Neos in two main places: the hook and the compatibility hash.
+NeosModLoader interfaces with Neos in two main places: the hook and the compatibility hash.
 
 ## The Hook
 
