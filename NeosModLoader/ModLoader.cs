@@ -119,7 +119,7 @@ namespace NeosModLoader
                 LoadedNeosMod? loaded = InitializeMod(mod);
                 if (loaded != null)
                 {
-                    if (!atStartup && !loaded.NeosMod.SupportsHotloading())
+                    if (!atStartup && !loaded.NeosMod.SupportsNewOnInit())
                     {
                         // trying to hotload a mod that doesn't support it
                         ModLoaderConfiguration config = ModLoaderConfiguration.Get();
@@ -247,7 +247,7 @@ namespace NeosModLoader
             try
             {
                 // check if the mod supports OnInit()
-                if (mod.NeosMod.SupportsHotloading())
+                if (mod.NeosMod.SupportsNewOnInit())
                 {
                     mod.NeosMod.OnInit(atStartup);
                 }

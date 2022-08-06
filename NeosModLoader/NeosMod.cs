@@ -35,7 +35,7 @@ namespace NeosModLoader
         /// </summary>
         public virtual void OnInit(bool atStartup) { }
 
-        public bool SupportsHotloading()
+        public bool SupportsNewOnInit()
         {
             return this.GetType().GetMethod("OnInit").DeclaringType != typeof(NeosMod);
         }
