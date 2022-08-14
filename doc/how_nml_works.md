@@ -1,6 +1,6 @@
 # Going Into Detail: How NeosModLoader Interfaces with Neos
 
-NeosModLoader only interfaces with Neos in two places: the hook and the compatibility hash.
+NeosModLoader interfaces with Neos in two main places: the hook and the compatibility hash.
 
 ## The Hook
 
@@ -32,3 +32,8 @@ In order to make a client using NeosModLoader compatible with vanilla Neos the c
 [components]: https://wiki.neos.com/Component
 [logix]: https://wiki.neos.com/LogiX
 [data model]: https://wiki.neos.com/Core_Concepts#Data_Model
+
+## Other Minor Ways NeosModLoader Interfaces with Neos
+
+- Hooking into the splash screen to show mod loading progress
+- Hooking into Neos shutdown to trigger one last mod configuration save
