@@ -9,12 +9,14 @@ nomods=false
 
 Not all keys are required to be present. Missing keys will use the defaults outlined below:
 
-| Configuration      | Default | Description |
-| ------------------ | ------- | ----------- |
-| `debug`            | `false` | If `true`, NeosMod.Debug() logs will appear in your log file. Otherwise, they are hidden. |
-| `hidevisuals`      | `false` | If `true`, NML won't show a loading indicator on the splash screen. |
-| `nomods`           | `false` | If `true`, mods will not be loaded from `nml_mods`. |
-| `nolibraries`      | `false` | If `true`, extra libraries from `nml_libs` will not be loaded. |
-| `advertiseversion` | `false` | If `false`, your version will be spoofed and will resemble `2021.8.29.1240`. If `true`, your version will be left unaltered and will resemble `2021.8.29.1240+NeosModLoader.dll`. This version string is visible to other players under certain circumstances. |
-| `unsafe`           | `false` | If `true`, the version spoofing safety check is disabled and it will still work even if you have other Neos plugins. DO NOT load plugin components in multiplayer sessions, as it will break things and cause crashes. Plugin components should only be used in your local home or user space. |
-| `logconflicts`     | `true`  | If `false`, conflict logging will be disabled. If `true`, potential mod conflicts will be logged. If `debug` is also `true` this will be more verbose. |
+| Configuration        | Default | Description |
+| -------------------- | ------- | ----------- |
+| `debug`              | `false` | If `true`, NeosMod.Debug() logs will appear in your log file. Otherwise, they are hidden. |
+| `hidevisuals`        | `false` | If `true`, NML won't show a loading indicator on the splash screen and won't show a loading indicator for mods loaded while the game is running. |
+| `nomods`             | `false` | If `true`, mods will not be loaded from `nml_mods`. |
+| `nolibraries`        | `false` | If `true`, extra libraries from `nml_libs` will not be loaded. |
+| `advertiseversion`   | `false` | If `false`, your version will be spoofed and will resemble `2021.8.29.1240`. If `true`, your version will be left unaltered and will resemble `2021.8.29.1240+NeosModLoader.dll`. This version string is visible to other players under certain circumstances. |
+| `unsafe`             | `false` | If `true`, the version spoofing safety check is disabled and it will still work even if you have other Neos plugins. DO NOT load plugin components in multiplayer sessions, as it will break things and cause crashes. Plugin components should only be used in your local home or user space. |
+| `logconflicts`       | `true`  | If `false`, conflict logging will be disabled. If `true`, potential mod conflicts will be logged. If `debug` is also `true` this will be more verbose. |
+| `hotloading`         | `true`  | If `true`, NML will watch `nml_mods` while the game is running and load any new mods that appear. (except if `nomods` is also `true`) |
+| `hotloadunsupported` | `false` | If `true`, NML will hotload mods even if they do not explicitly support it. |

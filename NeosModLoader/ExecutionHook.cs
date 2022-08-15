@@ -28,6 +28,7 @@ namespace NeosModLoader
                 SplashChanger.SetCustom("Initializing");
                 DebugInfo.Log();
                 NeosVersionReset.Initialize();
+                ModLoader.WatchModsDirectory();
                 ModLoader.LoadMods();
                 SplashChanger.SetCustom("Loaded");
             }
