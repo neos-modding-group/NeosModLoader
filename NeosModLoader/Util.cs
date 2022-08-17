@@ -74,7 +74,7 @@ namespace NeosModLoader
         {
             return t.IsCompleted && !t.IsFaulted && !t.IsCanceled;
         }
-        
+
         //credit to delta for this method https://github.com/XDelta/
         internal static string GenerateSHA256(string filepath)
         {

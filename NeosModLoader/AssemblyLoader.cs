@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -82,7 +82,7 @@ namespace NeosModLoader
                     }
                     catch (Exception e)
                     {
-                        Logger.ErrorInternal($"Unexpected exception loading assembly from {assemblyFilepath}{(sha256==string.Empty?"":$"({sha256})")}:\n{e}");
+                        Logger.ErrorInternal($"Unexpected exception loading assembly from {assemblyFilepath}{(sha256 == string.Empty ? "" : $"({sha256})")}:\n{e}");
                     }
                 }
             }
