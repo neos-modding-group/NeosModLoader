@@ -23,4 +23,4 @@ jobs:
       - name: build
         run: dotnet build ./NeosModLoader.sln
       - name: lint
-        run: dotnet format --verbosity detailed --verify-no-changes --include-generated ./NeosModLoader.sln
+        run: dotnet format --verbosity detailed --verify-no-changes ./NeosModLoader.sln
