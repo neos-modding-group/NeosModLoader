@@ -16,7 +16,7 @@ namespace NeosModLoader
             string[]? assembliesToLoad = null;
             try
             {
-                assembliesToLoad = Directory.GetFiles(assembliesDirectory, "*.dll");
+                assembliesToLoad = Directory.GetFiles(assembliesDirectory, "*.dll", SearchOption.AllDirectories);
                 Array.Sort(assembliesToLoad, (a, b) => string.CompareOrdinal(a, b));
             }
             catch (Exception e)
@@ -86,7 +86,6 @@ namespace NeosModLoader
                     }
                 }
             }
-
             return assemblyFiles.ToArray();
         }
     }

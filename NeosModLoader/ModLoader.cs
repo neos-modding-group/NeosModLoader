@@ -201,7 +201,7 @@ namespace NeosModLoader
                 }
                 if (neosMod == null)
                 {
-                    Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.asm.File}");
+                    Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.File}");
                     return null;
                 }
                 SplashChanger.SetCustom($"Loading configuration for [{neosMod.Name}/{neosMod.Version}]");
