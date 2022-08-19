@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -201,7 +201,7 @@ namespace NeosModLoader
                 }
                 if (neosMod == null)
                 {
-                    Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.File}");
+                    Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.asm.File}");
                     return null;
                 }
                 SplashChanger.SetCustom($"Loading configuration for [{neosMod.Name}/{neosMod.Version}]");
