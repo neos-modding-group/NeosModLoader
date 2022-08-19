@@ -1,4 +1,4 @@
-using FrooxEngine;
+﻿using FrooxEngine;
 using System;
 using System.Linq;
 
@@ -18,10 +18,10 @@ namespace NeosModLoader
       try
       {
         SplashChanger.SetCustom("Loading libraries");
-        AssemblyFileWithHash[] loadedAssemblies = AssemblyLoader.LoadAssembliesFromDir("nml_libs");
+        AssemblyFile[] loadedAssemblies = AssemblyLoader.LoadAssembliesFromDir("nml_libs");
         if (loadedAssemblies.Length != 0)
         {
-          string loadedAssemblyList = string.Join("\n", loadedAssemblies.Select(a => a.asm.Assembly.FullName+" Sha256="+a.sha256));
+          string loadedAssemblyList = string.Join("\n", loadedAssemblies.Select(a => a.Assembly.FullName+" Sha256="+a.Sha256));
           Logger.MsgInternal($"Loaded libraries from nml_libs:\n{loadedAssemblyList}");
         }
 

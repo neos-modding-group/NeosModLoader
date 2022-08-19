@@ -64,39 +64,27 @@ namespace NeosModLoader
             return assembly;
         }
 
-        internal static AssemblyFileWithHash[] LoadAssembliesFromDir(string dirName)
+        internal static AssemblyFile[] LoadAssembliesFromDir(string dirName)
         {
-            List<AssemblyFileWithHash> assemblyFiles = new();
+            List<AssemblyFile> assemblyFiles = new();
             if (GetAssemblyPathsFromDir(dirName) is string[] assemblyPaths)
             {
                 foreach (string assemblyFilepath in assemblyPaths)
                 {
-                    string sha256 = string.Empty;
                     try
                     {
-                        sha256 = Util.GenerateSHA256(assemblyFilepath);
                         if (LoadAssembly(assemblyFilepath) is Assembly assembly)
                         {
-                            assemblyFiles.Add(new AssemblyFileWithHash(sha256, new AssemblyFile(assemblyFilepath, assembly)));
+                            assemblyFiles.Add(new AssemblyFile(assemblyFilepath, assembly));
                         }
                     }
                     catch (Exception e)
                     {
-                        Logger.ErrorInternal($"Unexpected exception loading assembly from {assemblyFilepath}{(sha256 == string.Empty ? "" : $"({sha256})")}:\n{e}");
+                        Logger.ErrorInternal($"Unexpected exception loading assembly from {assemblyFilepath}:\n{e}");
                     }
                 }
             }
             return assemblyFiles.ToArray();
-        }
-    }
-    internal struct AssemblyFileWithHash
-    {
-        public string sha256;
-        public AssemblyFile asm;
-        public AssemblyFileWithHash(string sha256, AssemblyFile asm)
-        {
-            this.sha256 = sha256;
-            this.asm = asm;
         }
     }
 }

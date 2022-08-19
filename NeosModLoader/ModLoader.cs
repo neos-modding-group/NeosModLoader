@@ -42,8 +42,8 @@ namespace NeosModLoader
             SplashChanger.SetCustom("Looking for mods");
 
             // generate list of assemblies to load
-            AssemblyFileWithHash[] modsToLoad;
-            if (AssemblyLoader.LoadAssembliesFromDir("nml_mods") is AssemblyFileWithHash[] arr)
+            AssemblyFile[] modsToLoad;
+            if (AssemblyLoader.LoadAssembliesFromDir("nml_mods") is AssemblyFile[] arr)
             {
                 modsToLoad = arr;
             }
@@ -55,7 +55,7 @@ namespace NeosModLoader
             ModConfiguration.EnsureDirectoryExists();
 
             // call Initialize() each mod
-            foreach (AssemblyFileWithHash mod in modsToLoad)
+            foreach (AssemblyFile mod in modsToLoad)
             {
                 try
                 {
@@ -83,11 +83,11 @@ namespace NeosModLoader
                             }
                         }
                     }
-                    Logger.ErrorInternal($"ReflectionTypeLoadException initializing mod from {mod.asm.File}:\n{sb}");
+                    Logger.ErrorInternal($"ReflectionTypeLoadException initializing mod from {mod.File}:\n{sb}");
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorInternal($"Unexpected exception initializing mod from {mod.asm.File}:\n{e}");
+                    Logger.ErrorInternal($"Unexpected exception initializing mod from {mod.File}:\n{e}");
                 }
             }
 
@@ -168,22 +168,22 @@ namespace NeosModLoader
         }
 
         // loads mod class and mod config
-        private static LoadedNeosMod? InitializeMod(AssemblyFileWithHash mod)
+        private static LoadedNeosMod? InitializeMod(AssemblyFile mod)
         {
-            if (mod.asm.Assembly == null)
+            if (mod.Assembly == null)
             {
                 return null;
             }
 
-            Type[] modClasses = mod.asm.Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && NEOS_MOD_TYPE.IsAssignableFrom(t)).ToArray();
+            Type[] modClasses = mod.Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && NEOS_MOD_TYPE.IsAssignableFrom(t)).ToArray();
             if (modClasses.Length == 0)
             {
-                Logger.ErrorInternal($"no mods found in {mod.asm.File}");
+                Logger.ErrorInternal($"no mods found in {mod.File}");
                 return null;
             }
             else if (modClasses.Length != 1)
             {
-                Logger.ErrorInternal($"more than one mod found in {mod.asm.File}. no mods will be loaded.");
+                Logger.ErrorInternal($"more than one mod found in {mod.File}. no mods will be loaded.");
                 return null;
             }
             else
@@ -196,18 +196,18 @@ namespace NeosModLoader
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorInternal($"error instantiating mod {modClass.FullName} from {mod.asm.File}:\n{e}");
+                    Logger.ErrorInternal($"error instantiating mod {modClass.FullName} from {mod.File}:\n{e}");
                     return null;
                 }
                 if (neosMod == null)
                 {
-                    Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.asm.File}");
+                    Logger.ErrorInternal($"unexpected null instantiating mod {modClass.FullName} from {mod.File}");
                     return null;
                 }
                 SplashChanger.SetCustom($"Loading configuration for [{neosMod.Name}/{neosMod.Version}]");
 
-                LoadedNeosMod loadedMod = new(neosMod, mod.asm);
-                Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.asm.File)}) by {neosMod.Author} with 256hash: {mod.sha256}");
+                LoadedNeosMod loadedMod = new(neosMod, mod);
+                Logger.MsgInternal($"loaded mod [{neosMod.Name}/{neosMod.Version}] ({Path.GetFileName(mod.File)}) by {neosMod.Author} with 256hash: {mod.Sha256}");
                 loadedMod.ModConfiguration = ModConfiguration.LoadConfigForMod(loadedMod);
                 return loadedMod;
             }
