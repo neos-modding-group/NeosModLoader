@@ -27,6 +27,7 @@ Yes, so long as Neos's [Mod & Plugin Policy] is followed.
 ## Will people know I'm using mods?
 
 - By default, NeosModLoader does not do anything identifiable over the network. You will appear to be running the vanilla Neos version to any component that shows your version strings or compatibility hash.
+- It is still technically possible for a user to determine if you are running NeosModLoader or a specific mod. This is done through type-checking, where an impulse originating from your user evaluates whether the NeosMod type or any mod-specific type exists. Since the impulse is evaluated on your machine and writes the result of the check over the network, it can reveal certain details about your game's configuration. 
 - If you are running other plugins, they will alter your version strings and compatibility hash.
 - NeosModLoader logs to the same log file Neos uses. If you send your logs to anyone it will be obvious that you are using a plugin. This is intended.
 - NeosModLoader mods may have effects visible to other users, depending on the mod.
