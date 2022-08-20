@@ -30,10 +30,10 @@ namespace NeosModLoader
       string assemblyFilename = Path.GetFileName(Assembly.GetExecutingAssembly().Location);
       bool nmlPresent = extraAssemblies.Remove(assemblyFilename);
 
-      if (!nmlPresent)
-      {
-        throw new Exception($"Assertion failed: Engine.ExtraAssemblies did not contain \"{assemblyFilename}\"");
-      }
+			if (!nmlPresent)
+			{
+				throw new Exception($"Assertion failed: Engine.ExtraAssemblies did not contain \"{assemblyFilename}\"");
+			}
 
       // get all PostX'd assemblies. This is useful, as plugins can't NOT be PostX'd.
       Assembly[] postxedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
@@ -133,8 +133,8 @@ namespace NeosModLoader
         return;
       }
 
-      Logger.MsgInternal("Compatibility hash spoofing succeeded");
-    }
+			Logger.MsgInternal("Compatibility hash spoofing succeeded");
+		}
 
     private static bool IsPostXProcessed(Assembly assembly)
     {
@@ -198,25 +198,25 @@ namespace NeosModLoader
       return Convert.ToBase64String(hash);
     }
 
-    private static bool SetCompatibilityHash(Engine engine, string Target)
-    {
-      // This is super sketchy and liable to break with new compiler versions.
-      // I have a good reason for doing it though... if I just called the setter it would recursively
-      // end up calling itself, because I'm HOOKINGthe CompatibilityHash setter.
-      FieldInfo field = AccessTools.DeclaredField(typeof(Engine), $"<{nameof(Engine.CompatibilityHash)}>k__BackingField");
+		private static bool SetCompatibilityHash(Engine engine, string Target)
+		{
+			// This is super sketchy and liable to break with new compiler versions.
+			// I have a good reason for doing it though... if I just called the setter it would recursively
+			// end up calling itself, because I'm HOOKINGthe CompatibilityHash setter.
+			FieldInfo field = AccessTools.DeclaredField(typeof(Engine), $"<{nameof(Engine.CompatibilityHash)}>k__BackingField");
 
-      if (field == null)
-      {
-        Logger.WarnInternal("Unable to write Engine.CompatibilityHash");
-        return false;
-      }
-      else
-      {
-        Logger.DebugFuncInternal(() => $"Changing compatibility hash from {engine.CompatibilityHash} to {Target}");
-        field.SetValue(engine, Target);
-        return true;
-      }
-    }
+			if (field == null)
+			{
+				Logger.WarnInternal("Unable to write Engine.CompatibilityHash");
+				return false;
+			}
+			else
+			{
+				Logger.DebugFuncInternal(() => $"Changing compatibility hash from {engine.CompatibilityHash} to {Target}");
+				field.SetValue(engine, Target);
+				return true;
+			}
+		}
 
     private static bool SpoofVersionString(Engine engine, string originalVersionString)
     {
@@ -233,62 +233,62 @@ namespace NeosModLoader
       return true;
     }
 
-    // perform incredible bullshit to rip the hardcoded protocol version out of the dang IL
-    private static int? GetVanillaProtocolVersion()
-    {
-      // raw IL immediately surrounding the number we need to find, which in this example is 770
-      // ldc.i4       770
-      // call         unsigned int8[] [mscorlib]System.BitConverter::GetBytes(int32)
+		// perform incredible bullshit to rip the hardcoded protocol version out of the dang IL
+		private static int? GetVanillaProtocolVersion()
+		{
+			// raw IL immediately surrounding the number we need to find, which in this example is 770
+			// ldc.i4       770
+			// call         unsigned int8[] [mscorlib]System.BitConverter::GetBytes(int32)
 
-      // we're going to search for that method call, then grab the operand of the ldc.i4 that precedes it
+			// we're going to search for that method call, then grab the operand of the ldc.i4 that precedes it
 
-      MethodInfo targetCallee = AccessTools.DeclaredMethod(typeof(BitConverter), nameof(BitConverter.GetBytes), new Type[] { typeof(int) });
-      if (targetCallee == null)
-      {
-        Logger.ErrorInternal("Could not find System.BitConverter::GetBytes(System.Int32)");
-        return null;
-      }
+			MethodInfo targetCallee = AccessTools.DeclaredMethod(typeof(BitConverter), nameof(BitConverter.GetBytes), new Type[] { typeof(int) });
+			if (targetCallee == null)
+			{
+				Logger.ErrorInternal("Could not find System.BitConverter::GetBytes(System.Int32)");
+				return null;
+			}
 
-      MethodInfo initializeShim = AccessTools.DeclaredMethod(typeof(Engine), nameof(Engine.Initialize));
-      if (initializeShim == null)
-      {
-        Logger.ErrorInternal("Could not find Engine.Initialize(*)");
-        return null;
-      }
+			MethodInfo initializeShim = AccessTools.DeclaredMethod(typeof(Engine), nameof(Engine.Initialize));
+			if (initializeShim == null)
+			{
+				Logger.ErrorInternal("Could not find Engine.Initialize(*)");
+				return null;
+			}
 
-      AsyncStateMachineAttribute asyncAttribute = (AsyncStateMachineAttribute)initializeShim.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
-      if (asyncAttribute == null)
-      {
-        Logger.ErrorInternal("Could not find AsyncStateMachine for Engine.Initialize");
-        return null;
-      }
+			AsyncStateMachineAttribute asyncAttribute = (AsyncStateMachineAttribute)initializeShim.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
+			if (asyncAttribute == null)
+			{
+				Logger.ErrorInternal("Could not find AsyncStateMachine for Engine.Initialize");
+				return null;
+			}
 
-      // async methods are weird. Their body is just some setup code that passes execution... elsewhere.
-      // The compiler generates a companion type for async methods. This companion type has some ridiculous nondeterministic name, but luckily
-      // we can just ask this attribute what the type is. The companion type should have a MoveNext() method that contains the actual IL we need.
-      Type asyncStateMachineType = asyncAttribute.StateMachineType;
-      MethodInfo initializeImpl = AccessTools.DeclaredMethod(asyncStateMachineType, "MoveNext");
-      if (initializeImpl == null)
-      {
-        Logger.ErrorInternal("Could not find MoveNext method for Engine.Initialize");
-        return null;
-      }
+			// async methods are weird. Their body is just some setup code that passes execution... elsewhere.
+			// The compiler generates a companion type for async methods. This companion type has some ridiculous nondeterministic name, but luckily
+			// we can just ask this attribute what the type is. The companion type should have a MoveNext() method that contains the actual IL we need.
+			Type asyncStateMachineType = asyncAttribute.StateMachineType;
+			MethodInfo initializeImpl = AccessTools.DeclaredMethod(asyncStateMachineType, "MoveNext");
+			if (initializeImpl == null)
+			{
+				Logger.ErrorInternal("Could not find MoveNext method for Engine.Initialize");
+				return null;
+			}
 
-      List<CodeInstruction> instructions = PatchProcessor.GetOriginalInstructions(initializeImpl);
-      for (int i = 1; i < instructions.Count; i++)
-      {
-        if (instructions[i].Calls(targetCallee))
-        {
-          // we're guaranteed to have a previous instruction because we began iteration from 1
-          CodeInstruction previous = instructions[i - 1];
-          if (OpCodes.Ldc_I4.Equals(previous.opcode))
-          {
-            return (int)previous.operand;
-          }
-        }
-      }
+			List<CodeInstruction> instructions = PatchProcessor.GetOriginalInstructions(initializeImpl);
+			for (int i = 1; i < instructions.Count; i++)
+			{
+				if (instructions[i].Calls(targetCallee))
+				{
+					// we're guaranteed to have a previous instruction because we began iteration from 1
+					CodeInstruction previous = instructions[i - 1];
+					if (OpCodes.Ldc_I4.Equals(previous.opcode))
+					{
+						return (int)previous.operand;
+					}
+				}
+			}
 
-      return null;
-    }
-  }
+			return null;
+		}
+	}
 }
