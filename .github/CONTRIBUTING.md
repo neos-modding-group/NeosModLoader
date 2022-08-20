@@ -12,21 +12,7 @@ If you want your PR to be approved and merged quickly, please read the following
 
 ### Code Style
 
-If your PR does not follow the project's code style it **will not be approved**. I expect contributors to be capable of fixing code style issues on their own.
-
-Code style should match Microsoft convention. If you aren't sure, run Analyze > Code Cleanup on the file using Visual Studio.
-
-#### Whitespace
-
-- *.cs files
-  - Lines MUST be indented using four spaces. Tabs are not acceptable.
-  - MUST use unix-style (LF) line endings. CR or CRLF are not acceptable.
-- *.sln files: use the Visual Studio defaults
-  - indent using tabs
-  - CRLF line endings
-- *.csproj files: use the Visual Studio defaults
-  - indent using two spaces
-  - CRLF line endings
+If your PR does not follow the project's code style it **will not be approved**. Code style should match our [editor config](../.editorconfig). If you aren't sure, use your IDE's formatter (Analyze > Code Cleanup in Visual Studio).
 
 ### New Features
 
