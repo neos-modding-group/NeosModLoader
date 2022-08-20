@@ -14,18 +14,6 @@ If you want your PR to be approved and merged quickly, please read the following
 
 If your PR does not follow the project's code style it **will not be approved**. Code style should match our [editor config](../.editorconfig). If you aren't sure, use your IDE's formatter (Analyze > Code Cleanup in Visual Studio).
 
-#### Whitespace
-
-- *.cs files
-  - Lines MUST be indented using two spaces. Tabs are not acceptable.
-  - MUST use unix-style (LF) line endings. CR or CRLF are not acceptable.
-- *.sln files
-  - indent using two spaces
-  - CRLF line endings
-- *.csproj files
-  - indent using two spaces
-  - CRLF line endings
-
 ### New Features
 
 Please consider the NML [design goals](#design-goals) before adding a new feature. If you aren't sure if your new feature makes sense for NML, I'm happy to talk with you about a potential new feature in our [discussions area](https://github.com/zkxs/NeosModLoader/discussions).
