@@ -1,10 +1,10 @@
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Diagnostics;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace NeosModLoader
 {
