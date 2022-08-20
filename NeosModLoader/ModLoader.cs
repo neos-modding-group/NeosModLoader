@@ -8,17 +8,17 @@ using System.Text;
 
 namespace NeosModLoader
 {
-  public class ModLoader
-  {
-    internal const string VERSION_CONSTANT = "1.12.0";
-    /// <summary>
-    /// NeosModLoader's version
-    /// </summary>
-    public static readonly string VERSION = VERSION_CONSTANT;
-    private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
-    private static readonly List<LoadedNeosMod> LoadedMods = new(); // used for mod enumeration
-    internal static readonly Dictionary<Assembly, NeosMod> AssemblyLookupMap = new(); // used for logging
-    private static readonly Dictionary<string, LoadedNeosMod> ModNameLookupMap = new(); // used for duplicate mod checking
+	public class ModLoader
+	{
+		internal const string VERSION_CONSTANT = "1.12.0";
+		/// <summary>
+		/// NeosModLoader's version
+		/// </summary>
+		public static readonly string VERSION = VERSION_CONSTANT;
+		private static readonly Type NEOS_MOD_TYPE = typeof(NeosMod);
+		private static readonly List<LoadedNeosMod> LoadedMods = new(); // used for mod enumeration
+		internal static readonly Dictionary<Assembly, NeosMod> AssemblyLookupMap = new(); // used for logging
+		private static readonly Dictionary<string, LoadedNeosMod> ModNameLookupMap = new(); // used for duplicate mod checking
 
 		/// <summary>
 		/// Allows reading metadata for all loaded mods

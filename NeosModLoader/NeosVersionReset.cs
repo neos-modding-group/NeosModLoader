@@ -13,190 +13,190 @@ using System.Security.Cryptography;
 
 namespace NeosModLoader
 {
-  internal class NeosVersionReset
-  {
-    // used when AdvertiseVersion == true
-    private const string NEOS_MOD_LOADER = "NeosModLoader.dll";
+	internal class NeosVersionReset
+	{
+		// used when AdvertiseVersion == true
+		private const string NEOS_MOD_LOADER = "NeosModLoader.dll";
 
-    internal static void Initialize()
-    {
-      ModLoaderConfiguration config = ModLoaderConfiguration.Get();
-      Engine engine = Engine.Current;
+		internal static void Initialize()
+		{
+			ModLoaderConfiguration config = ModLoaderConfiguration.Get();
+			Engine engine = Engine.Current;
 
-      // get the version string before we mess with it
-      string originalVersionString = engine.VersionString;
+			// get the version string before we mess with it
+			string originalVersionString = engine.VersionString;
 
-      List<string> extraAssemblies = Engine.ExtraAssemblies;
-      string assemblyFilename = Path.GetFileName(Assembly.GetExecutingAssembly().Location);
-      bool nmlPresent = extraAssemblies.Remove(assemblyFilename);
+			List<string> extraAssemblies = Engine.ExtraAssemblies;
+			string assemblyFilename = Path.GetFileName(Assembly.GetExecutingAssembly().Location);
+			bool nmlPresent = extraAssemblies.Remove(assemblyFilename);
 
 			if (!nmlPresent)
 			{
 				throw new Exception($"Assertion failed: Engine.ExtraAssemblies did not contain \"{assemblyFilename}\"");
 			}
 
-      // get all PostX'd assemblies. This is useful, as plugins can't NOT be PostX'd.
-      Assembly[] postxedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-          .Where(IsPostXProcessed)
-          .ToArray();
+			// get all PostX'd assemblies. This is useful, as plugins can't NOT be PostX'd.
+			Assembly[] postxedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+				.Where(IsPostXProcessed)
+				.ToArray();
 
-      string potentialPlugins = postxedAssemblies
-          .Select(a => Path.GetFileName(a.Location))
-          .Join(delimiter: ", ");
+			string potentialPlugins = postxedAssemblies
+				.Select(a => Path.GetFileName(a.Location))
+				.Join(delimiter: ", ");
 
-      Logger.DebugFuncInternal(() => $"Found {postxedAssemblies.Length} potential plugins: {potentialPlugins}");
+			Logger.DebugFuncInternal(() => $"Found {postxedAssemblies.Length} potential plugins: {potentialPlugins}");
 
-      HashSet<Assembly> expectedPostXAssemblies = GetExpectedPostXAssemblies();
+			HashSet<Assembly> expectedPostXAssemblies = GetExpectedPostXAssemblies();
 
-      // attempt to map the PostX'd assemblies to Neos's plugin list
-      Dictionary<string, Assembly> plugins = new Dictionary<string, Assembly>(postxedAssemblies.Length);
-      Assembly[] unmatchedAssemblies = postxedAssemblies
-          .Where(assembly =>
-          {
-            string filename = Path.GetFileName(assembly.Location);
-            if (extraAssemblies.Contains(filename))
-            {
-              // okay, the assembly's filename is in the plugin list. It's probably a plugin.
-              plugins.Add(filename, assembly);
-              return false;
-            }
-            else
-            {
-              // remove certain expected assemblies from the "unmatchedAssemblies" naughty list
-              return !expectedPostXAssemblies.Contains(assembly);
-            }
-          })
-          .ToArray();
+			// attempt to map the PostX'd assemblies to Neos's plugin list
+			Dictionary<string, Assembly> plugins = new Dictionary<string, Assembly>(postxedAssemblies.Length);
+			Assembly[] unmatchedAssemblies = postxedAssemblies
+				.Where(assembly =>
+				{
+					string filename = Path.GetFileName(assembly.Location);
+					if (extraAssemblies.Contains(filename))
+					{
+						// okay, the assembly's filename is in the plugin list. It's probably a plugin.
+						plugins.Add(filename, assembly);
+						return false;
+					}
+					else
+					{
+						// remove certain expected assemblies from the "unmatchedAssemblies" naughty list
+						return !expectedPostXAssemblies.Contains(assembly);
+					}
+				})
+				.ToArray();
 
-      string actualPlugins = plugins.Keys.Join(delimiter: ", ");
-      Logger.DebugFuncInternal(() => $"Found {plugins.Count} actual plugins: {actualPlugins}");
+			string actualPlugins = plugins.Keys.Join(delimiter: ", ");
+			Logger.DebugFuncInternal(() => $"Found {plugins.Count} actual plugins: {actualPlugins}");
 
-      // warn about the assemblies we couldn't map to plugins
-      foreach (Assembly assembly in unmatchedAssemblies)
-      {
-        Logger.WarnInternal($"Unexpected PostX'd assembly: \"{assembly.Location}\". If this is a plugin, then my plugin-detection code is faulty.");
-      }
+			// warn about the assemblies we couldn't map to plugins
+			foreach (Assembly assembly in unmatchedAssemblies)
+			{
+				Logger.WarnInternal($"Unexpected PostX'd assembly: \"{assembly.Location}\". If this is a plugin, then my plugin-detection code is faulty.");
+			}
 
-      // warn about the plugins we couldn't map to assemblies
-      HashSet<string> unmatchedPlugins = new(extraAssemblies);
-      unmatchedPlugins.ExceptWith(plugins.Keys); // remove all matched plugins
-      foreach (string plugin in unmatchedPlugins)
-      {
-        Logger.ErrorInternal($"Unmatched plugin: \"{plugin}\". NML could not find the assembly for this plugin, therefore NML cannot properly calculate the compatibility hash.");
-      }
+			// warn about the plugins we couldn't map to assemblies
+			HashSet<string> unmatchedPlugins = new(extraAssemblies);
+			unmatchedPlugins.ExceptWith(plugins.Keys); // remove all matched plugins
+			foreach (string plugin in unmatchedPlugins)
+			{
+				Logger.ErrorInternal($"Unmatched plugin: \"{plugin}\". NML could not find the assembly for this plugin, therefore NML cannot properly calculate the compatibility hash.");
+			}
 
-      // flags used later to determine how to spoof
-      bool includePluginsInHash = true;
+			// flags used later to determine how to spoof
+			bool includePluginsInHash = true;
 
-      // if unsafe is true, we should pretend there are no plugins and spoof everything
-      if (config.Unsafe)
-      {
-        if (!config.AdvertiseVersion)
-        {
-          extraAssemblies.Clear();
-        }
-        includePluginsInHash = false;
-        Logger.WarnInternal("Unsafe mode is enabled! Not that you had a warranty, but now it's DOUBLE void!");
-      }
-      // else if unmatched plugins are present, we should not spoof anything
-      else if (unmatchedPlugins.Count != 0)
-      {
-        Logger.ErrorInternal("Version spoofing was not performed due to some plugins having missing assemblies.");
-        return;
-      }
-      // else we should spoof normally
+			// if unsafe is true, we should pretend there are no plugins and spoof everything
+			if (config.Unsafe)
+			{
+				if (!config.AdvertiseVersion)
+				{
+					extraAssemblies.Clear();
+				}
+				includePluginsInHash = false;
+				Logger.WarnInternal("Unsafe mode is enabled! Not that you had a warranty, but now it's DOUBLE void!");
+			}
+			// else if unmatched plugins are present, we should not spoof anything
+			else if (unmatchedPlugins.Count != 0)
+			{
+				Logger.ErrorInternal("Version spoofing was not performed due to some plugins having missing assemblies.");
+				return;
+			}
+			// else we should spoof normally
 
 
-      // get plugin assemblies sorted in the same order Neos sorted them.
-      List<Assembly> sortedPlugins = extraAssemblies
-          .Select(path => plugins[path])
-          .ToList();
+			// get plugin assemblies sorted in the same order Neos sorted them.
+			List<Assembly> sortedPlugins = extraAssemblies
+				.Select(path => plugins[path])
+				.ToList();
 
-      if (config.AdvertiseVersion)
-      {
-        // put NML back in the version string
-        Logger.MsgInternal($"Adding {NEOS_MOD_LOADER} to version string because you have AdvertiseVersion set to true.");
-        extraAssemblies.Insert(0, NEOS_MOD_LOADER);
-      }
+			if (config.AdvertiseVersion)
+			{
+				// put NML back in the version string
+				Logger.MsgInternal($"Adding {NEOS_MOD_LOADER} to version string because you have AdvertiseVersion set to true.");
+				extraAssemblies.Insert(0, NEOS_MOD_LOADER);
+			}
 
-      // we intentionally attempt to set the version string first, so if it fails the compatibilty hash is left on the original value
-      // this is to prevent the case where a player simply doesn't know their version string is wrong
-      if (!SpoofVersionString(engine, originalVersionString))
-      {
-        Logger.WarnInternal("Version string spoofing failed");
-        return;
-      }
+			// we intentionally attempt to set the version string first, so if it fails the compatibilty hash is left on the original value
+			// this is to prevent the case where a player simply doesn't know their version string is wrong
+			if (!SpoofVersionString(engine, originalVersionString))
+			{
+				Logger.WarnInternal("Version string spoofing failed");
+				return;
+			}
 
-      if (!SpoofCompatibilityHash(engine, sortedPlugins, includePluginsInHash))
-      {
-        Logger.WarnInternal("Compatibility hash spoofing failed");
-        return;
-      }
+			if (!SpoofCompatibilityHash(engine, sortedPlugins, includePluginsInHash))
+			{
+				Logger.WarnInternal("Compatibility hash spoofing failed");
+				return;
+			}
 
 			Logger.MsgInternal("Compatibility hash spoofing succeeded");
 		}
 
-    private static bool IsPostXProcessed(Assembly assembly)
-    {
-      return assembly.Modules // in practice there will only be one module, and it will have the dll's name
-          .SelectMany(module => module.GetCustomAttributes<DescriptionAttribute>())
-          .Where(IsPostXProcessedAttribute)
-          .Any();
-    }
+		private static bool IsPostXProcessed(Assembly assembly)
+		{
+			return assembly.Modules // in practice there will only be one module, and it will have the dll's name
+				.SelectMany(module => module.GetCustomAttributes<DescriptionAttribute>())
+				.Where(IsPostXProcessedAttribute)
+				.Any();
+		}
 
-    private static bool IsPostXProcessedAttribute(DescriptionAttribute descriptionAttribute)
-    {
-      return descriptionAttribute.Description == "POSTX_PROCESSED";
-    }
+		private static bool IsPostXProcessedAttribute(DescriptionAttribute descriptionAttribute)
+		{
+			return descriptionAttribute.Description == "POSTX_PROCESSED";
+		}
 
-    // get all the non-plugin PostX'd assemblies we expect to exist
-    private static HashSet<Assembly> GetExpectedPostXAssemblies()
-    {
-      List<Assembly?> list = new()
-            {
-                Type.GetType("FrooxEngine.IComponent, FrooxEngine")?.Assembly,
-                Type.GetType("BusinessX.NeosClassroom, BusinessX")?.Assembly,
-                Assembly.GetExecutingAssembly(),
-            };
-      return list
-          .Where(assembly => assembly != null)
-          .ToHashSet()!;
-    }
+		// get all the non-plugin PostX'd assemblies we expect to exist
+		private static HashSet<Assembly> GetExpectedPostXAssemblies()
+		{
+			List<Assembly?> list = new()
+			{
+				Type.GetType("FrooxEngine.IComponent, FrooxEngine")?.Assembly,
+				Type.GetType("BusinessX.NeosClassroom, BusinessX")?.Assembly,
+				Assembly.GetExecutingAssembly(),
+			};
+			return list
+				.Where(assembly => assembly != null)
+				.ToHashSet()!;
+		}
 
-    private static bool SpoofCompatibilityHash(Engine engine, List<Assembly> plugins, bool includePluginsInHash)
-    {
-      string vanillaCompatibilityHash;
-      int? vanillaProtocolVersionMaybe = GetVanillaProtocolVersion();
-      if (vanillaProtocolVersionMaybe is int vanillaProtocolVersion)
-      {
-        Logger.DebugFuncInternal(() => $"Vanilla protocol version is {vanillaProtocolVersion}");
-        vanillaCompatibilityHash = CalculateCompatibilityHash(vanillaProtocolVersion, plugins, includePluginsInHash);
-        return SetCompatibilityHash(engine, vanillaCompatibilityHash);
-      }
-      else
-      {
-        Logger.ErrorInternal("Unable to determine vanilla protocol version");
-        return false;
-      }
-    }
+		private static bool SpoofCompatibilityHash(Engine engine, List<Assembly> plugins, bool includePluginsInHash)
+		{
+			string vanillaCompatibilityHash;
+			int? vanillaProtocolVersionMaybe = GetVanillaProtocolVersion();
+			if (vanillaProtocolVersionMaybe is int vanillaProtocolVersion)
+			{
+				Logger.DebugFuncInternal(() => $"Vanilla protocol version is {vanillaProtocolVersion}");
+				vanillaCompatibilityHash = CalculateCompatibilityHash(vanillaProtocolVersion, plugins, includePluginsInHash);
+				return SetCompatibilityHash(engine, vanillaCompatibilityHash);
+			}
+			else
+			{
+				Logger.ErrorInternal("Unable to determine vanilla protocol version");
+				return false;
+			}
+		}
 
-    private static string CalculateCompatibilityHash(int ProtocolVersion, List<Assembly> plugins, bool includePluginsInHash)
-    {
-      using MD5CryptoServiceProvider cryptoServiceProvider = new();
-      ConcatenatedStream inputStream = new();
-      inputStream.EnqueueStream(new MemoryStream(BitConverter.GetBytes(ProtocolVersion)));
-      if (includePluginsInHash)
-      {
-        foreach (Assembly plugin in plugins)
-        {
-          FileStream fileStream = File.OpenRead(plugin.Location);
-          fileStream.Seek(375L, SeekOrigin.Current);
-          inputStream.EnqueueStream(fileStream);
-        }
-      }
-      byte[] hash = cryptoServiceProvider.ComputeHash(inputStream);
-      return Convert.ToBase64String(hash);
-    }
+		private static string CalculateCompatibilityHash(int ProtocolVersion, List<Assembly> plugins, bool includePluginsInHash)
+		{
+			using MD5CryptoServiceProvider cryptoServiceProvider = new();
+			ConcatenatedStream inputStream = new();
+			inputStream.EnqueueStream(new MemoryStream(BitConverter.GetBytes(ProtocolVersion)));
+			if (includePluginsInHash)
+			{
+				foreach (Assembly plugin in plugins)
+				{
+					FileStream fileStream = File.OpenRead(plugin.Location);
+					fileStream.Seek(375L, SeekOrigin.Current);
+					inputStream.EnqueueStream(fileStream);
+				}
+			}
+			byte[] hash = cryptoServiceProvider.ComputeHash(inputStream);
+			return Convert.ToBase64String(hash);
+		}
 
 		private static bool SetCompatibilityHash(Engine engine, string Target)
 		{
@@ -218,20 +218,20 @@ namespace NeosModLoader
 			}
 		}
 
-    private static bool SpoofVersionString(Engine engine, string originalVersionString)
-    {
-      FieldInfo field = AccessTools.DeclaredField(engine.GetType(), "_versionString");
-      if (field == null)
-      {
-        Logger.WarnInternal("Unable to write Engine._versionString");
-        return false;
-      }
-      // null the cached value
-      field.SetValue(engine, null);
+		private static bool SpoofVersionString(Engine engine, string originalVersionString)
+		{
+			FieldInfo field = AccessTools.DeclaredField(engine.GetType(), "_versionString");
+			if (field == null)
+			{
+				Logger.WarnInternal("Unable to write Engine._versionString");
+				return false;
+			}
+			// null the cached value
+			field.SetValue(engine, null);
 
-      Logger.DebugFuncInternal(() => $"Changing version string from {originalVersionString} to {engine.VersionString}");
-      return true;
-    }
+			Logger.DebugFuncInternal(() => $"Changing version string from {originalVersionString} to {engine.VersionString}");
+			return true;
+		}
 
 		// perform incredible bullshit to rip the hardcoded protocol version out of the dang IL
 		private static int? GetVanillaProtocolVersion()
