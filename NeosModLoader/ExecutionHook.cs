@@ -1,4 +1,4 @@
-﻿using FrooxEngine;
+using FrooxEngine;
 using System;
 using System.Linq;
 
@@ -13,17 +13,17 @@ namespace NeosModLoader
 		private static Type? __connectorTypes; // needed in Neos 2021.10.17.1326 and later
 #pragma warning restore CS0169
 
-    static ExecutionHook()
-    {
-      try
-      {
-        SplashChanger.SetCustom("Loading libraries");
-        AssemblyFile[] loadedAssemblies = AssemblyLoader.LoadAssembliesFromDir("nml_libs");
-        if (loadedAssemblies.Length != 0)
-        {
-          string loadedAssemblyList = string.Join("\n", loadedAssemblies.Select(a => a.Assembly.FullName+" Sha256="+a.Sha256));
-          Logger.MsgInternal($"Loaded libraries from nml_libs:\n{loadedAssemblyList}");
-        }
+		static ExecutionHook()
+		{
+			try
+			{
+				SplashChanger.SetCustom("Loading libraries");
+				AssemblyFile[] loadedAssemblies = AssemblyLoader.LoadAssembliesFromDir("nml_libs");
+				if (loadedAssemblies.Length != 0)
+				{
+					string loadedAssemblyList = string.Join("\n", loadedAssemblies.Select(a => a.Assembly.FullName + " Sha256=" + a.Sha256));
+					Logger.MsgInternal($"Loaded libraries from nml_libs:\n{loadedAssemblyList}");
+				}
 
 				SplashChanger.SetCustom("Initializing");
 				DebugInfo.Log();
