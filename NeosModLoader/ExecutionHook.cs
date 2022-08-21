@@ -21,7 +21,7 @@ namespace NeosModLoader
 				AssemblyFile[] loadedAssemblies = AssemblyLoader.LoadAssembliesFromDir("nml_libs");
 				if (loadedAssemblies.Length != 0)
 				{
-					string loadedAssemblyList = string.Join("\n", loadedAssemblies.Select(a => a.Assembly.FullName));
+					string loadedAssemblyList = string.Join("\n", loadedAssemblies.Select(a => a.Assembly.FullName + " Sha256=" + a.Sha256));
 					Logger.MsgInternal($"Loaded libraries from nml_libs:\n{loadedAssemblyList}");
 				}
 
