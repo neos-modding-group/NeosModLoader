@@ -55,6 +55,11 @@ namespace NeosModLoader
 					// this is super weird, and probably shouldn't ever happen... but if it does, I want to know about it.
 					Logger.WarnInternal($"The \"{__result}\" type does not appear to part of Neos or a mod. It is unclear whether it should be hidden or not.");
 				}
+				else
+				{
+					Type type = __result;
+					Logger.DebugFuncInternal(() => $"Hid type \"{type}\" from Neos");
+				}
 
 				// Pretend the type doesn't exist
 				__result = null;
