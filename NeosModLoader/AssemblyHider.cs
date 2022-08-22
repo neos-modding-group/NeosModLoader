@@ -19,11 +19,14 @@ namespace NeosModLoader
 		/// <param name="initialAssemblies">Assemblies that were loaded when NML first started</param>
 		internal static void PatchNeos(Harmony harmony, HashSet<Assembly> initialAssemblies)
 		{
-			neosAssemblies = GetNeosAssemblies(initialAssemblies);
-			modAssemblies = GetModAssemblies();
-			MethodInfo target = AccessTools.DeclaredMethod(typeof(TypeHelper), nameof(TypeHelper.FindType));
-			MethodInfo patch = AccessTools.DeclaredMethod(typeof(AssemblyHider), nameof(FindTypePostfix));
-			harmony.Patch(target, postfix: new HarmonyMethod(patch));
+			if (ModLoaderConfiguration.Get().HideModTypes)
+			{
+				neosAssemblies = GetNeosAssemblies(initialAssemblies);
+				modAssemblies = GetModAssemblies();
+				MethodInfo target = AccessTools.DeclaredMethod(typeof(TypeHelper), nameof(TypeHelper.FindType));
+				MethodInfo patch = AccessTools.DeclaredMethod(typeof(AssemblyHider), nameof(FindTypePostfix));
+				harmony.Patch(target, postfix: new HarmonyMethod(patch));
+			}
 		}
 
 		private static HashSet<Assembly> GetNeosAssemblies(HashSet<Assembly> initialAssemblies)

@@ -59,6 +59,10 @@ namespace NeosModLoader
 							{
 								_configuration.LogConflicts = false;
 							}
+							else if ("hidemodtypes".Equals(key) && "false".Equals(value))
+							{
+								_configuration.HideModTypes = false;
+							}
 						}
 					}
 				}
@@ -96,5 +100,6 @@ namespace NeosModLoader
 		public bool NoLibraries { get; private set; } = false;
 		public bool AdvertiseVersion { get; private set; } = false;
 		public bool LogConflicts { get; private set; } = true;
+		public bool HideModTypes { get; private set; } = true;
 	}
 }
