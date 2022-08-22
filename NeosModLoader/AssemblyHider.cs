@@ -31,8 +31,12 @@ namespace NeosModLoader
 
 		private static HashSet<Assembly> GetNeosAssemblies(HashSet<Assembly> initialAssemblies)
 		{
+			// Remove NML itself, as its types should be hidden but it's guaranteed to be loaded.
 			initialAssemblies.Remove(Assembly.GetExecutingAssembly());
+
+			// Remove Harmony, as users who aren't using nml_libs will already have it loaded.
 			initialAssemblies.Remove(typeof(Harmony).Assembly);
+
 			return initialAssemblies;
 		}
 
