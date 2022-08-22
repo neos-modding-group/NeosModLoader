@@ -1,6 +1,8 @@
 using FrooxEngine;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace NeosModLoader
 {
@@ -17,8 +19,11 @@ namespace NeosModLoader
 		{
 			try
 			{
+				HashSet<Assembly> initialAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToHashSet();
 				SplashChanger.SetCustom("Loading libraries");
 				AssemblyFile[] loadedAssemblies = AssemblyLoader.LoadAssembliesFromDir("nml_libs");
+				// note that harmony may not be loaded until this point, so this class cannot directly inport HarmonyLib.
+
 				if (loadedAssemblies.Length != 0)
 				{
 					string loadedAssemblyList = string.Join("\n", loadedAssemblies.Select(a => a.Assembly.FullName + " Sha256=" + a.Sha256));
@@ -28,7 +33,7 @@ namespace NeosModLoader
 				SplashChanger.SetCustom("Initializing");
 				DebugInfo.Log();
 				NeosVersionReset.Initialize();
-				ModLoader.LoadMods();
+				HarmonyWorker.LoadModsAndHideModAssemblies(initialAssemblies);
 				SplashChanger.SetCustom("Loaded");
 			}
 			catch (Exception e) // it's important that this doesn't send exceptions back to Neos

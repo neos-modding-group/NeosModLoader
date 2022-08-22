@@ -31,7 +31,7 @@ namespace NeosModLoader
 				.ToList();
 		}
 
-		internal static void LoadMods()
+		internal static void LoadMods(Harmony harmony)
 		{
 			ModLoaderConfiguration config = ModLoaderConfiguration.Get();
 			if (config.NoMods)
@@ -92,7 +92,6 @@ namespace NeosModLoader
 			}
 
 			SplashChanger.SetCustom("Hooking big fish");
-			Harmony harmony = new("net.michaelripley.neosmodloader");
 			ModConfiguration.RegisterShutdownHook(harmony);
 
 			foreach (LoadedNeosMod mod in LoadedMods)
