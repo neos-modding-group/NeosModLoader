@@ -38,6 +38,8 @@ Yes, so long as Neos's [Mod & Plugin Policy] is followed.
 
 Mods are not sandboxed in any way. In other words, they run with the same level of privilege as Neos itself. A poorly written mod could cause performance or stability issues. A maliciously designed mod could give a malicious actor a dangerous level of control over your computer. **Make sure you only use mods from sources you trust.**
 
+The modding community maintains [a list of mods](https://www.neosmodloader.com/mods) that have been manually audited to ensure they aren't evil. While this process isn't 100% foolproof, the mods on this list are significantly more trustworthy than an unvetted DLL.
+
 If you aren't sure if you can trust a mod and you have some level of ability to read code, you can look at its source code. If the source code is unavailable or you suspect it may differ from the contents of the .dll file, you can inspect the mod with a [C# decompiler](https://www.google.com/search?q=c%23+decompiler). Things to be particularly wary of include:
 
 - Obfuscated code
