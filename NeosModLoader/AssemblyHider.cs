@@ -60,16 +60,16 @@ namespace NeosModLoader
 					// an assembly was in neither neosAssemblies nor modAssemblies
 					// this implies someone late-loaded an assembly after NML, and it was later used in-game
 					// this is super weird, and probably shouldn't ever happen... but if it does, I want to know about it.
-					Logger.WarnInternal($"The \"{__result}\" type does not appear to part of Neos or a mod. It is unclear whether it should be hidden or not.");
+					// since this is an edge case users may want to handle it in different ways, the HideLateTypes nml config option allows them to chose.
+					bool hideLate = ModLoaderConfiguration.Get().HideLateTypes;
+					Logger.WarnInternal($"The \"{__result}\" type does not appear to part of Neos or a mod. It is unclear whether it should be hidden or not. due to the HideLateTypes config option being {hideLate} it will be {(hideLate ? "Hidden" : "Shown")}");
+					if(hideLate) __result = null;
 				}
 				else
 				{
-					Type type = __result;
-					Logger.DebugFuncInternal(() => $"Hid type \"{type}\" from Neos");
+					Logger.DebugInternal($"Hid type \"{__result}\" from Neos");
+					__result = null; // Pretend the type doesn't exist
 				}
-
-				// Pretend the type doesn't exist
-				__result = null;
 			}
 		}
 	}
