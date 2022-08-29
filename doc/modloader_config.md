@@ -19,4 +19,4 @@ Not all keys are required to be present. Missing keys will use the defaults outl
 | `unsafe`           | `false` | If `true`, the version spoofing safety check is disabled and it will still work even if you have other Neos plugins. DO NOT load plugin components in multiplayer sessions, as it will break things and cause crashes. Plugin components should only be used in your local home or user space. |
 | `logconflicts`     | `true`  | If `false`, conflict logging will be disabled. If `true`, potential mod conflicts will be logged. If `debug` is also `true` this will be more verbose. |
 | `hidemodtypes`     | `true`  | If `true`, mod-related types will be hidden in-game. If `false`, no types will be hidden, which makes NML detectable in-game. |
-| `hidelatetypes`    | `true`  | If `true` and `hidemodtypes` is `true`, late loaded types will be hidden in-game. If `false`, late loaded types ill be shown |
+| `hidelatetypes`    | `true`  | If `true` and `hidemodtypes` is `true`, late loaded types will be hidden in-game. If `false`, late loaded types will be shown |
