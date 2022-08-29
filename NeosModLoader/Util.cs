@@ -1,10 +1,11 @@
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Security.Cryptography;
 
 namespace NeosModLoader
 {
@@ -82,6 +83,11 @@ namespace NeosModLoader
 			using var stream = File.OpenRead(filepath);
 			var hash = hasher.ComputeHash(stream);
 			return BitConverter.ToString(hash).Replace("-", "");
+		}
+
+		internal static HashSet<T> ToHashSet<T>(this IEnumerable<T> source, IEqualityComparer<T>? comparer = null)
+		{
+			return new HashSet<T>(source, comparer);
 		}
 
 	}
