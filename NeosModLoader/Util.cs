@@ -25,8 +25,8 @@ namespace NeosModLoader
 			StackTrace stackTrace = new(2 + nmlCalleeDepth);
 			for (int i = 0; i < stackTrace.FrameCount; i++)
 			{
-				Assembly assembly = stackTrace.GetFrame(i).GetMethod().DeclaringType.Assembly;
-				if (ModLoader.AssemblyLookupMap.TryGetValue(assembly, out NeosMod mod))
+				Assembly? assembly = stackTrace.GetFrame(i)?.GetMethod()?.DeclaringType?.Assembly;
+				if (assembly != null && ModLoader.AssemblyLookupMap.TryGetValue(assembly, out NeosMod mod))
 				{
 					return mod;
 				}
