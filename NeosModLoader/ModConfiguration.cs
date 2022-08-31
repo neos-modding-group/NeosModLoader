@@ -671,7 +671,14 @@ namespace NeosModLoader
 				.Where(config => config!.AnyValuesSet())
 				.Do(config =>
 				{
-					config!.Save();
+					try
+					{
+						config!.Save();
+					}
+					catch (Exception e)
+					{
+						Logger.ErrorInternal($"Error saving configuration for {config!.Owner.Name}:\n{e}");
+					}
 					count += 1;
 				});
 			Logger.MsgInternal($"Configs saved for {count} mods.");
