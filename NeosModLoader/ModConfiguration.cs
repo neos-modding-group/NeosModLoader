@@ -354,19 +354,27 @@ namespace NeosModLoader
 		/// <param name="key">The key</param>
 		/// <param name="value">The new value</param>
 		/// <param name="eventLabel">A custom label you may assign to this event</param>
-		public void Set(ModConfigurationKey key, object value, string? eventLabel = null)
+		public void Set(ModConfigurationKey key, object? value, string? eventLabel = null)
 		{
 			if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey? definingKey))
 			{
 				throw new KeyNotFoundException($"{key.Name} is not defined in the config definition for {LoadedNeosMod.NeosMod.Name}");
 			}
 
-			if (!definingKey!.ValueType().IsAssignableFrom(value.GetType()))
+			if (value == null)
+			{
+				bool cannotBeNull = definingKey!.ValueType().IsValueType && Nullable.GetUnderlyingType(definingKey!.ValueType()) == null;
+				if (cannotBeNull)
+				{
+					throw new ArgumentException($"null cannot be assigned to {definingKey.ValueType()}");
+				}
+			}
+			else if (!definingKey!.ValueType().IsAssignableFrom(value.GetType()))
 			{
 				throw new ArgumentException($"{value.GetType()} cannot be assigned to {definingKey.ValueType()}");
 			}
 
-			if (!definingKey.Validate(value))
+			if (!definingKey!.Validate(value))
 			{
 				throw new ArgumentException($"\"{value}\" is not a valid value for \"{Owner.Name}{definingKey.Name}\"");
 			}
