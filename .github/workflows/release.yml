@@ -9,7 +9,7 @@ env:
 
 jobs:
   build:
-    if: github.repository == 'neos-modding-group/NeosModLoader' # only run for pushes to tags
+    if: github.repository == 'neos-modding-group/NeosModLoader'
     runs-on: ubuntu-latest
     steps:
       - name: setup .NET

@@ -30,10 +30,10 @@ jobs:
       - name: build headed
         run: dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=false;CopyToLibraries=true"
       - name: build headless
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' # only build headless for master branch builds
         run: dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=true;CopyToLibraries=true"
       - name: upload workflow artifacts
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' # only publish artifacts for master branch builds
         uses: actions/upload-artifact@v3
         with:
           name: NeosModLoader
