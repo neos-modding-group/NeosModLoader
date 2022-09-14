@@ -29,7 +29,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Lib.Harmony" Version="2.2.1" />
+		<PackageReference Include="Lib.Harmony" Version="2.2.2" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" Condition="'$(Headless)'=='true'" />
 		<Reference Include="Newtonsoft.Json" Condition="'$(Headless)'=='false'">
 			<HintPath>$(NeosPath)Neos_Data\Managed\Newtonsoft.Json.dll</HintPath>
