@@ -22,9 +22,8 @@ jobs:
           if [ "$REMOTE_NEOS_VERSION" = "" ]; then
             echo "REMOTE_NEOS_VERSION is empty"
             exit 1
-          else
-            echo "REMOTE_NEOS_VERSION=$REMOTE_NEOS_VERSION" >> $GITHUB_ENV
           fi
+          echo "REMOTE_NEOS_VERSION=$REMOTE_NEOS_VERSION" >> $GITHUB_ENV
         shell: bash
       - name: setup workflow cache
         id: cache
@@ -40,14 +39,14 @@ jobs:
         run: CACHED_NEOS_VERSION="foo"
       - name: install linux packages
         if: steps.cache.outputs.cache-hit != 'true'
-        run: sudo apt install -y 7zip
+        run: sudo apt-get install -y p7zip-full
       - name: download Neos
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           mkdir neos_install
           cd neos_install
-          curl -s "https://assets.neos.com/install/Pro/Data/${{ env.REMOTE_NEOS_VERSION }}.7z" -o neos.7z
-          7zz x neos.7z
+          curl -fs "https://assets.neos.com/install/Pro/Data/${{ env.REMOTE_NEOS_VERSION }}.7z" -o neos.7z
+          7za x neos.7z
           rm neos.7z
         shell: bash
       - name: lint
