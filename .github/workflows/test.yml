@@ -8,13 +8,13 @@ jobs:
     if: github.repository == 'neos-modding-group/NeosModLoader'
     runs-on: ubuntu-latest
     steps:
-      - name: dotnet-setup
+      - name: setup .NET
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.x'
-      - name: checkout
+      - name: checkout NML
         uses: actions/checkout@v3
-      - name: checkout-libs
+      - name: checkout Neos libs
         uses: actions/checkout@v3
         with:
           repository: neos-modding-group/Reference-Assemblies
@@ -24,3 +24,10 @@ jobs:
         run: dotnet format --verbosity detailed --verify-no-changes ./NeosModLoader.sln
       - name: build
         run: dotnet build ./NeosModLoader.sln --configuration Release "/p:Headless=false;CopyToLibraries=false"
+      - name: upload workflow artifact
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v3
+        with:
+          name: NeosModLoader
+          path: ./NeosModLoader/NeosModLoader/bin/Release/net462/NeosModLoader.dll
+          if-no-files-found: error
