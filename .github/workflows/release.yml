@@ -12,31 +12,57 @@ jobs:
     if: github.repository == 'neos-modding-group/NeosModLoader'
     runs-on: ubuntu-latest
     steps:
+      - name: checkout NML
+        uses: actions/checkout@v3
+      - name: get latest Neos version
+        run: |
+          REMOTE_NEOS_VERSION="$(curl -fs https://cloudxstorage.blob.core.windows.net/install/Pro/Public)"
+          echo "Remote Neos version is: \"$REMOTE_NEOS_VERSION\""
+          if [ "$REMOTE_NEOS_VERSION" = "" ]; then
+            echo "REMOTE_NEOS_VERSION is empty"
+            exit 1
+          fi
+          echo "REMOTE_NEOS_VERSION=$REMOTE_NEOS_VERSION" >> $GITHUB_ENV
+        shell: bash
+      - name: setup workflow cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: neos_install/
+          key: ${{ env.REMOTE_NEOS_VERSION }}
       - name: setup .NET
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.x'
-      - name: checkout NML
-        uses: actions/checkout@v3
-      - name: checkout Neos libs
-        uses: actions/checkout@v3
-        with:
-          repository: neos-modding-group/Reference-Assemblies
-          path: Libs
-          ssh-key: ${{ secrets.REFERENCE_ASSEMBLIES_AUTH }}
+      - name: install linux packages
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: sudo apt-get install -y p7zip-full
+      - name: download Neos
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir neos_install
+          cd neos_install
+          curl -fs "https://assets.neos.com/install/Pro/Data/${{ env.REMOTE_NEOS_VERSION }}.7z" -o neos.7z
+          7za x neos.7z
+          rm neos.7z
+        shell: bash
       - name: lint
         run: dotnet format --verbosity detailed --verify-no-changes ./NeosModLoader.sln
       - name: build headed
-        run: dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=false;CopyToLibraries=true"
+        run: |
+          dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=false;CopyToLibraries=false"
+          mv ./NeosModLoader/bin/Release/net462/NeosModLoader.dll ./NeosModLoader.dll
       - name: build headless
-        run: dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=true;CopyToLibraries=true"
+        run: |
+          dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=true;CopyToLibraries=false"
+          mv ./NeosModLoader/bin/Release/net462/NeosModLoader.dll ./NeosModLoaderHeadless.dll
       - name: upload workflow artifacts
         uses: actions/upload-artifact@v3
         with:
           name: NeosModLoader
           path: |
-            ${{ github.workspace }}/Libs/current/Libraries/NeosModLoader.dll
-            ${{ github.workspace }}/Libs/current/Libraries/NeosModLoaderHeadless.dll
+            ./NeosModLoader.dll
+            ./NeosModLoaderHeadless.dll
           if-no-files-found: error
       - name: upload release artifacts
         uses: softprops/action-gh-release@v1
@@ -44,6 +70,6 @@ jobs:
           draft: true # if creating a new release, make it a draft
           files: |
             ./NeosModLoader/bin/Release/net462/0Harmony.dll
-            ${{ github.workspace }}/Libs/current/Libraries/NeosModLoader.dll
-            ${{ github.workspace }}/Libs/current/Libraries/NeosModLoaderHeadless.dll
+            ./NeosModLoader.dll
+            ./NeosModLoaderHeadless.dll
           fail_on_unmatched_files: true
