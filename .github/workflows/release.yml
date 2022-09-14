@@ -8,7 +8,7 @@ env:
   NeosPath: "${{ github.workspace }}/Libs/current/"
 
 jobs:
-  build:
+  release:
     if: github.repository == 'neos-modding-group/NeosModLoader'
     runs-on: ubuntu-latest
     steps:
