@@ -29,5 +29,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: NeosModLoader
-          path: ./NeosModLoader/NeosModLoader/bin/Release/net462/NeosModLoader.dll
+          path: ./NeosModLoader/bin/Release/net462/NeosModLoader.dll
           if-no-files-found: error
