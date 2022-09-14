@@ -43,6 +43,7 @@ jobs:
         with:
           draft: true # if creating a new release, make it a draft
           files: |
+            ./NeosModLoader/bin/Release/net462/0Harmony.dll
             ${{ github.workspace }}/Libs/current/Libraries/NeosModLoader.dll
             ${{ github.workspace }}/Libs/current/Libraries/NeosModLoaderHeadless.dll
           fail_on_unmatched_files: true
