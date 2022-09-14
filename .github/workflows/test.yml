@@ -1,4 +1,9 @@
-on: [push, pull_request]
+name: Test & CI Build
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
 
 env:
   NeosPath: "${{ github.workspace }}/Libs/current/"
