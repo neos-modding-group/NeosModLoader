@@ -18,10 +18,8 @@ jobs:
       - name: get latest Neos version
         run: |
           REMOTE_NEOS_VERSION="$(curl -s https://cloudxstorage.blob.core.windows.net/install/Pro/Public)"
+          echo "Remote Neos version is: \"$REMOTE_NEOS_VERSION\""
           [[ -z "$REMOTE_NEOS_VERSION" ]] && { echo "REMOTE_NEOS_VERSION is empty"; exit 1; }
-        shell: bash
-      - name: echo latest Neos version
-        run: echo "$REMOTE_NEOS_VERSION"
         shell: bash
       - name: Setup workflow cache
         id: cache
