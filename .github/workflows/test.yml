@@ -23,4 +23,4 @@ jobs:
       - name: lint
         run: dotnet format --verbosity detailed --verify-no-changes ./NeosModLoader.sln
       - name: build
-        run: dotnet build ./NeosModLoader.sln
+        run: dotnet build ./NeosModLoader.sln --configuration Release "/p:Headless=false;CopyToLibraries=false"
