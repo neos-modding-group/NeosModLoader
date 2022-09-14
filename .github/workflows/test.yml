@@ -22,6 +22,8 @@ jobs:
           if [ "$REMOTE_NEOS_VERSION" = "" ]; then
             echo "REMOTE_NEOS_VERSION is empty"
             exit 1
+          else
+            echo "REMOTE_NEOS_VERSION=$REMOTE_NEOS_VERSION" >> $GITHUB_ENV
           fi
         shell: bash
       - name: setup workflow cache
