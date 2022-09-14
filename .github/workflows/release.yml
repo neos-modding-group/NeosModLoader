@@ -1,11 +1,12 @@
-on: [push, pull_request]
+name: Publish Release Artifacts
+on: push
 
 env:
   NeosPath: "${{ github.workspace }}/Libs/current/"
 
 jobs:
   build:
-    if: startsWith(github.ref, 'refs/heads/') && github.repository == 'neos-modding-group/NeosModLoader' # only run for pushes to branches
+    if: startsWith(github.ref, 'refs/tags/') && github.repository == 'neos-modding-group/NeosModLoader' # only run for pushes to tags
     runs-on: ubuntu-latest
     steps:
       - name: setup .NET
@@ -25,10 +26,8 @@ jobs:
       - name: build headed
         run: dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=false;CopyToLibraries=true"
       - name: build headless
-        if: github.ref == 'refs/heads/master'
         run: dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=true;CopyToLibraries=true"
       - name: upload workflow artifacts
-        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v3
         with:
           name: NeosModLoader
@@ -36,3 +35,11 @@ jobs:
             ${{ github.workspace }}/Libs/current/Libraries/NeosModLoader.dll
             ${{ github.workspace }}/Libs/current/Libraries/NeosModLoaderHeadless.dll
           if-no-files-found: error
+      - name: upload release artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true # if creating a new release, make it a draft
+          files: |
+            ${{ github.workspace }}/Libs/current/Libraries/NeosModLoader.dll
+            ${{ github.workspace }}/Libs/current/Libraries/NeosModLoaderHeadless.dll
+          fail_on_unmatched_files: true
