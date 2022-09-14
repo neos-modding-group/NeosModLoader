@@ -9,6 +9,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+	ignore:
+	  - dependency-name: "Newtonsoft.Json"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
