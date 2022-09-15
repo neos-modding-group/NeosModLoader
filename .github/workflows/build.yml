@@ -1,15 +1,12 @@
-name: Publish Release Artifacts
-on:
-  push:
-    tags:
-      - '**'
+name: Test, Build, and Release
+on: [push, pull_request]
 
 env:
-  NeosPath: "${{ github.workspace }}/Libs/current/"
+  NeosPath: "${{ github.workspace }}/neos_install/" # set up in neos-modding-group/neos-plugin-setup-action
 
 jobs:
-  release:
-    if: github.repository == 'neos-modding-group/NeosModLoader'
+  build:
+    if: github.repository == 'neos-modding-group/NeosModLoader' # prevent forks from running this workflow
     runs-on: ubuntu-latest
     steps:
       - name: checkout NML
@@ -23,10 +20,12 @@ jobs:
           dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=false;CopyToLibraries=false"
           mv ./NeosModLoader/bin/Release/net462/NeosModLoader.dll ./NeosModLoader.dll
       - name: build headless
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' # only build headless run for pushes to master or tags
         run: |
           dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=true;CopyToLibraries=false"
           mv ./NeosModLoader/bin/Release/net462/NeosModLoader.dll ./NeosModLoaderHeadless.dll
       - name: upload workflow artifacts
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' # only publish artifacts for pushes to master or tags
         uses: actions/upload-artifact@v3
         with:
           name: NeosModLoader
@@ -35,6 +34,7 @@ jobs:
             ./NeosModLoaderHeadless.dll
           if-no-files-found: error
       - name: upload release artifacts
+        if: startsWith(github.ref, 'refs/tags/') # only publish artifacts for pushes to tags
         uses: softprops/action-gh-release@v1
         with:
           draft: true # if creating a new release, make it a draft
