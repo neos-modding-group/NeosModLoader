@@ -1,3 +1,5 @@
+# This workflow handles all the CI checks, builds, and artifact publishing for NeosModLoader.
+
 name: Test, Build, and Release
 on: [push, pull_request]
 
@@ -6,13 +8,13 @@ env:
 
 jobs:
   build:
-    if: github.repository == 'neos-modding-group/NeosModLoader' # prevent forks from running this workflow
+    if: github.repository == 'neos-modding-group/NeosModLoader' # prevent forks from unintentionally running this workflow
     runs-on: ubuntu-latest
     steps:
       - name: checkout NML
         uses: actions/checkout@v3
       - name: setup build environment
-        uses: neos-modding-group/neos-plugin-setup-action@master
+        uses: neos-modding-group/neos-plugin-setup-action@master # This is where the Neos dependencies come from. Learn more at https://github.com/neos-modding-group/neos-plugin-setup-action
       - name: lint
         run: dotnet format --verbosity detailed --verify-no-changes ./NeosModLoader.sln
       - name: build headed
@@ -25,7 +27,7 @@ jobs:
           dotnet build ./NeosModLoader.sln --configuration Release "-property:Headless=true;CopyToLibraries=false"
           mv ./NeosModLoader/bin/Release/net462/NeosModLoader.dll ./NeosModLoaderHeadless.dll
       - name: upload workflow artifacts
-        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' # only publish artifacts for pushes to master or tags
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' # only publish workflow artifacts for pushes to master or tags
         uses: actions/upload-artifact@v3
         with:
           name: NeosModLoader
@@ -34,7 +36,7 @@ jobs:
             ./NeosModLoaderHeadless.dll
           if-no-files-found: error
       - name: upload release artifacts
-        if: startsWith(github.ref, 'refs/tags/') # only publish artifacts for pushes to tags
+        if: startsWith(github.ref, 'refs/tags/') # only publish release artifacts for pushes to tags
         uses: softprops/action-gh-release@v1
         with:
           draft: true # if creating a new release, make it a draft
