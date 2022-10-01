@@ -363,8 +363,7 @@ namespace NeosModLoader
 
 			if (value == null)
 			{
-				bool cannotBeNull = definingKey!.ValueType().IsValueType && Nullable.GetUnderlyingType(definingKey!.ValueType()) == null;
-				if (cannotBeNull)
+				if (Util.CannotBeNull(definingKey!.ValueType()))
 				{
 					throw new ArgumentException($"null cannot be assigned to {definingKey.ValueType()}");
 				}
