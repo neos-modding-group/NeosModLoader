@@ -10,7 +10,7 @@ namespace NeosModLoader
 {
 	public class ModLoader
 	{
-		internal const string VERSION_CONSTANT = "1.12.3";
+		internal const string VERSION_CONSTANT = "1.12.4";
 		/// <summary>
 		/// NeosModLoader's version
 		/// </summary>
