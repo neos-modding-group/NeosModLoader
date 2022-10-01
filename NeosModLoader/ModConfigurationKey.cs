@@ -146,7 +146,7 @@ namespace NeosModLoader
 				if (Util.CanBeNull(ValueType()))
 				{
 					// null is valid for T
-					return ValidateTyped((T?) value);
+					return ValidateTyped((T?)value);
 				}
 				else
 				{
