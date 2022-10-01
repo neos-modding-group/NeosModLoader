@@ -136,13 +136,27 @@ namespace NeosModLoader
 		/// <returns>true if the value is valid</returns>
 		public override bool Validate(object? value)
 		{
-			// specifically allow nulls for class types
-			if (value is T || (value is null && !typeof(T).IsValueType))
+			if (value is T typedValue)
 			{
-				return ValidateTyped((T?)value);
+				// value is of the correct type
+				return ValidateTyped(typedValue);
+			}
+			else if (value == null)
+			{
+				if (Util.CanBeNull(ValueType()))
+				{
+					// null is valid for T
+					return ValidateTyped((T?) value);
+				}
+				else
+				{
+					// null is not valid for T
+					return false;
+				}
 			}
 			else
 			{
+				// value is of the wrong type
 				return false;
 			}
 		}

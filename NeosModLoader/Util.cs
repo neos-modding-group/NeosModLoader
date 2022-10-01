@@ -90,5 +90,17 @@ namespace NeosModLoader
 			return new HashSet<T>(source, comparer);
 		}
 
+		// check if a type cannot possibly have null assigned
+		internal static bool CannotBeNull(Type t)
+		{
+			return t.IsValueType && Nullable.GetUnderlyingType(t) == null;
+		}
+
+		// check if a type is allowed to have null assigned
+		internal static bool CanBeNull(Type t)
+		{
+			return !CannotBeNull(t);
+		}
+
 	}
 }
