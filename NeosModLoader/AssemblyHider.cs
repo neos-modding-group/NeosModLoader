@@ -1,4 +1,5 @@
 using BaseX;
+using FrooxEngine;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -23,9 +24,21 @@ namespace NeosModLoader
 			{
 				neosAssemblies = GetNeosAssemblies(initialAssemblies);
 				modAssemblies = GetModAssemblies();
-				MethodInfo target = AccessTools.DeclaredMethod(typeof(TypeHelper), nameof(TypeHelper.FindType));
-				MethodInfo patch = AccessTools.DeclaredMethod(typeof(AssemblyHider), nameof(FindTypePostfix));
-				harmony.Patch(target, postfix: new HarmonyMethod(patch));
+
+				// TypeHelper.FindType explicitly does a type search
+				MethodInfo findTypeTarget = AccessTools.DeclaredMethod(typeof(TypeHelper), nameof(TypeHelper.FindType));
+				MethodInfo findTypePatch = AccessTools.DeclaredMethod(typeof(AssemblyHider), nameof(FindTypePostfix));
+				harmony.Patch(findTypeTarget, postfix: new HarmonyMethod(findTypePatch));
+
+				// WorkerManager.IsValidGenericType checks a type for validity, and if it returns `true` it reveals that the type exists
+				MethodInfo isValidGenericTypeTarget = AccessTools.DeclaredMethod(typeof(WorkerManager), nameof(WorkerManager.IsValidGenericType));
+				MethodInfo isValidGenericTypePatch = AccessTools.DeclaredMethod(typeof(AssemblyHider), nameof(IsValidTypePostfix));
+				harmony.Patch(isValidGenericTypeTarget, postfix: new HarmonyMethod(isValidGenericTypePatch));
+
+				// WorkerManager.GetType uses FindType, but upon failure fails back to doing a (strangely) exhausitive reflection-based search for the type
+				MethodInfo getTypeTarget = AccessTools.DeclaredMethod(typeof(WorkerManager), nameof(WorkerManager.GetType));
+				MethodInfo getTypePatch = AccessTools.DeclaredMethod(typeof(AssemblyHider), nameof(FindTypePostfix));
+				harmony.Patch(getTypeTarget, postfix: new HarmonyMethod(getTypePatch));
 			}
 		}
 
@@ -51,24 +64,56 @@ namespace NeosModLoader
 			return assemblies;
 		}
 
-		private static void FindTypePostfix(ref Type? __result)
+		private static bool IsModType(Type type)
 		{
-			if (__result != null && !neosAssemblies!.Contains(__result.Assembly))
+			if (neosAssemblies!.Contains(type.Assembly))
 			{
-				if (!modAssemblies!.Contains(__result.Assembly))
+				// the type belongs to a Neos assembly
+				return false; // don't hide the type
+			}
+			else
+			{
+				if (modAssemblies!.Contains(type.Assembly))
+				{
+					// known type from a mod assembly
+					Logger.DebugInternal($"Hid type \"{type}\" from Neos");
+					return true; // hide the type
+				}
+				else
 				{
 					// an assembly was in neither neosAssemblies nor modAssemblies
 					// this implies someone late-loaded an assembly after NML, and it was later used in-game
 					// this is super weird, and probably shouldn't ever happen... but if it does, I want to know about it.
 					// since this is an edge case users may want to handle in different ways, the HideLateTypes nml config option allows them to choose.
 					bool hideLate = ModLoaderConfiguration.Get().HideLateTypes;
-					Logger.WarnInternal($"The \"{__result}\" type does not appear to part of Neos or a mod. It is unclear whether it should be hidden or not. due to the HideLateTypes config option being {hideLate} it will be {(hideLate ? "Hidden" : "Shown")}");
-					if (hideLate) __result = null;
+					Logger.WarnInternal($"The \"{type}\" type does not appear to part of Neos or a mod. It is unclear whether it should be hidden or not. Due to the HideLateTypes config option being {hideLate} it will be {(hideLate ? "Hidden" : "Shown")}");
+					return hideLate; // hide the type only if hideLate == true
 				}
-				else
+			}
+		}
+
+		// postfix for a method that searches for a type, and returns a reference to it if found (TypeHelper.FindType and WorkerManager.GetType)
+		private static void FindTypePostfix(ref Type? __result)
+		{
+			if (__result != null)
+			{
+				// we only need to think about types if the method actually returned a non-null result
+				if (IsModType(__result))
 				{
-					Logger.DebugInternal($"Hid type \"{__result}\" from Neos");
-					__result = null; // Pretend the type doesn't exist
+					__result = null;
+				}
+			}
+		}
+
+		// postfix for a method that validates a type (WorkerManager.IsValidGenericType)
+		private static void IsValidTypePostfix(ref bool __result, Type type)
+		{
+			if (__result == true)
+			{
+				// we only need to think about types if the method actually returned a true result
+				if (IsModType(type))
+				{
+					__result = false;
 				}
 			}
 		}
