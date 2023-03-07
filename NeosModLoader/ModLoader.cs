@@ -10,7 +10,7 @@ namespace NeosModLoader
 {
 	public class ModLoader
 	{
-		internal const string VERSION_CONSTANT = "1.12.5";
+		internal const string VERSION_CONSTANT = "1.12.6";
 		/// <summary>
 		/// NeosModLoader's version
 		/// </summary>
@@ -174,7 +174,7 @@ namespace NeosModLoader
 				return null;
 			}
 
-			Type[] modClasses = mod.Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && NEOS_MOD_TYPE.IsAssignableFrom(t)).ToArray();
+			Type[] modClasses = mod.Assembly.GetLoadableTypes(t => t.IsClass && !t.IsAbstract && NEOS_MOD_TYPE.IsAssignableFrom(t)).ToArray();
 			if (modClasses.Length == 0)
 			{
 				Logger.ErrorInternal($"no mods found in {mod.File}");
