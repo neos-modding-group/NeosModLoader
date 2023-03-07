@@ -148,7 +148,7 @@ namespace NeosModLoader
 			}
 			catch (Exception e)
 			{
-				Logger.DebugInternal("Could not read the name for a type.");
+				Logger.DebugFuncInternal(() => $"Could not read the name for a type: {e}");
 				return false;
 			}
 			try
