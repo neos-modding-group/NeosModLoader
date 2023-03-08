@@ -70,6 +70,15 @@ namespace NeosModLoader
 			return assemblies;
 		}
 
+		/// <summary>
+		/// Check if an assembly belongs to a mod or not
+		/// </summary>
+		/// <param name="assembly">The assembly to check</param>
+		/// <param name="typeOrAssembly">Type of root check being performed. Should be "type" or  "assembly". Used in logging.</param>
+		/// <param name="name">Name of the root check being performed. Used in logging.</param>
+		/// <param name="log">If `true`, this will emit logs. If `false`, this function will not log.</param>
+		/// <param name="forceShowLate">If `true`, then this function will always return `false` for late-loaded types</param>
+		/// <returns>`true` if this assembly belongs to a mod.</returns>
 		private static bool IsModAssembly(Assembly assembly, string typeOrAssembly, string name, bool log, bool forceShowLate)
 		{
 			if (neosAssemblies!.Contains(assembly))
@@ -99,20 +108,33 @@ namespace NeosModLoader
 					{
 						Logger.WarnInternal($"The \"{name}\" {typeOrAssembly} does not appear to part of Neos or a mod. It is unclear whether it should be hidden or not. Due to the HideLateTypes config option being {hideLate} it will be {(hideLate ? "Hidden" : "Shown")}");
 					}
-					return hideLate && forceShowLate; // hide the thing only if hideLate == true
+					// if forceShowLate == true, then this function will always return `false` for late-loaded types
+					// if forceShowLate == false, then this function will return `true` when hideLate == true
+					return hideLate && !forceShowLate;
 				}
 			}
 		}
 
+		/// <summary>
+		/// Check if an assembly belongs to a mod or not
+		/// </summary>
+		/// <param name="assembly">The assembly to check</param>
+		/// <param name="forceShowLate">If `true`, then this function will always return `false` for late-loaded types</param>
+		/// <returns>`true` if this assembly belongs to a mod.</returns>
 		private static bool IsModAssembly(Assembly assembly, bool forceShowLate = false)
 		{
 			// this generates a lot of logspam, as a single call to AppDomain.GetAssemblies() calls this many times
-			return IsModAssembly(assembly, "assembly", assembly.ToString(), false, forceShowLate);
+			return IsModAssembly(assembly, "assembly", assembly.ToString(), log: false, forceShowLate);
 		}
 
+		/// <summary>
+		/// Check if a type belongs to a mod or not
+		/// </summary>
+		/// <param name="type">The type to check</param>
+		/// <returns>true` if this type belongs to a mod.</returns>
 		private static bool IsModType(Type type)
 		{
-			return IsModAssembly(type.Assembly, "type", type.ToString(), true, false);
+			return IsModAssembly(type.Assembly, "type", type.ToString(), log: true, forceShowLate: false);
 		}
 
 		// postfix for a method that searches for a type, and returns a reference to it if found (TypeHelper.FindType and WorkerManager.GetType)
@@ -149,7 +171,7 @@ namespace NeosModLoader
 				// if we're being called by Neos, then hide mod assemblies
 				Logger.DebugFuncInternal(() => $"Intercepting call to AppDomain.GetAssemblies() from {callingAssembly}");
 				__result = __result
-					.Where(assembly => !IsModAssembly(assembly, true)) // it turns out Neos itself late-loads a bunch of stuff, so we force-show late-loaded assemblies here
+					.Where(assembly => !IsModAssembly(assembly, forceShowLate: true)) // it turns out Neos itself late-loads a bunch of stuff, so we force-show late-loaded assemblies here
 					.ToArray();
 			}
 		}
