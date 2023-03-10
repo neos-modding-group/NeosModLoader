@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading;
@@ -34,6 +35,25 @@ namespace NeosModLoader
 			return null;
 		}
 
+		/// <summary>
+		/// Get the calling assembly by stack trace analysis. Always skips the first one frame, being this method and you, the caller.
+		/// </summary>
+		/// <param name="skipFrames">The number of extra frame skip in the stack</param>
+		/// <returns>The executing mod, or null if none found</returns>
+		internal static Assembly? GetCallingAssembly(int skipFrames = 0)
+		{
+			// same logic as ExecutingMod(), but simpler case
+			StackTrace stackTrace = new(2 + skipFrames);
+			for (int i = 0; i < stackTrace.FrameCount; i++)
+			{
+				Assembly? assembly = stackTrace.GetFrame(i)?.GetMethod()?.DeclaringType?.Assembly;
+				if (assembly != null)
+				{
+					return assembly;
+				}
+			}
+			return null;
+		}
 
 		/// <summary>
 		/// Used to debounce a method call. The underlying method will be called after there have been no additional calls
@@ -102,5 +122,57 @@ namespace NeosModLoader
 			return !CannotBeNull(t);
 		}
 
+		internal static IEnumerable<Type> GetLoadableTypes(this Assembly assembly, Predicate<Type> predicate)
+		{
+			try
+			{
+				return assembly.GetTypes();
+			}
+			catch (ReflectionTypeLoadException e)
+			{
+				return e.Types.Where(type => CheckType(type, predicate));
+			}
+		}
+
+		// check a potentially unloadable type to see if it is (A) loadable and (B) satsifies a predicate without throwing an exception
+		// this does a series of increasingly aggressive checks to see if the type is unsafe to touch
+		private static bool CheckType(Type type, Predicate<Type> predicate)
+		{
+			if (type == null)
+			{
+				return false;
+			}
+			try
+			{
+				string _name = type.Name;
+			}
+			catch (Exception e)
+			{
+				Logger.DebugFuncInternal(() => $"Could not read the name for a type: {e}");
+				return false;
+			}
+			try
+			{
+				if (type.TypeInitializer == null)
+				{
+					return false;
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.DebugFuncInternal(() => $"Could not read TypeInitializer for type \"{type.Name}\": {e}");
+				return false;
+			}
+
+			try
+			{
+				return predicate(type);
+			}
+			catch (Exception e)
+			{
+				Logger.DebugFuncInternal(() => $"Could not load type \"{type.Name}\": {e}");
+				return false;
+			}
+		}
 	}
 }
