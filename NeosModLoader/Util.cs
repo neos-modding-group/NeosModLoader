@@ -126,7 +126,7 @@ namespace NeosModLoader
 		{
 			try
 			{
-				return assembly.GetTypes();
+				return assembly.GetTypes().Where(type => CheckType(type, predicate));
 			}
 			catch (ReflectionTypeLoadException e)
 			{
