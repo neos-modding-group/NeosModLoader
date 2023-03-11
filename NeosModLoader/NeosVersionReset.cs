@@ -40,11 +40,14 @@ namespace NeosModLoader
 				.Where(IsPostXProcessed)
 				.ToArray();
 
-			string potentialPlugins = postxedAssemblies
-				.Select(a => Path.GetFileName(a.Location))
-				.Join(delimiter: ", ");
+			if (Logger.IsDebugEnabled())
+			{
+				string potentialPlugins = postxedAssemblies
+					.Select(a => Path.GetFileName(a.Location))
+					.Join(delimiter: ", ");
 
-			Logger.DebugFuncInternal(() => $"Found {postxedAssemblies.Length} potential plugins: {potentialPlugins}");
+				Logger.DebugInternal($"Found {postxedAssemblies.Length} potential plugins: {potentialPlugins}");
+			}
 
 			HashSet<Assembly> expectedPostXAssemblies = GetExpectedPostXAssemblies();
 
@@ -68,8 +71,11 @@ namespace NeosModLoader
 				})
 				.ToArray();
 
-			string actualPlugins = plugins.Keys.Join(delimiter: ", ");
-			Logger.DebugFuncInternal(() => $"Found {plugins.Count} actual plugins: {actualPlugins}");
+			if (Logger.IsDebugEnabled())
+			{
+				string actualPlugins = plugins.Keys.Join(delimiter: ", ");
+				Logger.DebugInternal($"Found {plugins.Count} actual plugins: {actualPlugins}");
+			}
 
 			// warn about the assemblies we couldn't map to plugins
 			foreach (Assembly assembly in unmatchedAssemblies)

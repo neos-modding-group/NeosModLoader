@@ -93,7 +93,7 @@ namespace NeosModLoader
 					// known type from a mod assembly
 					if (log)
 					{
-						Logger.DebugInternal($"Hid {typeOrAssembly} \"{name}\" from Neos");
+						Logger.DebugFuncInternal(() => $"Hid {typeOrAssembly} \"{name}\" from Neos");
 					}
 					return true; // hide the thing
 				}

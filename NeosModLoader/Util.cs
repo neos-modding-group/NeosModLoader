@@ -155,12 +155,13 @@ namespace NeosModLoader
 			{
 				if (type.TypeInitializer == null)
 				{
+					Logger.DebugFuncInternal(() => $"No TypeInitializer for type \"{type}\"");
 					return false;
 				}
 			}
 			catch (Exception e)
 			{
-				Logger.DebugFuncInternal(() => $"Could not read TypeInitializer for type \"{type.Name}\": {e}");
+				Logger.DebugFuncInternal(() => $"Could not read TypeInitializer for type \"{type}\": {e}");
 				return false;
 			}
 
@@ -170,7 +171,7 @@ namespace NeosModLoader
 			}
 			catch (Exception e)
 			{
-				Logger.DebugFuncInternal(() => $"Could not load type \"{type.Name}\": {e}");
+				Logger.DebugFuncInternal(() => $"Could not load type \"{type}\": {e}");
 				return false;
 			}
 		}
