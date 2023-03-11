@@ -13,43 +13,19 @@ namespace NeosModLoader
 	internal static class Util
 	{
 		/// <summary>
-		/// Get the executing mod by stack trace analysis. Always skips the first two frames, being this method and you, the caller.
+		/// Get the executing mod by stack trace analysis.
 		/// You may skip extra frames if you know your callers are guaranteed to be NML code.
 		/// </summary>
-		/// <param name="nmlCalleeDepth">The number NML method calls above you in the stack</param>
+		/// <param name="stackTrace">A stack trace captured by the callee</param>
 		/// <returns>The executing mod, or null if none found</returns>
-		internal static NeosMod? ExecutingMod(int nmlCalleeDepth = 0)
+		internal static NeosMod? ExecutingMod(StackTrace stackTrace)
 		{
-			// example: ExecutingMod(), SourceFromStackTrace(), MsgExternal(), Msg(), ACTUAL MOD CODE
-			// you'd skip 4 frames
-			// we always skip ExecutingMod() and whoever called us (as this is an internal method), which is where the 2 comes from
-			StackTrace stackTrace = new(2 + nmlCalleeDepth);
 			for (int i = 0; i < stackTrace.FrameCount; i++)
 			{
 				Assembly? assembly = stackTrace.GetFrame(i)?.GetMethod()?.DeclaringType?.Assembly;
 				if (assembly != null && ModLoader.AssemblyLookupMap.TryGetValue(assembly, out NeosMod mod))
 				{
 					return mod;
-				}
-			}
-			return null;
-		}
-
-		/// <summary>
-		/// Get the calling assembly by stack trace analysis. Always skips the first one frame, being this method and you, the caller.
-		/// </summary>
-		/// <param name="skipFrames">The number of extra frame skip in the stack</param>
-		/// <returns>The executing mod, or null if none found</returns>
-		internal static Assembly? GetCallingAssembly(int skipFrames = 0)
-		{
-			// same logic as ExecutingMod(), but simpler case
-			StackTrace stackTrace = new(2 + skipFrames);
-			for (int i = 0; i < stackTrace.FrameCount; i++)
-			{
-				Assembly? assembly = stackTrace.GetFrame(i)?.GetMethod()?.DeclaringType?.Assembly;
-				if (assembly != null)
-				{
-					return assembly;
 				}
 			}
 			return null;
@@ -142,6 +118,7 @@ namespace NeosModLoader
 			{
 				return false;
 			}
+
 			try
 			{
 				string _name = type.Name;
@@ -158,7 +135,7 @@ namespace NeosModLoader
 			}
 			catch (Exception e)
 			{
-				Logger.DebugFuncInternal(() => $"Could not load type \"{type.Name}\": {e}");
+				Logger.DebugFuncInternal(() => $"Could not load type \"{type}\": {e}");
 				return false;
 			}
 		}

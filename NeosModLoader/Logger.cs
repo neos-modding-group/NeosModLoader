@@ -1,5 +1,6 @@
 using BaseX;
 using System;
+using System.Diagnostics;
 
 namespace NeosModLoader
 {
@@ -25,7 +26,7 @@ namespace NeosModLoader
 		{
 			if (IsDebugEnabled())
 			{
-				LogInternal(LogType.DEBUG, messageProducer(), SourceFromStackTrace());
+				LogInternal(LogType.DEBUG, messageProducer(), SourceFromStackTrace(new(1)));
 			}
 		}
 
@@ -41,7 +42,7 @@ namespace NeosModLoader
 		{
 			if (IsDebugEnabled())
 			{
-				LogInternal(LogType.DEBUG, message, SourceFromStackTrace());
+				LogInternal(LogType.DEBUG, message, SourceFromStackTrace(new(1)));
 			}
 		}
 
@@ -49,19 +50,19 @@ namespace NeosModLoader
 		{
 			if (IsDebugEnabled())
 			{
-				LogListInternal(LogType.DEBUG, messages, SourceFromStackTrace());
+				LogListInternal(LogType.DEBUG, messages, SourceFromStackTrace(new(1)));
 			}
 		}
 
 		internal static void MsgInternal(string message) => LogInternal(LogType.INFO, message);
-		internal static void MsgExternal(object message) => LogInternal(LogType.INFO, message, SourceFromStackTrace());
-		internal static void MsgListExternal(object[] messages) => LogListInternal(LogType.INFO, messages, SourceFromStackTrace());
+		internal static void MsgExternal(object message) => LogInternal(LogType.INFO, message, SourceFromStackTrace(new(1)));
+		internal static void MsgListExternal(object[] messages) => LogListInternal(LogType.INFO, messages, SourceFromStackTrace(new(1)));
 		internal static void WarnInternal(string message) => LogInternal(LogType.WARN, message);
-		internal static void WarnExternal(object message) => LogInternal(LogType.WARN, message, SourceFromStackTrace());
-		internal static void WarnListExternal(object[] messages) => LogListInternal(LogType.WARN, messages, SourceFromStackTrace());
+		internal static void WarnExternal(object message) => LogInternal(LogType.WARN, message, SourceFromStackTrace(new(1)));
+		internal static void WarnListExternal(object[] messages) => LogListInternal(LogType.WARN, messages, SourceFromStackTrace(new(1)));
 		internal static void ErrorInternal(string message) => LogInternal(LogType.ERROR, message);
-		internal static void ErrorExternal(object message) => LogInternal(LogType.ERROR, message, SourceFromStackTrace());
-		internal static void ErrorListExternal(object[] messages) => LogListInternal(LogType.ERROR, messages, SourceFromStackTrace());
+		internal static void ErrorExternal(object message) => LogInternal(LogType.ERROR, message, SourceFromStackTrace(new(1)));
+		internal static void ErrorListExternal(object[] messages) => LogListInternal(LogType.ERROR, messages, SourceFromStackTrace(new(1)));
 
 		private static void LogInternal(string logTypePrefix, object message, string? source = null)
 		{
@@ -94,10 +95,10 @@ namespace NeosModLoader
 			}
 		}
 
-		private static string? SourceFromStackTrace()
+		private static string? SourceFromStackTrace(StackTrace stackTrace)
 		{
 			// MsgExternal() and Msg() are above us in the stack
-			return Util.ExecutingMod(2)?.Name;
+			return Util.ExecutingMod(stackTrace)?.Name;
 		}
 
 		private sealed class LogType

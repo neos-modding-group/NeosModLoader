@@ -527,7 +527,7 @@ namespace NeosModLoader
 		{
 
 			Thread thread = Thread.CurrentThread;
-			NeosMod? callee = Util.ExecutingMod();
+			NeosMod? callee = Util.ExecutingMod(new(1));
 			Action<bool>? saveAction = null;
 
 			// get saved state for this callee
