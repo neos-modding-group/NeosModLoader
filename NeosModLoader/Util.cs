@@ -32,25 +32,6 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Get the calling assembly by stack trace analysis.
-		/// </summary>
-		/// <param name="stacktrace">A stack trace captured by the callee</param>
-		/// <returns>The executing mod, or null if none found</returns>
-		internal static Assembly? GetCallingAssembly(StackTrace stackTrace)
-		{
-			// same logic as ExecutingMod(), but simpler case
-			for (int i = 0; i < stackTrace.FrameCount; i++)
-			{
-				Assembly? assembly = stackTrace.GetFrame(i)?.GetMethod()?.DeclaringType?.Assembly;
-				if (assembly != null)
-				{
-					return assembly;
-				}
-			}
-			return null;
-		}
-
-		/// <summary>
 		/// Used to debounce a method call. The underlying method will be called after there have been no additional calls
 		/// for n milliseconds.
 		/// 
