@@ -165,7 +165,7 @@ namespace NeosModLoader
 
 		private static void GetAssembliesPostfix(ref Assembly[] __result)
 		{
-			Assembly? callingAssembly = Util.GetCallingAssembly();
+			Assembly? callingAssembly = Util.GetCallingAssembly(new(1));
 			if (callingAssembly != null && neosAssemblies!.Contains(callingAssembly))
 			{
 				// if we're being called by Neos, then hide mod assemblies
