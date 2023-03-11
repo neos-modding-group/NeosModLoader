@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeosModLoader.Utility
 {
-	internal sealed class GenericMethodInvoker<TInstance, TReturn>
+	public sealed class GenericMethodInvoker<TInstance, TReturn>
 	{
 		private readonly Dictionary<TypeDefinition, MethodInfo> concreteMethods = new();
 
@@ -19,9 +19,6 @@ namespace NeosModLoader.Utility
 
 			GenericMethod = method;
 		}
-
-		public GenericMethodInvoker(Delegate @delegate) : this(@delegate.Method)
-		{ }
 
 		internal GenericMethodInvoker(MethodInfo method, bool ignoreLackOfGenericParameters)
 		{
@@ -55,7 +52,7 @@ namespace NeosModLoader.Utility
 		}
 	}
 
-	internal sealed class GenericMethodInvoker<TReturn>
+	public sealed class GenericMethodInvoker<TReturn>
 	{
 		private readonly Dictionary<TypeDefinition, MethodInfo> concreteMethods = new();
 
@@ -68,9 +65,6 @@ namespace NeosModLoader.Utility
 
 			GenericMethod = method;
 		}
-
-		public GenericMethodInvoker(Delegate @delegate) : this(@delegate.Method)
-		{ }
 
 		public TReturn Invoke(Type[] types, params object[] parameters)
 		{
@@ -98,7 +92,7 @@ namespace NeosModLoader.Utility
 		}
 	}
 
-	internal sealed class GenericMethodInvoker
+	public sealed class GenericMethodInvoker
 	{
 		private readonly Dictionary<TypeDefinition, MethodInfo> concreteMethods = new();
 
@@ -111,9 +105,6 @@ namespace NeosModLoader.Utility
 
 			GenericMethod = method;
 		}
-
-		public GenericMethodInvoker(Delegate @delegate) : this(@delegate.Method)
-		{ }
 
 		public void Invoke(Type[] types, params object[] parameters)
 		{

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NeosModLoader.Utility
 {
-	internal sealed class GenericTypeMethodsInvoker
+	public sealed class GenericTypeMethodsInvoker
 	{
 		private readonly Dictionary<TypeDefinition, ConcreteType> concreteTypes = new();
 
