@@ -519,7 +519,7 @@ namespace NeosModLoader
 
 
 		/// <summary>
-		/// Persist this configuration to disk. This method is not called automatically.
+		/// Asynchronously persist this configuration to disk.
 		/// </summary>
 		/// <param name="saveDefaultValues">If true, default values will also be persisted</param>
 		/// <param name="immediate">Skip the debouncing and save immediately</param>
@@ -583,8 +583,11 @@ namespace NeosModLoader
 			}
 		}
 
-		// performs the actual, synchronous save
-		private void SaveInternal(bool saveDefaultValues)
+		/// <summary>
+		/// performs the actual, synchronous save
+		/// </summary>
+		/// <param name="saveDefaultValues">If true, default values will also be persisted</param>
+		private void SaveInternal(bool saveDefaultValues = false)
 		{
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			JObject json = new()
@@ -680,7 +683,8 @@ namespace NeosModLoader
 				{
 					try
 					{
-						config!.Save();
+						// synchronously save the config
+						config!.SaveInternal();
 					}
 					catch (Exception e)
 					{

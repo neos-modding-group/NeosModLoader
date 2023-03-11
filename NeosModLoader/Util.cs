@@ -118,6 +118,7 @@ namespace NeosModLoader
 			{
 				return false;
 			}
+
 			try
 			{
 				string _name = type.Name;
@@ -125,19 +126,6 @@ namespace NeosModLoader
 			catch (Exception e)
 			{
 				Logger.DebugFuncInternal(() => $"Could not read the name for a type: {e}");
-				return false;
-			}
-			try
-			{
-				if (type.TypeInitializer == null)
-				{
-					Logger.DebugFuncInternal(() => $"No TypeInitializer for type \"{type}\"");
-					return false;
-				}
-			}
-			catch (Exception e)
-			{
-				Logger.DebugFuncInternal(() => $"Could not read TypeInitializer for type \"{type}\": {e}");
 				return false;
 			}
 
