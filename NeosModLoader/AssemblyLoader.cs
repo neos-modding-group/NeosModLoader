@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace NeosModLoader
@@ -16,8 +17,14 @@ namespace NeosModLoader
 			string[]? assembliesToLoad = null;
 			try
 			{
-				assembliesToLoad = Directory.GetFiles(assembliesDirectory, "*.dll", SearchOption.AllDirectories);
-				Array.Sort(assembliesToLoad, (a, b) => string.CompareOrdinal(a, b));
+				// Directory.GetFiles and Directory.EnumerateFiles have a fucked up API: https://learn.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=netframework-4.6.2#system-io-directory-getfiles(system-string-system-string-system-io-searchoption)
+				// long story short if I searched for "*.dll* it would unhelpfully use some incredibly inconsistent behavior and return results like "foo.dll_disabled"
+				// So I have to filter shit after the fact... ugh
+				Logger.DebugInternal("I'm morbing");
+				assembliesToLoad = Directory.EnumerateFiles(assembliesDirectory, "*?.dll", SearchOption.AllDirectories)
+					.Where(file => file.EndsWith(".dll"))
+					.ToArray();
+				Array.Sort(assembliesToLoad, string.CompareOrdinal);
 			}
 			catch (Exception e)
 			{
