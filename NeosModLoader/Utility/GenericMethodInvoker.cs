@@ -12,17 +12,14 @@ namespace NeosModLoader.Utility
 
 		public MethodInfo GenericMethod { get; }
 
-		public GenericMethodInvoker(MethodInfo method)
-		{
-			if (!method.ContainsGenericParameters)
-				throw new ArgumentException("Target method must have remaining open type parameters.", nameof(method));
-
-			GenericMethod = method;
-		}
+		public GenericMethodInvoker(MethodInfo method) : this(method, false)
+		{ }
 
 		internal GenericMethodInvoker(MethodInfo method, bool ignoreLackOfGenericParameters)
 		{
-			//Intentionally left out generic parameter check to simplify the GenericTypeMethodInvoker
+			if (!ignoreLackOfGenericParameters && !method.ContainsGenericParameters)
+				throw new ArgumentException("Target method must have remaining open type parameters.", nameof(method));
+
 			GenericMethod = method;
 		}
 
@@ -80,11 +77,7 @@ namespace NeosModLoader.Utility
 		{
 			if (!concreteMethods.TryGetValue(definition, out var method))
 			{
-				if (GenericMethod.ContainsGenericParameters)
-					method = GenericMethod.MakeGenericMethod(definition.Types);
-				else
-					method = GenericMethod;
-
+				method = GenericMethod.MakeGenericMethod(definition.Types);
 				concreteMethods.Add(definition, method);
 			}
 
@@ -120,11 +113,7 @@ namespace NeosModLoader.Utility
 		{
 			if (!concreteMethods.TryGetValue(definition, out var method))
 			{
-				if (GenericMethod.ContainsGenericParameters)
-					method = GenericMethod.MakeGenericMethod(definition.Types);
-				else
-					method = GenericMethod;
-
+				method = GenericMethod;
 				concreteMethods.Add(definition, method);
 			}
 
