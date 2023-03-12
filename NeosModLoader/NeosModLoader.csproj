@@ -29,11 +29,11 @@
 		<NeosPath Condition="Exists('D:/Files/Games/Neos/app/')">D:/Files/Games/Neos/app/</NeosPath>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 	  <DebugType>none</DebugType>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
