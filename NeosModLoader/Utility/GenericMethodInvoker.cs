@@ -15,7 +15,7 @@ namespace NeosModLoader.Utility
 		public GenericMethodInvoker(MethodInfo method)
 		{
 			if (!method.ContainsGenericParameters)
-				throw new InvalidOperationException("Target method must have remaining open type parameters.");
+				throw new ArgumentException("Target method must have remaining open type parameters.", nameof(method));
 
 			GenericMethod = method;
 		}
@@ -61,7 +61,7 @@ namespace NeosModLoader.Utility
 		public GenericMethodInvoker(MethodInfo method)
 		{
 			if (!method.ContainsGenericParameters)
-				throw new InvalidOperationException("Target method must have remaining open type parameters.");
+				throw new ArgumentException("Target method must have remaining open type parameters.", nameof(method));
 
 			GenericMethod = method;
 		}
@@ -101,7 +101,7 @@ namespace NeosModLoader.Utility
 		public GenericMethodInvoker(MethodInfo method)
 		{
 			if (!method.ContainsGenericParameters)
-				throw new InvalidOperationException("Target method must have remaining open type parameters.");
+				throw new ArgumentException("Target method must have remaining open type parameters.", nameof(method));
 
 			GenericMethod = method;
 		}
