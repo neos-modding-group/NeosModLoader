@@ -27,64 +27,34 @@ namespace NeosModLoader.Utility
 			GetGenericMethodOfConcreteType = getGenericMethodOfConcreteType;
 		}
 
-		public TReturn Invoke<TReturn>(MethodInfo method, Type[] instanceTypes, object instance, Type[] methodTypes, params object[] parameters)
+		public TReturn Invoke<TReturn>(MethodInfo method, TypeDefinition instanceDefinition, object instance, TypeDefinition methodDefinition, params object[] parameters)
 		{
-			return (TReturn)InvokeInternal(method, instanceTypes, instance, methodTypes, parameters);
+			return (TReturn)InvokeInternal(method, instanceDefinition, instance, methodDefinition, parameters);
 		}
 
-		public TReturn Invoke<TReturn>(MethodInfo method, Type[] instanceTypes, object instance, Type methodType, params object[] parameters)
+		public object Invoke(MethodInfo method, TypeDefinition instanceDefinition, object instance, TypeDefinition methodDefinition, params object[] parameters)
 		{
-			return (TReturn)InvokeInternal(method, instanceTypes, instance, methodType, parameters);
+			return InvokeInternal(method, instanceDefinition, instance, methodDefinition, parameters);
 		}
 
-		public object Invoke(MethodInfo method, Type[] instanceTypes, object instance, Type[] methodTypes, params object[] parameters)
+		public TReturn Invoke<TReturn>(MethodInfo method, TypeDefinition instanceDefinition, object instance, params object[] parameters)
 		{
-			return InvokeInternal(method, instanceTypes, instance, methodTypes, parameters);
+			return (TReturn)InvokeInternal(method, instanceDefinition, instance, new TypeDefinition(), parameters);
 		}
 
-		public object Invoke(MethodInfo method, Type instanceType, object instance, Type[] methodTypes, params object[] parameters)
+		public TReturn Invoke<TReturn>(MethodInfo method, TypeDefinition instanceDefinition, params object[] parameters)
 		{
-			return InvokeInternal(method, instanceType, instance, methodTypes, parameters);
+			return (TReturn)InvokeInternal(method, instanceDefinition, null, new TypeDefinition(), parameters);
 		}
 
-		public object Invoke(MethodInfo method, Type[] instanceTypes, object instance, Type methodType, params object[] parameters)
+		public object Invoke(MethodInfo method, TypeDefinition instanceDefinition, object instance, params object[] parameters)
 		{
-			return InvokeInternal(method, instanceTypes, instance, methodType, parameters);
+			return InvokeInternal(method, instanceDefinition, instance, new TypeDefinition(), parameters);
 		}
 
-		public object Invoke(MethodInfo method, Type instanceType, object instance, Type methodType, params object[] parameters)
+		public object Invoke(MethodInfo method, TypeDefinition instanceDefinition, params object[] parameters)
 		{
-			return InvokeInternal(method, instanceType, instance, methodType, parameters);
-		}
-
-		public TReturn Invoke<TReturn>(MethodInfo method, Type instanceType, object instance, Type[] methodTypes, params object[] parameters)
-		{
-			return (TReturn)InvokeInternal(method, instanceType, instance, methodTypes, parameters);
-		}
-
-		public TReturn Invoke<TReturn>(MethodInfo method, Type instanceType, object instance, Type methodType, params object[] parameters)
-		{
-			return (TReturn)InvokeInternal(method, instanceType, instance, methodType, parameters);
-		}
-
-		public TReturn Invoke<TReturn>(MethodInfo method, Type instanceType, object instance, params object[] parameters)
-		{
-			return (TReturn)InvokeInternal(method, instanceType, instance, new TypeDefinition(), parameters);
-		}
-
-		public TReturn Invoke<TReturn>(MethodInfo method, Type instanceType, params object[] parameters)
-		{
-			return (TReturn)InvokeInternal(method, instanceType, null, new TypeDefinition(), parameters);
-		}
-
-		public object Invoke(MethodInfo method, Type[] instanceTypes, object instance, params object[] parameters)
-		{
-			return InvokeInternal(method, instanceTypes, instance, new TypeDefinition(), parameters);
-		}
-
-		public object Invoke(MethodInfo method, Type[] instanceTypes, params object[] parameters)
-		{
-			return InvokeInternal(method, instanceTypes, null, new TypeDefinition(), parameters);
+			return InvokeInternal(method, instanceDefinition, null, new TypeDefinition(), parameters);
 		}
 
 		private static MethodInfo GetGenericMethodOfConcreteTypeDefault(MethodInfo needleMethod, Type concreteType)
@@ -126,11 +96,11 @@ namespace NeosModLoader.Utility
 				});
 		}
 
-		private object InvokeInternal(MethodInfo method, TypeDefinition instanceTypes, object? instance, TypeDefinition methodTypes, object[]? parameters)
+		private object InvokeInternal(MethodInfo method, TypeDefinition instanceTypes, object? instance, TypeDefinition methodTypes, object[] parameters)
 		{
 			if (!concreteTypes.TryGetValue(instanceTypes, out var concreteType))
 			{
-				concreteType = GenericType.MakeGenericType(instanceTypes.Types);
+				concreteType = GenericType.MakeGenericType(instanceTypes.types);
 				concreteTypes.Add(instanceTypes, concreteType);
 			}
 

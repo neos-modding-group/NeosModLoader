@@ -23,14 +23,9 @@ namespace NeosModLoader.Utility
 			GenericMethod = method;
 		}
 
-		public TReturn Invoke(TInstance instance, Type[] types, params object[] parameters)
+		public TReturn Invoke(TInstance instance, TypeDefinition definition, params object[] parameters)
 		{
-			return InvokeInternal(instance, types, parameters);
-		}
-
-		public TReturn Invoke(TInstance instance, Type type, params object[] parameters)
-		{
-			return InvokeInternal(instance, type, parameters);
+			return InvokeInternal(instance, definition, parameters);
 		}
 
 		internal TReturn InvokeInternal(TInstance? instance, TypeDefinition definition, object[]? parameters)
@@ -38,7 +33,7 @@ namespace NeosModLoader.Utility
 			if (!concreteMethods.TryGetValue(definition, out var method))
 			{
 				if (GenericMethod.ContainsGenericParameters)
-					method = GenericMethod.MakeGenericMethod(definition.Types);
+					method = GenericMethod.MakeGenericMethod(definition.types);
 				else
 					method = GenericMethod;
 
@@ -63,21 +58,11 @@ namespace NeosModLoader.Utility
 			GenericMethod = method;
 		}
 
-		public TReturn Invoke(Type[] types, params object[] parameters)
-		{
-			return InvokeInternal(types, parameters);
-		}
-
-		public TReturn Invoke(Type type, params object[] parameters)
-		{
-			return InvokeInternal(type, parameters);
-		}
-
-		private TReturn InvokeInternal(TypeDefinition definition, object[] parameters)
+		public TReturn Invoke(TypeDefinition definition, params object[] parameters)
 		{
 			if (!concreteMethods.TryGetValue(definition, out var method))
 			{
-				method = GenericMethod.MakeGenericMethod(definition.Types);
+				method = GenericMethod.MakeGenericMethod(definition.types);
 				concreteMethods.Add(definition, method);
 			}
 
@@ -99,17 +84,7 @@ namespace NeosModLoader.Utility
 			GenericMethod = method;
 		}
 
-		public void Invoke(Type[] types, params object[] parameters)
-		{
-			InvokeInternal(types, parameters);
-		}
-
-		public void Invoke(Type type, params object[] parameters)
-		{
-			InvokeInternal(type, parameters);
-		}
-
-		private void InvokeInternal(TypeDefinition definition, object[] parameters)
+		public void Invoke(TypeDefinition definition, params object[] parameters)
 		{
 			if (!concreteMethods.TryGetValue(definition, out var method))
 			{

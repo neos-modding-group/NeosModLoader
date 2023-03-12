@@ -1,18 +1,18 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NeosModLoader.Utility
 {
-	internal readonly struct TypeDefinition : IEquatable<TypeDefinition>
+	public readonly struct TypeDefinition : IEquatable<TypeDefinition>, IEnumerable<Type>
 	{
-		public readonly Type[] Types;
+		internal readonly Type[] types;
 
-		public int Length => Types.Length;
+		public int Length => types.Length;
 
 		public TypeDefinition(params Type[] types)
-		{
-			Types = types ?? Array.Empty<Type>();
-		}
+			=> this.types = types ?? Array.Empty<Type>();
 
 		public static implicit operator TypeDefinition(Type[] types) => new(types);
 
@@ -35,12 +35,17 @@ namespace NeosModLoader.Utility
 
 		public bool Equals(TypeDefinition other)
 		{
-			return Types.SequenceEqual(other.Types);
+			return types.SequenceEqual(other.types);
 		}
+
+		public IEnumerator<Type> GetEnumerator()
+			=> ((IEnumerable<Type>)types).GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => types.GetEnumerator();
 
 		public override int GetHashCode()
 		{
-			return unchecked(Types.Aggregate(0, (acc, type) => (-136316459 * acc) + type.GetHashCode()));
+			return unchecked(types.Aggregate(0, (acc, type) => (31 * acc) + type.GetHashCode()));
 		}
 	}
 }
