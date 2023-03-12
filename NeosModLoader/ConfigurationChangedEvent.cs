@@ -1,19 +1,22 @@
 namespace NeosModLoader
 {
+	/// <summary>
+	/// Represents the data for the <see cref="ModConfiguration.OnThisConfigurationChanged"/> and <see cref="ModConfiguration.OnAnyConfigurationChanged"/> events.
+	/// </summary>
 	public class ConfigurationChangedEvent
 	{
 		/// <summary>
-		/// The configuration the change occurred in
+		/// The <see cref="ModConfiguration"/> in which the change occured.
 		/// </summary>
 		public ModConfiguration Config { get; private set; }
 
 		/// <summary>
-		/// The specific key who's value changed
+		/// The specific <see cref="ModConfigurationKey{T}"/> who's value changed.
 		/// </summary>
 		public ModConfigurationKey Key { get; private set; }
 
 		/// <summary>
-		/// A custom label that may be set by whoever changed the configuration
+		/// A custom label that may be set by whoever changed the configuration.
 		/// </summary>
 		public string? Label { get; private set; }
 

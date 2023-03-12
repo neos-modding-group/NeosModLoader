@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace NeosModLoader
 {
 	/// <summary>
-	/// Untyped mod configuration key.
+	/// Represents an untyped mod configuration key.
 	/// </summary>
 	public abstract class ModConfigurationKey
 	{
@@ -16,45 +16,53 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Unique name of this config item. Must be present.
+		/// Gets the mod-unique name of this config item. Must be present.
 		/// </summary>
 		public string Name { get; private set; }
 
 		/// <summary>
-		/// Human-readable description of this config item. Should be specified by the defining mod.
+		/// Gets the human-readable description of this config item. Should be specified by the defining mod.
 		/// </summary>
 		public string? Description { get; private set; }
 
 		/// <summary>
-		/// If true, only the owning mod should have access to this config item
+		/// Gets whether only the owning mod should have access to this config item.
 		/// </summary>
 		public bool InternalAccessOnly { get; private set; }
 
-		/// <returns>Type of the config item</returns>
+		/// <summary>
+		/// Get the <see cref="Type"/> of this key's value.
+		/// </summary>
+		/// <returns>The <see cref="Type"/> of this key's value.</returns>
 		public abstract Type ValueType();
 
 		/// <summary>
-		/// Checks if a value is valid for this configuration item
+		/// Checks if a value is valid for this configuration item.
 		/// </summary>
-		/// <param name="value">The value to check</param>
-		/// <returns>true if the value is valid</returns>
+		/// <param name="value">The value to check.</param>
+		/// <returns><c>true</c> if the value is valid.</returns>
 		public abstract bool Validate(object? value);
 
 		/// <summary>
-		/// Computes a default value for this key, if a default provider is set
+		/// Tries to compute the default value for this key, if a default provider was set.
 		/// </summary>
-		/// <param name="defaultValue">the computed default value, or null if no default provider was set</param>
-		/// <returns>true if a default was computed</returns>
+		/// <param name="defaultValue">The computed default value if the return value is <c>true</c>. Otherwise <c>default</c>.</param>
+		/// <returns><c>true</c> if the default value was successfully computed.</returns>
 		public abstract bool TryComputeDefault(out object? defaultValue);
 
-		// We only care about key name for non-defining keys.
-		// For defining keys all of the other properties (default, validator, etc.) also matter.
+		/// <summary>
+		/// We only care about key name for non-defining keys.<br/>
+		/// For defining keys all of the other properties (default, validator, etc.) also matter.
+		/// </summary>
+		/// <param name="obj">The other object to compare against.</param>
+		/// <returns><c>true</c> if the other object is equal to this.</returns>
 		public override bool Equals(object obj)
 		{
 			return obj is ModConfigurationKey key &&
 				   Name == key.Name;
 		}
 
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
@@ -67,7 +75,7 @@ namespace NeosModLoader
 		/// Each configuration item has exactly ONE defining key, and that is the key defined by the mod.
 		/// Duplicate keys can be created (they only need to share the same Name) and they'll still work
 		/// for reading configs.
-		/// 
+		/// <para/>
 		/// This is a non-null self-reference for the defining key itself as soon as the definition is done initializing.
 		/// </summary>
 		internal ModConfigurationKey? DefiningKey;
@@ -101,19 +109,19 @@ namespace NeosModLoader
 	}
 
 	/// <summary>
-	/// Typed mod configuration key.
+	/// Represents a typed mod configuration key.
 	/// </summary>
-	/// <typeparam name="T">The value's type</typeparam>
+	/// <typeparam name="T">The type of this key's value.</typeparam>
 	public class ModConfigurationKey<T> : ModConfigurationKey
 	{
 		/// <summary>
-		/// Creates a new ModConfigurationKey
+		/// Creates a new instance of the <see cref="ModConfigurationKey{T}"/> class with the given parameters.
 		/// </summary>
-		/// <param name="name">Unique name of this config item</param>
-		/// <param name="description">Human-readable description of this config item</param>
-		/// <param name="computeDefault">Function that, if present, computes a default value for this key</param>
-		/// <param name="internalAccessOnly">If true, only the owning mod should have access to this config item</param>
-		/// <param name="valueValidator">Checks if a value is valid for this configuration item</param>
+		/// <param name="name">The mod-unique name of this config item.</param>
+		/// <param name="description">The human-readable description of this config item.</param>
+		/// <param name="computeDefault">The function that computes a default value for this key. Otherwise <c>default(<typeparamref name="T"/>)</c> will be used.</param>
+		/// <param name="internalAccessOnly">If <c>true</c>, only the owning mod should have access to this config item.</param>
+		/// <param name="valueValidator">The function that checks if the given value is valid for this configuration item. Otherwise everything will be accepted.</param>
 		public ModConfigurationKey(string name, string? description = null, Func<T>? computeDefault = null, bool internalAccessOnly = false, Predicate<T?>? valueValidator = null) : base(name, description, internalAccessOnly)
 		{
 			ComputeDefault = computeDefault;
@@ -123,17 +131,10 @@ namespace NeosModLoader
 		private readonly Func<T>? ComputeDefault;
 		private readonly Predicate<T?>? IsValueValid;
 
-		/// <summary>
-		/// Get the type of this key's value
-		/// </summary>
-		/// <returns>the type of this key's value</returns>
+		/// <inheritdoc/>
 		public override Type ValueType() => typeof(T);
 
-		/// <summary>
-		/// Checks if a value is valid for this configuration item
-		/// </summary>
-		/// <param name="value">value to check</param>
-		/// <returns>true if the value is valid</returns>
+		/// <inheritdoc/>
 		public override bool Validate(object? value)
 		{
 			if (value is T typedValue)
@@ -162,10 +163,10 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Checks if a value is valid for this configuration item
+		/// Checks if a value is valid for this configuration item.
 		/// </summary>
-		/// <param name="value">value to check</param>
-		/// <returns>true if the value is valid</returns>
+		/// <param name="value">The value to check.</param>
+		/// <returns><c>true</c> if the value is valid.</returns>
 		public bool ValidateTyped(T? value)
 		{
 			if (IsValueValid == null)
@@ -178,6 +179,7 @@ namespace NeosModLoader
 			}
 		}
 
+		/// <inheritdoc/>
 		public override bool TryComputeDefault(out object? defaultValue)
 		{
 			if (TryComputeDefaultTyped(out T? defaultTypedValue))
@@ -193,10 +195,10 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Computes a default value for this key, if a default provider is set
+		/// Tries to compute the default value for this key, if a default provider was set.
 		/// </summary>
-		/// <param name="defaultValue">the computed default value, or default(T) if no default provider was set</param>
-		/// <returns>true if a default was computed</returns>
+		/// <param name="defaultValue">The computed default value if the return value is <c>true</c>. Otherwise <c>default(T)</c>.</param>
+		/// <returns><c>true</c> if the default value was successfully computed.</returns>
 		public bool TryComputeDefaultTyped(out T? defaultValue)
 		{
 			if (ComputeDefault == null)
