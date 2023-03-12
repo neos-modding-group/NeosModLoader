@@ -89,15 +89,15 @@ namespace NeosModLoader.Utility
 
 		private static MethodInfo GetGenericMethodOfConcreteTypeDefault(MethodInfo needleMethod, Type concreteType)
 		{
-			NeosMod.Debug($"Looking for: {needleMethod.ReturnType.Name} {needleMethod.Name}({string.Join(", ", needleMethod.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"))})");
+			Logger.DebugFuncInternal(() => $"Looking for: {needleMethod.FullDescription()}");
 
 			return concreteType.GetMethods(AccessTools.all)
 				.Single(hayMethod =>
 				{
-					NeosMod.Debug($"Testing: {hayMethod.ReturnType.Name} {hayMethod.Name}({string.Join(", ", hayMethod.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"))})");
-
 					if (hayMethod.Name != needleMethod.Name)
 						return false;
+
+					Logger.DebugFuncInternal(() => $"Testing potential candidate: {hayMethod.FullDescription()}");
 
 					var needleParameters = needleMethod.GetParameters();
 					var hayParameters = hayMethod.GetParameters();
