@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<ProjectGuid>{D4627C7F-8091-477A-ABDC-F1465D94D8D9}</ProjectGuid>
@@ -19,6 +19,7 @@
 		<CopyToLibraries Condition="'$(CopyToLibraries)'==''">true</CopyToLibraries>
 		<DebugSymbols Condition="'$(Configuration)'=='Release'">false</DebugSymbols>
 		<DebugType Condition="'$(Configuration)'=='Release'">None</DebugType>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(NeosPath)'==''">
@@ -26,6 +27,14 @@
 		<NeosPath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\NeosVR\')">C:\Program Files (x86)\Steam\steamapps\common\NeosVR\</NeosPath>
 		<NeosPath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/NeosVR/')">$(HOME)/.steam/steam/steamapps/common/NeosVR/</NeosPath>
 		<NeosPath Condition="Exists('D:/Files/Games/Neos/app/')">D:/Files/Games/Neos/app/</NeosPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -45,6 +54,8 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToLibraries)'=='true'">
 		<Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFiles="$(NeosPath)Libraries\$(AssemblyFileName)" />
 		<Message Text="Copied $(TargetFileName) to $(NeosPath)Libraries\$(AssemblyFileName)" Importance="high" />
+		<Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFiles="$(NeosPath)Libraries\$(AssemblyTitle).xml" />
+		<Message Text="Copied $(TargetName).xml to $(NeosPath)Libraries\$(AssemblyTitle).xml" Importance="high" />
 	</Target>
 
 </Project>
