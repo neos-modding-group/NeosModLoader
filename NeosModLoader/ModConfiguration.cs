@@ -14,37 +14,36 @@ using System.Threading.Tasks;
 
 namespace NeosModLoader
 {
+	/// <summary>
+	/// Represents an interface for mod configurations.
+	/// </summary>
 	public interface IModConfigurationDefinition
 	{
 		/// <summary>
-		/// Mod that owns this configuration definition
+		/// Gets the mod that owns this configuration definition.
 		/// </summary>
 		NeosModBase Owner { get; }
 
 		/// <summary>
-		/// Semantic version for this configuration definition. This is used to check if the defined and saved configs are compatible
+		/// Gets the semantic version for this configuration definition. This is used to check if the defined and saved configs are compatible.
 		/// </summary>
 		Version Version { get; }
 
 		/// <summary>
-		/// The set of coniguration keys defined in this configuration definition
+		/// Gets the set of configuration keys defined in this configuration definition.
 		/// </summary>
 		ISet<ModConfigurationKey> ConfigurationItemDefinitions { get; }
 	}
 
 	/// <summary>
-	/// Defines a mod configuration. This should be defined by a NeosMod using the NeosMod.DefineConfiguration() method.
+	/// Defines a mod configuration. This should be defined by a <see cref="NeosMod"/> using the <see cref="NeosMod.DefineConfiguration(ModConfigurationDefinitionBuilder)"/> method.
 	/// </summary>
 	public class ModConfigurationDefinition : IModConfigurationDefinition
 	{
-		/// <summary>
-		/// Mod that owns this configuration definition
-		/// </summary>
+		/// <inheritdoc/>
 		public NeosModBase Owner { get; private set; }
 
-		/// <summary>
-		/// Semantic version for this configuration definition. This is used to check if the defined and saved configs are compatible
-		/// </summary>
+		/// <inheritdoc/>
 		public Version Version { get; private set; }
 
 		internal bool AutoSave;
@@ -52,9 +51,7 @@ namespace NeosModLoader
 		// this is a ridiculous hack because HashSet.TryGetValue doesn't exist in .NET 4.6.2
 		private Dictionary<ModConfigurationKey, ModConfigurationKey> configurationItemDefinitionsSelfMap;
 
-		/// <summary>
-		/// The set of coniguration keys defined in this configuration definition
-		/// </summary>
+		/// <inheritdoc/>
 		public ISet<ModConfigurationKey> ConfigurationItemDefinitions
 		{
 			// clone the collection because I don't trust giving public API users shallow copies one bit
@@ -113,19 +110,13 @@ namespace NeosModLoader
 		private static readonly string VERSION_JSON_KEY = "version";
 		private static readonly string VALUES_JSON_KEY = "values";
 
-		/// <summary>
-		/// Mod that owns this configuration definition
-		/// </summary>
+		/// <inheritdoc/>
 		public NeosModBase Owner => Definition.Owner;
 
-		/// <summary>
-		/// Semantic version for this configuration definition. This is used to check if the defined and saved configs are compatible
-		/// </summary>
+		/// <inheritdoc/>
 		public Version Version => Definition.Version;
 
-		/// <summary>
-		/// The set of coniguration keys defined in this configuration definition
-		/// </summary>
+		/// <inheritdoc/>
 		public ISet<ModConfigurationKey> ConfigurationItemDefinitions => Definition.ConfigurationItemDefinitions;
 
 		private bool AutoSave => Definition.AutoSave;
@@ -223,10 +214,10 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Check if a key is defined in this config
+		/// Checks if the given key is defined in this config.
 		/// </summary>
-		/// <param name="key">the key to check</param>
-		/// <returns>true if the key is defined</returns>
+		/// <param name="key">The key to check.</param>
+		/// <returns><c>true</c> if the key is defined.</returns>
 		public bool IsKeyDefined(ModConfigurationKey key)
 		{
 			// if a key has a non-null defining key it's guaranteed a real key. Lets check for that.
@@ -249,10 +240,10 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Check if a key is the defining key
+		/// Checks if the given key is the defining key.
 		/// </summary>
-		/// <param name="key">the key to check</param>
-		/// <returns>true if the key is the defining key</returns>
+		/// <param name="key">The key to check.</param>
+		/// <returns><c>true</c> if the key is the defining key.</returns>
 		internal bool IsKeyDefiningKey(ModConfigurationKey key)
 		{
 			// a key is the defining key if and only if its DefiningKey property references itself
@@ -260,11 +251,11 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Get a value, throwing an exception if the key is not found
+		/// Get a value, throwing a <see cref="KeyNotFoundException"/> if the key is not found.
 		/// </summary>
-		/// <param name="key">The key to find</param>
-		/// <returns>The found value</returns>
-		/// <exception cref="KeyNotFoundException">key does not exist in the collection</exception>
+		/// <param name="key">The key to get the value for.</param>
+		/// <returns>The value for the key.</returns>
+		/// <exception cref="KeyNotFoundException">The given key does not exist in the configuration.</exception>
 		public object GetValue(ModConfigurationKey key)
 		{
 			if (TryGetValue(key, out object? value))
@@ -278,12 +269,12 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Get a value, throwing an exception if the key is not found
+		/// Get a value, throwing a <see cref="KeyNotFoundException"/> if the key is not found.
 		/// </summary>
-		/// <typeparam name="T">The value's type</typeparam>
-		/// <param name="key">The key to find</param>
-		/// <returns>The found value</returns>
-		/// <exception cref="KeyNotFoundException">key does not exist in the collection</exception>
+		/// <typeparam name="T">The type of the key's value.</typeparam>
+		/// <param name="key">The key to get the value for.</param>
+		/// <returns>The value for the key.</returns>
+		/// <exception cref="KeyNotFoundException">The given key does not exist in the configuration.</exception>
 		public T? GetValue<T>(ModConfigurationKey<T> key)
 		{
 			if (TryGetValue(key, out T? value))
@@ -297,11 +288,11 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Try to read a configuration value
+		/// Tries to get a value, returning <c>default</c> if the key is not found.
 		/// </summary>
-		/// <param name="key">The key</param>
-		/// <param name="value">The value if we succeeded, or null if we failed.</param>
-		/// <returns>true if the value was read successfully</returns>
+		/// <param name="key">The key to get the value for.</param>
+		/// <param name="value">The value if the return value is <c>true</c>, or <c>default</c> if <c>false</c>.</param>
+		/// <returns><c>true</c> if the value was read successfully.</returns>
 		public bool TryGetValue(ModConfigurationKey key, out object? value)
 		{
 			if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey? definingKey))
@@ -327,13 +318,13 @@ namespace NeosModLoader
 			}
 		}
 
+
 		/// <summary>
-		/// Try to read a typed configuration value
+		/// Tries to get a value, returning <c>default(<typeparamref name="T"/>)</c> if the key is not found.
 		/// </summary>
-		/// <typeparam name="T">The value type</typeparam>
-		/// <param name="key">The key</param>
-		/// <param name="value">The value if we succeeded, or default(T) if we failed.</param>
-		/// <returns>true if the value was read successfully</returns>
+		/// <param name="key">The key to get the value for.</param>
+		/// <param name="value">The value if the return value is <c>true</c>, or <c>default</c> if <c>false</c>.</param>
+		/// <returns><c>true</c> if the value was read successfully.</returns>
 		public bool TryGetValue<T>(ModConfigurationKey<T> key, out T? value)
 		{
 			if (TryGetValue(key, out object? valueObject))
@@ -349,11 +340,14 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Set a configuration value
+		/// Sets a configuration value for the given key, throwing a <see cref="KeyNotFoundException"/> if the key is not found
+		/// or an <see cref="ArgumentException"/> if the value is not valid for it.
 		/// </summary>
-		/// <param name="key">The key</param>
-		/// <param name="value">The new value</param>
-		/// <param name="eventLabel">A custom label you may assign to this event</param>
+		/// <param name="key">The key to get the value for.</param>
+		/// <param name="value">The new value to set.</param>
+		/// <param name="eventLabel">A custom label you may assign to this change event.</param>
+		/// <exception cref="KeyNotFoundException">The given key does not exist in the configuration.</exception>
+		/// <exception cref="ArgumentException">The new value is not valid for the given key.</exception>
 		public void Set(ModConfigurationKey key, object? value, string? eventLabel = null)
 		{
 			if (!Definition.TryGetDefiningKey(key, out ModConfigurationKey? definingKey))
@@ -383,12 +377,15 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Set a typed configuration value
+		/// Sets a configuration value for the given key, throwing a <see cref="KeyNotFoundException"/> if the key is not found
+		/// or an <see cref="ArgumentException"/> if the value is not valid for it.
 		/// </summary>
-		/// <typeparam name="T">The value type</typeparam>
-		/// <param name="key">The key</param>
-		/// <param name="value">The new value</param>
-		/// <param name="eventLabel">A custom label you may assign to this event</param>
+		/// <typeparam name="T">The type of the key's value.</typeparam>
+		/// <param name="key">The key to get the value for.</param>
+		/// <param name="value">The new value to set.</param>
+		/// <param name="eventLabel">A custom label you may assign to this change event.</param>
+		/// <exception cref="KeyNotFoundException">The given key does not exist in the configuration.</exception>
+		/// <exception cref="ArgumentException">The new value is not valid for the given key.</exception>
 		public void Set<T>(ModConfigurationKey<T> key, T value, string? eventLabel = null)
 		{
 			// the reason we don't fall back to untyped Set() here is so we can skip the type check
@@ -408,10 +405,11 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Removes a configuration value, if set
+		/// Removes a configuration value, throwing a <see cref="KeyNotFoundException"/> if the key is not found.
 		/// </summary>
-		/// <param name="key"></param>
-		/// <returns>true if a value was successfully found and removed, false if there was no value to remove</returns>
+		/// <param name="key">The key to remove the value for.</param>
+		/// <returns><c>true</c> if a value was successfully found and removed, <c>false</c> if there was no value to remove.</returns>
+		/// <exception cref="KeyNotFoundException">The given key does not exist in the configuration.</exception>
 		public bool Unset(ModConfigurationKey key)
 		{
 			if (Definition.TryGetDefiningKey(key, out ModConfigurationKey? definingKey))
@@ -501,7 +499,9 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Persist this configuration to disk. This method is not called automatically. Default values are not automatically saved.
+		/// Persist this configuration to disk.<br/>
+		/// This method is not called automatically.<br/>
+		/// Default values are not automatically saved.
 		/// </summary>
 		public void Save() // this overload is needed for binary compatibility (REMOVE IN NEXT MAJOR VERSION)
 		{
@@ -509,9 +509,10 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Persist this configuration to disk. This method is not called automatically.
+		/// Persist this configuration to disk.<br/>
+		/// This method is not called automatically.
 		/// </summary>
-		/// <param name="saveDefaultValues">If true, default values will also be persisted</param>
+		/// <param name="saveDefaultValues">If <c>true</c>, default values will also be persisted.</param>
 		public void Save(bool saveDefaultValues = false) // this overload is needed for binary compatibility (REMOVE IN NEXT MAJOR VERSION)
 		{
 			Save(saveDefaultValues, false);
@@ -519,10 +520,10 @@ namespace NeosModLoader
 
 
 		/// <summary>
-		/// Asynchronously persist this configuration to disk.
+		/// Asynchronously persists this configuration to disk.
 		/// </summary>
-		/// <param name="saveDefaultValues">If true, default values will also be persisted</param>
-		/// <param name="immediate">Skip the debouncing and save immediately</param>
+		/// <param name="saveDefaultValues">If <c>true</c>, default values will also be persisted.</param>
+		/// <param name="immediate">If <c>true</c>, skip the debouncing and save immediately.</param>
 		internal void Save(bool saveDefaultValues = false, bool immediate = false)
 		{
 
@@ -696,6 +697,9 @@ namespace NeosModLoader
 		}
 	}
 
+	/// <summary>
+	/// Represents an <see cref="Exception"/> encountered while loading a mod's configuration file.
+	/// </summary>
 	public class ModConfigurationException : Exception
 	{
 		internal ModConfigurationException(string message) : base(message)
@@ -708,7 +712,7 @@ namespace NeosModLoader
 	}
 
 	/// <summary>
-	/// Defines handling of incompatible configuration versions
+	/// Defines options for the handling of incompatible configuration versions.
 	/// </summary>
 	public enum IncompatibleConfigurationHandlingOption
 	{
@@ -723,7 +727,7 @@ namespace NeosModLoader
 		CLOBBER,
 
 		/// <summary>
-		/// Ignore the version number and attempt to load the config from disk
+		/// Ignore the version number and attempt to load the config from disk.
 		/// </summary>
 		FORCE_LOAD,
 	}
