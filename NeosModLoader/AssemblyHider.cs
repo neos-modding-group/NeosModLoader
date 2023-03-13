@@ -107,9 +107,9 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Check if an assembly belongs to a mod or not
+		/// Checks if an <see cref="Assembly"/> belongs to a mod or not.
 		/// </summary>
-		/// <param name="assembly">The assembly to check</param>
+		/// <param name="assembly">The <see cref="Assembly"/> to check.</param>
 		/// <param name="typeOrAssembly">Type of root check being performed. Should be "type" or  "assembly". Used in logging.</param>
 		/// <param name="name">Name of the root check being performed. Used in logging.</param>
 		/// <param name="log">If `true`, this will emit logs. If `false`, this function will not log.</param>
@@ -152,11 +152,11 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Check if an assembly belongs to a mod or not
+		/// Checks if an <see cref="Assembly"/> belongs to a mod or not.
 		/// </summary>
-		/// <param name="assembly">The assembly to check</param>
-		/// <param name="forceShowLate">If `true`, then this function will always return `false` for late-loaded types</param>
-		/// <returns>`true` if this assembly belongs to a mod.</returns>
+		/// <param name="assembly">The <see cref="Assembly"/> to check</param>
+		/// <param name="forceShowLate">If <c>true</c>, then this function will always return <c>false</c> for late-loaded types.</param>
+		/// <returns><c>true</c> if this <see cref="Assembly"/> belongs to a mod.</returns>
 		private static bool IsModAssembly(Assembly assembly, bool forceShowLate = false)
 		{
 			// this generates a lot of logspam, as a single call to AppDomain.GetAssemblies() calls this many times
@@ -164,10 +164,10 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Check if a type belongs to a mod or not
+		/// Checks if a <see cref="Type"/> belongs to a mod or not.
 		/// </summary>
-		/// <param name="type">The type to check</param>
-		/// <returns>true` if this type belongs to a mod.</returns>
+		/// <param name="type">The <see cref="Type"/> to check.</param>
+		/// <returns><c>true</c> if this <see cref="Type"/> belongs to a mod.</returns>
 		private static bool IsModType(Type type)
 		{
 			return IsModAssembly(type.Assembly, "type", type.ToString(), log: true, forceShowLate: false);
@@ -213,11 +213,11 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Get the calling assembly by stack trace analysis, ignoring .NET assemblies.
-		/// This implementation is SPECIFICALLY for the AppDomain.GetAssemblies() patch and may not be valid for other use-cases.
+		/// Get the calling <see cref="Assembly"/> using stack trace analysis, ignoring .NET assemblies.
+		/// This implementation is SPECIFICALLY for the <see cref="AppDomain.GetAssemblies"/> patch and may not be valid for other use-cases.
 		/// </summary>
-		/// <param name="stacktrace">A stack trace captured by the callee</param>
-		/// <returns>The executing assembly, or null if none found</returns>
+		/// <param name="stackTrace">The stack trace captured by the callee.</param>
+		/// <returns>The calling <see cref="Assembly"/>, or null if none was found.</returns>
 		private static Assembly? GetCallingAssembly(StackTrace stackTrace)
 		{
 			for (int i = 0; i < stackTrace.FrameCount; i++)

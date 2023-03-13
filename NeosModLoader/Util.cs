@@ -32,16 +32,16 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Used to debounce a method call. The underlying method will be called after there have been no additional calls
-		/// for n milliseconds.
-		/// 
-		/// The Action<T> returned by this function has internal state used for the debouncing, so you will need to store and reuse the Action
-		/// for each call.
+		/// Used to debounce calls to a given method. The given method will be called after there have been no additional calls
+		/// for the given number of milliseconds.
+		/// <para/>
+		/// The <see cref="Action{T}"/> returned by this method has internal state used for debouncing,
+		/// so you will need to store and reuse the Action for each call.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="func">underlying function call</param>
-		/// <param name="milliseconds">debounce delay</param>
-		/// <returns>a debounced wrapper to a method call</returns>
+		/// <typeparam name="T">The type of the debounced method's input.</typeparam>
+		/// <param name="func">The method to be debounced.</param>
+		/// <param name="milliseconds">How long to wait before a call to the debounced method gets passed through.</param>
+		/// <returns>A debouncing wrapper for the given method.</returns>
 		// credit: https://stackoverflow.com/questions/28472205/c-sharp-event-debounce
 		internal static Action<T> Debounce<T>(this Action<T> func, int milliseconds)
 		{

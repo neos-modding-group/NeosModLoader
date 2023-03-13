@@ -85,7 +85,7 @@ namespace NeosModLoader.Utility
 		}
 
 		/// <summary>
-		/// Creates a new instance of the <see cref="EnumerableInjector{TIn, TOut}"/> class using the supplied input enumerable and transform function.
+		/// Creates a new instance of the <see cref="EnumerableInjector{TIn, TOut}"/> class using the supplied input <see cref="IEnumerable{T}"/> and transform function.
 		/// </summary>
 		/// <param name="enumerable">The enumerable to inject into and transform.</param>
 		/// <param name="transformItem">The transformation function.</param>
@@ -94,7 +94,7 @@ namespace NeosModLoader.Utility
 		{ }
 
 		/// <summary>
-		/// Creates a new instance of the <see cref="EnumerableInjector{TIn, TOut}"/> class using the supplied input enumerator and transform function.
+		/// Creates a new instance of the <see cref="EnumerableInjector{TIn, TOut}"/> class using the supplied input <see cref="IEnumerator{T}"/> and transform function.
 		/// </summary>
 		/// <param name="enumerator">The enumerator to inject into and transform.</param>
 		/// <param name="transformItem">The transformation function.</param>
@@ -159,7 +159,7 @@ namespace NeosModLoader.Utility
 	public class EnumerableInjector<T> : EnumerableInjector<T, T>
 	{
 		/// <summary>
-		/// Creates a new instance of the <see cref="EnumerableInjector{T}"/> class using the supplied input enumerable.
+		/// Creates a new instance of the <see cref="EnumerableInjector{T}"/> class using the supplied input <see cref="IEnumerable{T}"/>.
 		/// </summary>
 		/// <param name="enumerable">The enumerable to inject into.</param>
 		public EnumerableInjector(IEnumerable<T> enumerable)
@@ -167,9 +167,9 @@ namespace NeosModLoader.Utility
 		{ }
 
 		/// <summary>
-		/// Creates a new instance of the <see cref="EnumerableInjector{T}"/> class using the supplied input enumerator.
+		/// Creates a new instance of the <see cref="EnumerableInjector{T}"/> class using the supplied input <see cref="IEnumerator{T}"/>.
 		/// </summary>
-		/// <param name="enumerable">The enumerator to inject into.</param>
+		/// <param name="enumerator">The enumerator to inject into.</param>
 		public EnumerableInjector(IEnumerator<T> enumerator)
 			: base(enumerator, item => item)
 		{ }

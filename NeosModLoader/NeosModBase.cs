@@ -1,25 +1,27 @@
 namespace NeosModLoader
 {
-	// contains public metadata about the mod
+	/// <summary>
+	/// Contains public metadata about a mod.
+	/// </summary>
 	public abstract class NeosModBase
 	{
 		/// <summary>
-		/// Name of the mod. This must be unique.
+		/// Gets the mod's name. This must be unique.
 		/// </summary>
 		public abstract string Name { get; }
 
 		/// <summary>
-		/// Mod's author.
+		/// Gets the mod's author.
 		/// </summary>
 		public abstract string Author { get; }
 
 		/// <summary>
-		/// Semantic version of this mod.
+		/// Gets the mod's semantic version.
 		/// </summary>
 		public abstract string Version { get; }
 
 		/// <summary>
-		/// Optional hyperlink to this mod's homepage
+		/// Gets an optional hyperlink to the mod's homepage.
 		/// </summary>
 		public virtual string? Link { get; }
 
@@ -29,7 +31,12 @@ namespace NeosModLoader
 		/// </summary>
 		internal LoadedNeosMod? loadedNeosMod;
 
-		/// <returns>This mod's current configuration. This method will always return the same ModConfiguration instance.</returns>
+		/// <summary>
+		/// Gets this mod's current <see cref="ModConfiguration"/>.
+		/// <para/>
+		/// This will always be the same instance.
+		/// </summary>
+		/// <returns>This mod's current configuration.</returns>
 		public ModConfiguration? GetConfiguration()
 		{
 			if (!FinishedLoading)

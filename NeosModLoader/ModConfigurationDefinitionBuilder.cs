@@ -6,6 +6,9 @@ using System.Reflection;
 
 namespace NeosModLoader
 {
+	/// <summary>
+	/// Represents a fluent configuration interface to define mod configurations.
+	/// </summary>
 	public class ModConfigurationDefinitionBuilder
 	{
 		private readonly NeosModBase Owner;
@@ -22,7 +25,7 @@ namespace NeosModLoader
 		/// Sets the semantic version of this configuration definition. Default is 1.0.0.
 		/// </summary>
 		/// <param name="version">The config's semantic version.</param>
-		/// <returns>This builder</returns>
+		/// <returns>This builder.</returns>
 		public ModConfigurationDefinitionBuilder Version(Version version)
 		{
 			ConfigVersion = version;
@@ -33,7 +36,7 @@ namespace NeosModLoader
 		/// Sets the semantic version of this configuration definition. Default is 1.0.0.
 		/// </summary>
 		/// <param name="version">The config's semantic version, as a string.</param>
-		/// <returns>This builder</returns>
+		/// <returns>This builder.</returns>
 		public ModConfigurationDefinitionBuilder Version(string version)
 		{
 			ConfigVersion = new Version(version);
@@ -41,10 +44,10 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Adds a new key to this configuration definition
+		/// Adds a new key to this configuration definition.
 		/// </summary>
-		/// <param name="key">A configuration key</param>
-		/// <returns>This builder</returns>
+		/// <param name="key">A configuration key.</param>
+		/// <returns>This builder.</returns>
 		public ModConfigurationDefinitionBuilder Key(ModConfigurationKey key)
 		{
 			Keys.Add(key);
@@ -52,10 +55,10 @@ namespace NeosModLoader
 		}
 
 		/// <summary>
-		/// Sets the AutoSave property of this configuration definition. Default is true.
+		/// Sets the AutoSave property of this configuration definition. Default is <c>true</c>.
 		/// </summary>
-		/// <param name="autoSave">If false, the config will not be autosaved on Neos close</param>
-		/// <returns>This builder</returns>
+		/// <param name="autoSave">If <c>false</c>, the config will not be autosaved on Neos close.</param>
+		/// <returns>This builder.</returns>
 		public ModConfigurationDefinitionBuilder AutoSave(bool autoSave)
 		{
 			AutoSaveConfig = autoSave;
