@@ -1,3 +1,4 @@
+using FrooxEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,23 +11,53 @@ namespace NeosModLoader.Utility
 	/// <summary>
 	/// Contains methods to access the command line arguments Neos was launched with.
 	/// </summary>
-	/// Refer to FrooxEngine.Engine.Initialize(...) to gather possible Arguments
+	/// Use analyze on Environment.GetCommandLineArgs() to find all possible arguments.
 	public static class LaunchArguments
 	{
 		/// <summary>
 		/// Prefix symbol that indicates an argument name: <c>-</c>
 		/// </summary>
-		public const string ArgumentIndicator = "-";
+		public const char ArgumentIndicator = '-';
 
 		/// <summary>
-		/// Prefix string that indicated an argument targeted at NML itself or mods loaded by it: <c>-NML.</c><br/>
+		/// Prefix string after the argument indicator, that indicated an argument targeted at NML itself or mods loaded by it: <c>NML.</c><br/>
 		/// This is removed from argument names to get their proper name.
 		/// </summary>
-		public const string NMLArgumentPrefix = ArgumentIndicator + "NML.";
+		public const string NMLArgumentPrefix = "NML.";
 
-		private static readonly Dictionary<string, Argument> arguments = new();
-		private static readonly string[] possibleNeosArguments = { "config", "LoadAssembly", "GeneratePrecache", "Verbose", "pro", "backgroundworkers", "priorityworkers" };
-		private static readonly string[] possibleNeosFlagArguments = { "GeneratePrecache", "Verbose", "pro" };
+		private static readonly Dictionary<string, Argument> arguments = new(StringComparer.InvariantCultureIgnoreCase);
+
+		private static readonly string[] possibleNeosExactFlagArguments =
+		{
+			"ctaa", "ctaatemporaledgepower", "ctaasharpnessenabled", "ctaaadaptivesharpness", "ForceSRAnipal",
+			"StereoDisplay", "MixedReality", "DirectComposition", "ExternalComposition", "create_mrc_config",
+			"load_mrc_config"
+		};
+
+		private static readonly string[] possibleNeosExactParameterArguments =
+		{
+			"TextureSizeRatio", "DataPath", "CachePath"
+		};
+
+		private static readonly string[] possibleNeosInfixFlagArguments =
+		{
+			"CameraBiggestGroup", "CameraTimelapse", "CameraStayBehind", "CameraStayInFront", "AnnounceHomeOnLAN"
+		};
+
+		private static readonly string[] possibleNeosSuffixFlagArguments =
+		{
+			"GeneratePrecache", "Verbose", "pro", "UseLocalCloud", "UseStagingCloud", "ForceRelay", "Invisible",
+			"ForceReticleAboveHorizon", "ForceNoVoice", "ResetDash", "Kiosk", "DontAutoOpenCloudHome", "ResetUserspace",
+			"ForceLANOnly", "DeleteUnsyncedCloudRecords", "ForceSyncConflictingCloudRecords", "ForceIntroTutorial",
+			"SkipIntroTutorial", "RepairDatabase", "UseNeosCamera", "LegacySteamVRInput", "Etee", "HideScreenReticle",
+			"Viveport", "DisableNativeTextureUpload"
+		};
+
+		private static readonly string[] possibleNeosSuffixParameterArguments =
+		{
+			"Config", "LoadAssembly", "BackgroundWorkers", "PriorityWorkers", "Bench", "Watchdog", "Bootstrap",
+			"OnlyHost", "Join", "Open", "OpenUnsafe", "EnableOWO"
+		};
 
 		/// <summary>
 		/// Gets all arguments Neos was launched with.
@@ -41,75 +72,150 @@ namespace NeosModLoader.Utility
 		}
 
 		/// <summary>
-		/// Gets the names of all flag arguments recognized by Neos.<br/>
-		/// These are forbidden as suffixes of any other arguments.
+		/// Gets the path to the launched Neos executable.
 		/// </summary>
-		public static IEnumerable<string> PossibleNeosFlagArguments
+		public static string ExecutablePath { get; }
+
+		/// <summary>
+		/// Gets the names of all arguments recognized by Neos.<br/>
+		/// These have different rules relating to the names of other arguments.
+		/// </summary>
+		public static IEnumerable<string> PossibleNeosArguments
+			=> PossibleNeosParameterArguments.Concat(PossibleNeosFlagArguments);
+
+		/// <summary>
+		/// Gets the names of all exact flag arguments recognized by Neos.<br/>
+		/// These are forbidden as the exact names of any other arguments.
+		/// </summary>
+		public static IEnumerable<string> PossibleNeosExactFlagArguments
 		{
 			get
 			{
-				foreach (var flagArgument in possibleNeosFlagArguments)
+				foreach (var argument in possibleNeosExactFlagArguments)
+					yield return argument;
+			}
+		}
+
+		/// <summary>
+		/// Gets the names of all exact parameter arguments recognized by Neos.<br/>
+		/// These are forbidden as the exact names of any other arguments.
+		/// </summary>
+		public static IEnumerable<string> PossibleNeosExactParameterArguments
+		{
+			get
+			{
+				foreach (var argument in possibleNeosExactParameterArguments)
+					yield return argument;
+			}
+		}
+
+		/// <summary>
+		/// Gets the names of all flag arguments recognized by Neos.<br/>
+		/// These have different rules relating to the names of other arguments.
+		/// </summary>
+		public static IEnumerable<string> PossibleNeosFlagArguments
+			=> possibleNeosExactFlagArguments.Concat(possibleNeosSuffixFlagArguments).Concat(possibleNeosInfixFlagArguments);
+
+		/// <summary>
+		/// Gets the names of all infix flag arguments recognized by Neos.<br/>
+		/// These are forbidden as infixes of any other arguments.
+		/// </summary>
+		public static IEnumerable<string> PossibleNeosInfixFlagArguments
+		{
+			get
+			{
+				foreach (var argument in possibleNeosInfixFlagArguments)
+					yield return argument;
+			}
+		}
+
+		/// <summary>
+		/// Gets the names of all parameter arguments recognized by Neos.<br/>
+		/// These have different rules relating to the names of other arguments.
+		/// </summary>
+		public static IEnumerable<string> PossibleNeosParameterArguments
+			=> possibleNeosExactParameterArguments.Concat(possibleNeosSuffixParameterArguments);
+
+		/// <summary>
+		/// Gets the names of all suffix flag arguments recognized by Neos.<br/>
+		/// These are forbidden as suffixes of any other arguments.
+		/// </summary>
+		public static IEnumerable<string> PossibleNeosSuffixFlagArguments
+		{
+			get
+			{
+				foreach (var flagArgument in possibleNeosSuffixFlagArguments)
 					yield return flagArgument;
 			}
 		}
 
 		/// <summary>
-		/// Gets the names of all arguments recognized by Neos.<br/>
+		/// Gets the names of all suffix parameter arguments recognized by Neos.<br/>
 		/// These are forbidden as suffixes of any other arguments.
 		/// </summary>
-		public static IEnumerable<string> PossibleNeosLaunchArguments
+		public static IEnumerable<string> PossibleNeosSuffixParameterArguments
 		{
 			get
 			{
-				foreach (var argument in possibleNeosArguments)
+				foreach (var argument in possibleNeosSuffixParameterArguments)
 					yield return argument;
 			}
 		}
 
 		static LaunchArguments()
 		{
-			var args = Environment.GetCommandLineArgs();
+			possibleNeosExactFlagArguments = possibleNeosExactFlagArguments
+				.Concat(
+					Enum.GetValues(typeof(HeadOutputDevice))
+					.Cast<HeadOutputDevice>()
+					.Select(v => v.ToString()))
+				.ToArray();
 
-			var i = 0;
+			// First argument is the path of the executable
+			var args = Environment.GetCommandLineArgs();
+			ExecutablePath = args[0];
+
+			var i = 1;
 			while (i < args.Length)
 			{
-				var arg = args[i++];
+				var arg = args[i++].TrimStart(ArgumentIndicator);
+				var hasParameter = i < args.Length && args[i].FirstOrDefault() != ArgumentIndicator && MatchNeosArgument(args[i]) == null;
 
-				var matchedNeosArgument = MatchNeosArgument(arg);
+				var matchedNeosArgument = MatchNeosFlagArgument(arg);
 				if (matchedNeosArgument != null)
 				{
-					if (MatchNeosFlagArgument(matchedNeosArgument) != null)
-						arguments.Add(matchedNeosArgument, new Argument(Target.Neos, arg, matchedNeosArgument));
-					else if (i < args.Length)
-						arguments.Add(matchedNeosArgument, new Argument(Target.Neos, arg, matchedNeosArgument, args[i++]));
-					else
-						Logger.WarnInternal($"Found Neos Launch Argument [{matchedNeosArgument}] without a value");
+					arguments.Add(matchedNeosArgument, new Argument(Target.Neos, arg, matchedNeosArgument));
+
+					if (hasParameter)
+						Logger.WarnInternal($"Possible misplaced parameter value after flag argument: {matchedNeosArgument}");
 
 					continue;
 				}
 
-				string? value = null;
-				// If it's the last argument or followed by another, treat it as a flag
-				if (i < args.Length && !args[i].StartsWith(ArgumentIndicator) && MatchNeosArgument(args[i]) == null)
-					value = args[i];
+				matchedNeosArgument = MatchNeosParameterArgument(arg);
+				if (matchedNeosArgument != null)
+				{
+					if (hasParameter)
+						arguments.Add(matchedNeosArgument, new Argument(Target.Neos, arg, matchedNeosArgument, args[i++]));
+					else
+						Logger.WarnInternal($"Expected parameter for argument: {matchedNeosArgument}");
+
+					continue;
+				}
 
 				if (!arg.StartsWith(NMLArgumentPrefix, StringComparison.InvariantCultureIgnoreCase))
 				{
 					// The value of an unknown argument is not skipped, but added as its own argument in the next iteration as well
-					arguments.Add(arg, new Argument(Target.Unknown, arg, value));
+					arguments.Add(arg, new Argument(Target.Unknown, arg, hasParameter ? args[i] : null));
 					continue;
 				}
 
-				// The value of an NML argument gets skipped
-				if (value != null)
-					++i;
-
 				var name = arg.Substring(NMLArgumentPrefix.Length);
-				arguments.Add(name, new Argument(Target.NML, arg, name, value));
+				arguments.Add(name, new Argument(Target.NML, arg, name, hasParameter ? args[i++] : null));
 			}
 
 			foreach (var argument in arguments)
-				Logger.MsgInternal($"Parsed {argument}");
+				Logger.MsgInternal($"Parsed {argument.Value}");
 		}
 
 		/// <summary>
@@ -131,20 +237,32 @@ namespace NeosModLoader.Utility
 			=> arguments.ContainsKey(name);
 
 		/// <summary>
-		/// Tries to find one of the <see cref="PossibleNeosLaunchArguments"/> that is a suffix of the given name.
+		/// Tries to find one of the <see cref="PossibleNeosArguments"/> that matches the given name in the right way.
 		/// </summary>
 		/// <param name="name">The name to check.</param>
 		/// <returns>The matched Neos launch argument or <c>null</c> if there's no match.</returns>
 		public static string? MatchNeosArgument(string name)
-			=> possibleNeosArguments.FirstOrDefault(neosArg => name.EndsWith(neosArg, StringComparison.InvariantCultureIgnoreCase));
+			=> MatchNeosParameterArgument(name)
+			?? MatchNeosFlagArgument(name);
 
 		/// <summary>
-		/// Tries to find one of the <see cref="PossibleNeosFlagArguments"/> that is a suffix of the given name.
+		/// Tries to find one of the <see cref="PossibleNeosFlagArguments"/> that matches the given name in the right way.
 		/// </summary>
 		/// <param name="name">The name to check.</param>
 		/// <returns>The matched Neos launch argument flags or <c>null</c> if there's no match.</returns>
 		public static string? MatchNeosFlagArgument(string name)
-			=> possibleNeosFlagArguments.FirstOrDefault(neosArg => name.EndsWith(neosArg, StringComparison.InvariantCultureIgnoreCase));
+			=> possibleNeosExactFlagArguments.FirstOrDefault(neosArg => name.Equals(neosArg, StringComparison.InvariantCultureIgnoreCase))
+			?? possibleNeosSuffixFlagArguments.FirstOrDefault(neosArg => name.EndsWith(neosArg, StringComparison.InvariantCultureIgnoreCase))
+			?? possibleNeosInfixFlagArguments.FirstOrDefault(neosArg => name.IndexOf(neosArg, StringComparison.InvariantCultureIgnoreCase) >= 0);
+
+		/// <summary>
+		/// Tries to find one of the <see cref="PossibleNeosParameterArguments"/> that matches the given name in the right way.
+		/// </summary>
+		/// <param name="name">The name to check.</param>
+		/// <returns>The matched Neos launch argument or <c>null</c> if there's no match.</returns>
+		public static string? MatchNeosParameterArgument(string name)
+			=> possibleNeosExactParameterArguments.FirstOrDefault(neosArg => name.Equals(neosArg, StringComparison.InvariantCultureIgnoreCase))
+			?? possibleNeosSuffixParameterArguments.FirstOrDefault(neosArg => name.EndsWith(neosArg, StringComparison.InvariantCultureIgnoreCase));
 
 		/// <summary>
 		/// Tries to get the <see cref="Argument"/> with the given proper name.
@@ -206,7 +324,7 @@ namespace NeosModLoader.Utility
 			/// <returns>A string representing this parsed argument.</returns>
 			public override string ToString()
 			{
-				return $"{Target} Argument {RawName} ({Name}): {(IsFlag ? "present" : $"\"{Value}\"")}";
+				return $"{Target} Argument {(Name.Equals(RawName, StringComparison.InvariantCultureIgnoreCase) ? Name : $"{RawName} ({Name})")}: {(IsFlag ? "present" : $"\"{Value}\"")}";
 			}
 		}
 
