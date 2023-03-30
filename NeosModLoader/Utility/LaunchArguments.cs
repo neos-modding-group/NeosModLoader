@@ -184,7 +184,7 @@ namespace NeosModLoader.Utility
 				var matchedNeosArgument = MatchNeosFlagArgument(arg);
 				if (matchedNeosArgument != null)
 				{
-					arguments.Add(matchedNeosArgument, new Argument(Target.Neos, arg, matchedNeosArgument));
+					arguments.Add(matchedNeosArgument, new Argument(Target.Neos, i, arg, matchedNeosArgument));
 
 					if (hasParameter)
 						Logger.WarnInternal($"Possible misplaced parameter value after flag argument: {matchedNeosArgument}");
@@ -196,7 +196,7 @@ namespace NeosModLoader.Utility
 				if (matchedNeosArgument != null)
 				{
 					if (hasParameter)
-						arguments.Add(matchedNeosArgument, new Argument(Target.Neos, arg, matchedNeosArgument, args[i++]));
+						arguments.Add(matchedNeosArgument, new Argument(Target.Neos, i, arg, matchedNeosArgument, args[i++]));
 					else
 						Logger.WarnInternal($"Expected parameter for argument: {matchedNeosArgument}");
 
@@ -206,12 +206,12 @@ namespace NeosModLoader.Utility
 				if (!arg.StartsWith(NMLArgumentPrefix, StringComparison.InvariantCultureIgnoreCase))
 				{
 					// The value of an unknown argument is not skipped, but added as its own argument in the next iteration as well
-					arguments.Add(arg, new Argument(Target.Unknown, arg, hasParameter ? args[i] : null));
+					arguments.Add(arg, new Argument(Target.Unknown, i, arg, arg, hasParameter ? args[i] : null));
 					continue;
 				}
 
 				var name = arg.Substring(NMLArgumentPrefix.Length);
-				arguments.Add(name, new Argument(Target.NML, arg, name, hasParameter ? args[i++] : null));
+				arguments.Add(name, new Argument(Target.NML, i, arg, name, hasParameter ? args[i++] : null));
 			}
 
 			foreach (var argument in arguments)
@@ -280,6 +280,11 @@ namespace NeosModLoader.Utility
 		public readonly struct Argument
 		{
 			/// <summary>
+			/// Gets the index of this argument in the array returned by <see cref="Environment.GetCommandLineArgs"/>.
+			/// </summary>
+			public int Index { get; }
+
+			/// <summary>
 			/// Gets whether the argument is a flag, i.e. whether it doesn't have a value.
 			/// </summary>
 			public bool IsFlag => Value == null;
@@ -306,17 +311,14 @@ namespace NeosModLoader.Utility
 			/// </summary>
 			public string? Value { get; }
 
-			internal Argument(Target target, string rawName, string name, string? value = null)
+			internal Argument(Target target, int index, string rawName, string name, string? value = null)
 			{
 				Target = target;
+				Index = index - 1;
 				RawName = rawName;
 				Name = name;
 				Value = value;
 			}
-
-			internal Argument(Target target, string name, string? value = null)
-				: this(target, name, name, value)
-			{ }
 
 			/// <summary>
 			/// Gets a string representation of this parsed argument.
