@@ -1,6 +1,8 @@
+using FrooxEngine;
 using HarmonyLib;
 using NeosModLoader.Utility;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -86,7 +88,9 @@ namespace NeosModLoader
 				// Time to reinvent the wheel. This parses simple key=value style properties from a text file.
 				try
 				{
+					var unknownKeys = new List<string>();
 					var lines = File.ReadAllLines(path);
+
 					foreach (var line in lines)
 					{
 						var splitIdx = line.IndexOf('=');
@@ -99,8 +103,7 @@ namespace NeosModLoader
 						var possibleProperty = configOptions.FirstOrDefault(property => property.Name.Equals(key, StringComparison.InvariantCultureIgnoreCase));
 						if (possibleProperty == null)
 						{
-							Logger.WarnInternal($"Unknown key found in config file: {key}");
-							Logger.WarnInternal($"Supported keys: {string.Join(", ", configOptions.Select(property => property.Name))}");
+							unknownKeys.Add(key);
 							continue;
 						}
 
@@ -109,6 +112,9 @@ namespace NeosModLoader
 
 						Logger.MsgInternal($"Loaded value for {possibleProperty.Name} from file: {parsedValue}");
 					}
+
+					Logger.WarnInternal($"Unknown key found in config file: {string.Join(", ", unknownKeys)}");
+					Logger.WarnInternal($"Supported keys: {string.Join(", ", configOptions.Select(property => $"{property.PropertyType} {property.Name}"))}");
 				}
 				catch (Exception e)
 				{
@@ -127,29 +133,25 @@ namespace NeosModLoader
 				}
 			}
 
-			try
+			var boolType = typeof(bool);
+			foreach (var option in configOptions)
 			{
-				var boolType = typeof(bool);
-				foreach (var option in configOptions)
+				if (LaunchArguments.TryGetArgument($"Config.{option.Name}", out var argument))
 				{
-					if (LaunchArguments.TryGetArgument($"Config.{option.Name}", out var argument))
+					if (option.PropertyType == boolType)
 					{
-						if (option.PropertyType == boolType)
-						{
-							option.SetValue(config, true);
-							Logger.MsgInternal($"Enabling [{option.Name}] from launch flag");
-						}
-						else if (!argument.IsFlag)
-						{
-							config.SetProperty(option, argument.Value!);
-							Logger.MsgInternal($"Setting [{option.Name}] from launch flag: {argument.Value}");
-						}
+						option.SetValue(config, true);
+						Logger.MsgInternal($"Enabling [{option.Name}] from launch flag");
+
+						if (!argument.IsFlag)
+							Logger.WarnInternal("Found possible misplaced parameter value after this flag argument");
+					}
+					else if (!argument.IsFlag)
+					{
+						config.SetProperty(option, argument.Value!);
+						Logger.MsgInternal($"Setting [{option.Name}] from launch flag: {argument.Value}");
 					}
 				}
-			}
-			catch
-			{
-				throw;
 			}
 
 			return config;
