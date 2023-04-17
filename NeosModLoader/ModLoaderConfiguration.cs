@@ -1,3 +1,4 @@
+using NeosModLoader.Utility;
 using System;
 using System.IO;
 using System.Reflection;
@@ -15,6 +16,7 @@ namespace NeosModLoader
 			if (_configuration == null)
 			{
 				// the config file can just sit next to the dll. Simple.
+				// ...unless the DLL is embedded. In that case, fallback to MainDirectory.
 				string path = Path.Combine(GetAssemblyDirectory(), CONFIG_FILENAME);
 				_configuration = new ModLoaderConfiguration();
 
@@ -94,6 +96,7 @@ namespace NeosModLoader
 			string codeBase = Assembly.GetExecutingAssembly().CodeBase;
 			UriBuilder uri = new(codeBase);
 			string path = Uri.UnescapeDataString(uri.Path);
+			if (PlatformHelper.IsPathEmbedded(path)) return PlatformHelper.MainDirectory;
 			return Path.GetDirectoryName(path);
 		}
 
