@@ -9,7 +9,8 @@ namespace NeosModLoader.Utility
 		public static readonly string AndroidNeosPath = "/sdcard/ModData/com.Solirax.Neos";
 
 		// Android does not support Directory.GetCurrentDirectory(), so will fall back to the root '/' directory.
-		private static bool UseFallbackPath() => Directory.GetCurrentDirectory().Replace('\\', '/') == "/" && !Directory.Exists("/Neos_Data");
+		public static bool UseFallbackPath() => Directory.GetCurrentDirectory().Replace('\\', '/') == "/" && !Directory.Exists("/Neos_Data");
+		public static bool IsPathEmbedded(string path) => path.StartsWith("/data/app/com.Solirax.Neos");
 
 		public static string MainDirectory
 		{
