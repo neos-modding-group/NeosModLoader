@@ -1,6 +1,7 @@
 using FrooxEngine;
 using HarmonyLib;
 using NeosModLoader.JsonConverters;
+using NeosModLoader.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -106,7 +107,7 @@ namespace NeosModLoader
 		private readonly ModConfigurationDefinition Definition;
 		internal LoadedNeosMod LoadedNeosMod { get; private set; }
 
-		private static readonly string ConfigDirectory = Path.Combine(Directory.GetCurrentDirectory(), "nml_config");
+		private static readonly string ConfigDirectory = Path.Combine(PlatformHelper.MainDirectory, "nml_config");
 		private static readonly string VERSION_JSON_KEY = "version";
 		private static readonly string VALUES_JSON_KEY = "values";
 
