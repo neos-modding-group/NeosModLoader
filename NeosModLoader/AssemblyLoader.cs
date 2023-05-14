@@ -1,3 +1,4 @@
+using NeosModLoader.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,7 @@ namespace NeosModLoader
 	{
 		private static string[]? GetAssemblyPathsFromDir(string dirName)
 		{
-			string assembliesDirectory = Path.Combine(Directory.GetCurrentDirectory(), dirName);
+			string assembliesDirectory = Path.Combine(PlatformHelper.MainDirectory, dirName);
 
 			Logger.MsgInternal($"loading assemblies from {dirName}");
 
