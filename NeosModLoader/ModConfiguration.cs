@@ -492,8 +492,10 @@ namespace NeosModLoader
 			catch (Exception e)
 			{
 				// I know not what exceptions the JSON library will throw, but they must be contained
-				mod.AllowSavingConfiguration = false;
-				throw new ModConfigurationException($"Error loading config for {mod.NeosMod.Name}", e);
+				mod.AllowSavingConfiguration = true;
+				var backupPath = configFile + ".bak";
+				Logger.ErrorExternal($"Error loading config for {mod.NeosMod.Name}, creating new config file (old file can be found at {backupPath}). Exception:\n{e}");
+				File.Move(configFile, backupPath);
 			}
 
 			return new ModConfiguration(mod, definition);
