@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout NML
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: setup build environment
         uses: neos-modding-group/neos-plugin-setup-action@master # This is where the Neos dependencies come from. Learn more at https://github.com/neos-modding-group/neos-plugin-setup-action
       - name: lint
