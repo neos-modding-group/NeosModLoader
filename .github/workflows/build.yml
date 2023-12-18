@@ -28,7 +28,7 @@ jobs:
           mv ./NeosModLoader/bin/Release/net462/NeosModLoader.dll ./NeosModLoaderHeadless.dll
       - name: upload workflow artifacts
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master' # only publish workflow artifacts for pushes to master or tags
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: NeosModLoader
           path: |
